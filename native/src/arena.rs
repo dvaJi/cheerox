@@ -69,7 +69,8 @@ impl Attributes {
     }
 
     /// Sets `name`, in place if present, as a map insert does.
-    pub(crate) fn insert(&mut self, name: String, value: Value) -> Option<Value> {        match self.0.iter_mut().find(|(key, _)| *key == name) {
+    pub(crate) fn insert(&mut self, name: String, value: Value) -> Option<Value> {
+        match self.0.iter_mut().find(|(key, _)| *key == name) {
             Some((_, slot)) => Some(std::mem::replace(slot, value)),
             None => {
                 self.0.push((name, value));
@@ -682,11 +683,13 @@ impl DomArena {
         // Cheerio serializes HTML with parse5, which always escapes; only the
         // htmlparser2 serializer leaves entities alone when asked to.
         let is_parse5 = !xml && !is_htmlparser2;
-        let legacy = options.get("legacySerializer") == Some(&Value::Bool(true));
         // 0.1.x encodes only when `decodeEntities` is truthy — an absent flag
         // (as on the bare module's `cheerio.xml()`) leaves text raw.
         let encode = if legacy {
-            options.get("decodeEntities").and_then(Value::as_bool).unwrap_or(false)
+            options
+                .get("decodeEntities")
+                .and_then(Value::as_bool)
+                .unwrap_or(false)
         } else {
             is_parse5
                 || options
@@ -744,8 +747,7 @@ impl DomArena {
                                 )
                             })
                     } else {
-                        !xml
-                            && !is_foreign
+                        !xml && !is_foreign
                             && node
                                 .parent
                                 .and_then(|id| self.node(id))
@@ -764,7 +766,8 @@ impl DomArena {
                                         )
                                     ) && (!is_parse5
                                         || parent.name.as_deref() != Some("noscript")
-                                        || options.get("scriptingEnabled") != Some(&Value::Bool(false)))
+                                        || options.get("scriptingEnabled")
+                                            != Some(&Value::Bool(false)))
                                 })
                     };
                     if raw || !encode {
@@ -1527,7 +1530,8 @@ fn legacy_escape(value: &str, output: &mut String) {
     }
 }
 
-fn escape(value: &str, attribute: bool, xml: bool, utf8: bool, output: &mut String) {    if xml && !utf8 && crate::codec::has_encoding(value) {
+fn escape(value: &str, attribute: bool, xml: bool, utf8: bool, output: &mut String) {
+    if xml && !utf8 && crate::codec::has_encoding(value) {
         use std::fmt::Write;
         let units = crate::codec::to_units(value);
         let mut index = 0;
@@ -1888,7 +1892,10 @@ pub(crate) fn primitive(arena: &mut DomArena, command: &str, args: &Value) -> Re
             // crossing instead of one per element.
             if let Some(writes) = args.get("writes").and_then(Value::as_array) {
                 for write in writes {
-                    let id = write.get("id").and_then(Value::as_u64).unwrap_or(u32::MAX as u64) as u32;
+                    let id = write
+                        .get("id")
+                        .and_then(Value::as_u64)
+                        .unwrap_or(u32::MAX as u64) as u32;
                     if let Some(node) = arena
                         .node_mut(id)
                         .filter(|node| node.is_element() || node.kind == "root")
