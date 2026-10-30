@@ -570,11 +570,11 @@ const parentTypes = new Set(['root', 'tag', 'script', 'style', 'cdata']);
 const pointerFields = new Set(['parent', 'parentNode', 'prev', 'previousSibling', 'next', 'nextSibling']);
 const idResultCommands = new Set(['select', 'matches', 'uniqueSort', 'traverse', 'clone']);
 const scratchCommands = new Set(['select', 'matches', 'uniqueSort', 'serializeArray', 'serialize', 'extractPlan']);
-const writeCommands = new Set(['create', 'createNode', 'setNode', 'import', 'insert', 'clone', 'remove', 'removeAttr', 'removeData', 'addClass', 'removeClass', 'toggleClass']);
+const writeCommands = new Set(['create', 'createNode', 'setNode', 'setAttrs', 'import', 'insert', 'clone', 'remove', 'removeAttr', 'removeData', 'addClass', 'removeClass', 'toggleClass']);
 const attributeFields = new Set(['attribs', 'x-attribsNamespace', 'x-attribsPrefix']);
 const targetedAttributeWrites = new Set(['attr', 'removeAttr', 'addClass', 'removeClass', 'toggleClass', 'css']);
 /** Writes that only change the records of their own ids. */
-const recordOnlyWrites = new Set([...targetedAttributeWrites, 'data', 'removeData']);
+const recordOnlyWrites = new Set([...targetedAttributeWrites, 'data', 'removeData', 'setAttrs']);
 const structuralWrites = new Set(['create', 'createNode', 'import', 'insert', 'clone', 'remove', 'html', 'text', 'data', 'removeData']);
 
 /**
@@ -794,6 +794,24 @@ export class RoutedDocument implements NativeDocument {
       }
       return result;
     }
+    if (command === 'setAttrs') {
+      // Batched attribute writes: one native call per document group.
+      const groups = this.groups((args.writes ?? []).map((write: { id: number }) => write.id));
+      for (const group of groups) {
+        const byId = new Map<number, Array<{ name: string; value?: unknown }>>();
+        for (const write of args.writes ?? []) {
+          const state = this.owner(write.id);
+          if (state !== group.state) continue;
+          const local = write.id - state.base;
+          const list = byId.get(local) ?? [];
+          list.push({ name: write.name, value: write.value });
+          byId.set(local, list);
+        }
+        const writes = [...byId.entries()].map(([id, attrs]) => ({ id, attrs }));
+        this.call(group.state, command, { ids: [...byId.keys()], writes });
+      }
+      return null;
+    }
     if (command === 'insert') {
       const targets: number[] = args.targetIds ?? [];
       const nodes: number[] = args.nodeIds ?? [];
@@ -934,7 +952,9 @@ function rehome(source: DocumentState, target: DocumentState, mapping: [number, 
 function refreshWrittenAttributes(state: DocumentState, command: string, args: any): void {
   if (!hasViews(state)) return;
   let locals: number[] | undefined;
-  if (targetedAttributeWrites.has(command)) locals = args.ids ?? [];
+  if (command === 'setAttrs') {
+    locals = (args.writes ?? []).map((write: { id: number }) => write.id);
+  } else if (targetedAttributeWrites.has(command)) locals = args.ids ?? [];
   else if (command === 'setNode') { if (!attributeFields.has(args.field)) return; locals = [args.id]; }
   else if (structuralWrites.has(command)) return;
   const refresh = (view: object | undefined): void => { if (view && (view as Record<symbol, unknown>)[VIEW_ATTRIBUTES]) attributeRefresher?.(view); };

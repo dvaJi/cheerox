@@ -69,8 +69,7 @@ impl Attributes {
     }
 
     /// Sets `name`, in place if present, as a map insert does.
-    pub(crate) fn insert(&mut self, name: String, value: Value) -> Option<Value> {
-        match self.0.iter_mut().find(|(key, _)| *key == name) {
+    pub(crate) fn insert(&mut self, name: String, value: Value) -> Option<Value> {        match self.0.iter_mut().find(|(key, _)| *key == name) {
             Some((_, slot)) => Some(std::mem::replace(slot, value)),
             None => {
                 self.0.push((name, value));
@@ -423,6 +422,11 @@ impl DomArena {
             .get(id as usize)
             .filter(|node| node.kind != "released")
     }
+    pub(crate) fn node_mut(&mut self, id: u32) -> Option<&mut DomNode> {
+        self.nodes
+            .get_mut(id as usize)
+            .filter(|node| node.kind != "released")
+    }
     pub(crate) fn xml_mode(&self) -> bool {
         xml_mode(&self.options)
     }
@@ -625,7 +629,11 @@ impl DomArena {
         self.serialize(ids, &self.options)
     }
     pub(crate) fn serialize_mut(&mut self, ids: &[u32], options: &Value) -> String {
-        if !xml_mode(options) && options.get("_useHtmlParser2") == Some(&Value::Bool(true)) {
+        let legacy = options.get("legacySerializer") == Some(&Value::Bool(true));
+        if !legacy
+            && !xml_mode(options)
+            && options.get("_useHtmlParser2") == Some(&Value::Bool(true))
+        {
             let mut stack: Vec<(u32, bool)> = ids.iter().rev().map(|id| (*id, false)).collect();
             let mut budget = self.nodes.len().saturating_mul(8).saturating_add(1024);
             while let Some((id, is_foreign)) = stack.pop() {
@@ -668,14 +676,24 @@ impl DomArena {
         let mut output = String::new();
         let xml = xml_mode(options);
         let is_htmlparser2 = options.get("_useHtmlParser2") == Some(&Value::Bool(true));
+        // dom-serializer 0.1.x (Cheerio 0.22.0): no foreign-name corrections,
+        // no foreign-content escaping rules, svg rendered in XML mode.
+        let legacy = options.get("legacySerializer") == Some(&Value::Bool(true));
         // Cheerio serializes HTML with parse5, which always escapes; only the
         // htmlparser2 serializer leaves entities alone when asked to.
         let is_parse5 = !xml && !is_htmlparser2;
-        let encode = is_parse5
-            || options
-                .get("encodeEntities")
-                .or_else(|| options.get("decodeEntities"))
-                != Some(&Value::Bool(false));
+        let legacy = options.get("legacySerializer") == Some(&Value::Bool(true));
+        // 0.1.x encodes only when `decodeEntities` is truthy — an absent flag
+        // (as on the bare module's `cheerio.xml()`) leaves text raw.
+        let encode = if legacy {
+            options.get("decodeEntities").and_then(Value::as_bool).unwrap_or(false)
+        } else {
+            is_parse5
+                || options
+                    .get("encodeEntities")
+                    .or_else(|| options.get("decodeEntities"))
+                    != Some(&Value::Bool(false))
+        };
         let is_utf8 = options.get("encodeEntities").and_then(Value::as_str) == Some("utf8");
         let mut stack: Vec<(u32, bool, bool)> =
             ids.iter().rev().map(|id| (*id, false, false)).collect();
@@ -707,10 +725,8 @@ impl DomArena {
                         .map(|id| (*id, false, is_foreign)),
                 ),
                 "text" => {
-                    let raw = !xml
-                        && !is_foreign
-                        && node
-                            .parent
+                    let raw = if legacy {
+                        node.parent
                             .and_then(|id| self.node(id))
                             .is_some_and(|parent| {
                                 matches!(
@@ -725,12 +741,36 @@ impl DomArena {
                                             | "plaintext"
                                             | "noscript"
                                     )
-                                ) && (!is_parse5
-                                    || parent.name.as_deref() != Some("noscript")
-                                    || options.get("scriptingEnabled") != Some(&Value::Bool(false)))
-                            });
+                                )
+                            })
+                    } else {
+                        !xml
+                            && !is_foreign
+                            && node
+                                .parent
+                                .and_then(|id| self.node(id))
+                                .is_some_and(|parent| {
+                                    matches!(
+                                        parent.name.as_deref(),
+                                        Some(
+                                            "script"
+                                                | "style"
+                                                | "xmp"
+                                                | "iframe"
+                                                | "noembed"
+                                                | "noframes"
+                                                | "plaintext"
+                                                | "noscript"
+                                        )
+                                    ) && (!is_parse5
+                                        || parent.name.as_deref() != Some("noscript")
+                                        || options.get("scriptingEnabled") != Some(&Value::Bool(false)))
+                                })
+                    };
                     if raw || !encode {
                         output.push_str(node.data.as_deref().unwrap_or(""));
+                    } else if legacy {
+                        legacy_escape(node.data.as_deref().unwrap_or(""), &mut output);
                     } else {
                         escape(
                             node.data.as_deref().unwrap_or(""),
@@ -767,6 +807,55 @@ impl DomArena {
                     output.push('>');
                 }
                 _ if node.is_element() => {
+                    if legacy {
+                        // dom-serializer 0.1.x rules: no foreign-content
+                        // handling; an svg element (and its subtree) renders
+                        // in XML mode; void elements render their children
+                        // without a closing tag, as the original did.
+                        let name = node.name.as_deref().unwrap_or("");
+                        let in_svg = is_foreign;
+                        let effective_xml = xml || in_svg || name == "svg";
+                        output.push('<');
+                        output.push_str(name);
+                        let attributes = super::js_property_order(
+                            node.attribs
+                                .iter()
+                                .map(|(name, value)| (name.as_str(), value)),
+                        );
+                        for (attr_name, value) in attributes {
+                            let value = value
+                                .as_str()
+                                .map(str::to_owned)
+                                .unwrap_or_else(|| value.to_string());
+                            output.push(' ');
+                            output.push_str(attr_name);
+                            if effective_xml || !value.is_empty() {
+                                output.push_str("=\"");
+                                if encode {
+                                    legacy_escape(&value, &mut output);
+                                } else {
+                                    output.push_str(&value);
+                                }
+                                output.push('"');
+                            }
+                        }
+                        if effective_xml && node.children.is_empty() {
+                            output.push_str("/>");
+                            continue;
+                        }
+                        output.push('>');
+                        let single = html_parser_void(name);
+                        if !single || effective_xml {
+                            stack.push((id, true, in_svg));
+                        }
+                        stack.extend(
+                            node.children
+                                .iter()
+                                .rev()
+                                .map(|child| (*child, false, in_svg || name == "svg")),
+                        );
+                        continue;
+                    }
                     let stored_name = node.name.as_deref().unwrap_or("");
                     let name = if is_foreign {
                         foreign_element_name(stored_name)
@@ -1417,8 +1506,28 @@ fn foreign_attribute_name(name: &str) -> &str {
         _ => name,
     }
 }
-fn escape(value: &str, attribute: bool, xml: bool, utf8: bool, output: &mut String) {
-    if xml && !utf8 && crate::codec::has_encoding(value) {
+/// entities 1.1 `encodeXML`, as dom-serializer 0.1.x applies it: the five
+/// named XML entities, then every non-ASCII scalar as an uppercase hex
+/// reference. Astral scalars encode as single combined code points, matching
+/// the original surrogate-pair replacer.
+fn legacy_escape(value: &str, output: &mut String) {
+    use std::fmt::Write;
+    for ch in value.chars() {
+        match ch {
+            '&' => output.push_str("&amp;"),
+            '\'' => output.push_str("&apos;"),
+            '>' => output.push_str("&gt;"),
+            '<' => output.push_str("&lt;"),
+            '"' => output.push_str("&quot;"),
+            ch if ch > '\u{7f}' => {
+                let _ = write!(output, "&#x{:X};", ch as u32);
+            }
+            ch => output.push(ch),
+        }
+    }
+}
+
+fn escape(value: &str, attribute: bool, xml: bool, utf8: bool, output: &mut String) {    if xml && !utf8 && crate::codec::has_encoding(value) {
         use std::fmt::Write;
         let units = crate::codec::to_units(value);
         let mut index = 0;
@@ -1772,6 +1881,37 @@ pub(crate) fn primitive(arena: &mut DomArena, command: &str, args: &Value) -> Re
         }
         "setNode" => {
             arena.set_node(id, args["field"].as_str().unwrap_or(""), &args["value"])?;
+            Value::Null
+        }
+        "setAttrs" => {
+            // Batched single-attribute writes for one selection: one boundary
+            // crossing instead of one per element.
+            if let Some(writes) = args.get("writes").and_then(Value::as_array) {
+                for write in writes {
+                    let id = write.get("id").and_then(Value::as_u64).unwrap_or(u32::MAX as u64) as u32;
+                    if let Some(node) = arena
+                        .node_mut(id)
+                        .filter(|node| node.is_element() || node.kind == "root")
+                    {
+                        if let Some(attrs) = write.get("attrs").and_then(Value::as_array) {
+                            for attr in attrs {
+                                let name = attr.get("name").and_then(Value::as_str).unwrap_or("");
+                                if name.is_empty() {
+                                    continue;
+                                }
+                                match attr.get("value") {
+                                    Some(Value::Null) | None => {
+                                        node.attribs.shift_remove(name);
+                                    }
+                                    Some(value) => {
+                                        node.attribs.insert(name.to_string(), value.clone());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             Value::Null
         }
         "attrs" => {

@@ -1398,18 +1398,29 @@ impl NativeDocument {
     }
 
     fn render_nodes(&self, ids: &[u32], overrides: Option<Value>) -> Result<String> {
+        let legacy = overrides
+            .as_ref()
+            .and_then(|value| value.get("legacySerializer"))
+            .and_then(Value::as_bool)
+            .unwrap_or(false);
         if self.arena.borrow().is_none() {
-            let mut options = self.options.clone();
-            if let Some(Value::Object(overrides)) = &overrides {
-                for (key, value) in overrides {
-                    options[key] = value.clone();
+            if legacy {
+                // The record tree converts to the arena on demand; the legacy
+                // serializer rules live in the arena walker.
+                self.ensure_arena()?;
+            } else {
+                let mut options = self.options.clone();
+                if let Some(Value::Object(overrides)) = &overrides {
+                    for (key, value) in overrides {
+                        options[key] = value.clone();
+                    }
                 }
-            }
-            let options = arena::normalized_options(options);
-            if !arena::xml_mode(&options)
-                && options.get("_useHtmlParser2") != Some(&Value::Bool(true))
-            {
-                return Ok(self.serialize_nodes(ids, false));
+                let options = arena::normalized_options(options);
+                if !arena::xml_mode(&options)
+                    && options.get("_useHtmlParser2") != Some(&Value::Bool(true))
+                {
+                    return Ok(self.serialize_nodes(ids, false));
+                }
             }
         }
         self.ensure_arena()?;

@@ -106,6 +106,23 @@ const cases = [
     extract: (result) => result.length,
   },
   {
+    name: 'mutations (large)',
+    input: fixtures.large,
+    setup: () => ({}),
+    run: (mod, html) => {
+      const $ = mod.load(html);
+      $('article').each(function (index) {
+        $(this).attr('data-order', String(index));
+        $(this).find('a').addClass('link');
+      });
+      $('.teaser').after('<span class="marker">m</span>');
+      $('ul li:last-child').remove();
+      return $.html().length;
+    },
+    verify: (a, b) => a === b,
+    extract: (result) => result,
+  },
+  {
     name: 'serialization (large)',
     input: fixtures.large,
     setup: () => ({ $: null }),

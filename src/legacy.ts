@@ -286,11 +286,29 @@ function formatAttrs(attribs: Record<string, string> | undefined, opts: LegacyOp
   return output;
 }
 
+/**
+ * dom-serializer 0.1.x rules run natively (one call per document); nodes
+ * outside the engine, or spanning several documents, fall back to the port.
+ */
 function renderWith(opts: LegacyOptions, dom: unknown, parentName?: string): string {
-  let output = '';
   const nodes = Array.isArray(dom) || (dom && typeof dom === 'object' && 'length' in (dom as object))
     ? Array.from(dom as ArrayLike<LegacyNode>)
     : [dom as LegacyNode];
+  void parentName;
+  if (nodes.length) {
+    const bindings = nodes.map((node) => bindingOf(node));
+    const document = bindings[0]?.document;
+    if (document && bindings.every((binding) => binding?.document === document)) {
+      return operation<string>(document, 'render', {
+        ids: bindings.map((binding) => binding!.id),
+        // The options go through exactly as 0.22.0's render received them:
+        // defaults already applied by the static, `decodeEntities` possibly
+        // absent (bare-module `cheerio.xml()` leaves text raw).
+        options: { ...opts, _useHtmlParser2: true, legacySerializer: true },
+      }) as string;
+    }
+  }
+  let output = '';
   for (const elem of nodes) {
     if (!elem || !elem.type) continue;
     if (elem.type === 'root') output += renderWith(opts, elem.children);
@@ -721,6 +739,28 @@ const attributesApi: CheerioPrototype = {
           setAttr(el, name, value.call(el, i, el.attribs![name]));
         });
       }
+      if (typeof name === 'string') {
+        // Batch the plain set across the selection: one native call instead
+        // of one per element. `null` removes, as in setAttr.
+        const groups = new Map<NativeDocument, Array<{ id: number; name: string; value: string | null }>>();
+        let usable = this.length > 0;
+        for (let i = 0; i < this.length; i++) {
+          const el = this[i];
+          if (!isTag(el)) continue;
+          if (!el.attribs) el.attribs = {};
+          const binding = bindingOf(el);
+          if (!binding) { usable = false; break; }
+          let group = groups.get(binding.document);
+          if (!group) groups.set(binding.document, group = []);
+          group.push({ id: binding.id, name, value: value === null ? null : value + '' });
+        }
+        if (usable) {
+          for (const [document, writes] of groups) {
+            operation(document, 'setAttrs', { writes });
+          }
+          return this;
+        }
+      }
       return domEach(this, function (_i, el) {
         if (!isTag(el)) return;
         if (typeof name === 'object') {
@@ -1027,6 +1067,22 @@ const traversingApi: CheerioPrototype = {
         }
         return false;
       }));
+    }
+
+    // The native within-select covers the 0.22.0 candidate set (every
+    // descendant of the matched elements) in one call, at any document size.
+    const document = bindingOf(this[0])?.document;
+    if (document && selectorOrHaystack) {
+      const contexts = idsOf(document, this.toArray());
+      if (contexts.length) {
+        try {
+          validateLegacySelector(selectorOrHaystack);
+          const found = operation<number[]>(document, 'select', { selector: selectorOrHaystack, contexts });
+          if (found) return this._make(asNodes(document, found) as LegacyNode[]);
+        } catch (error) {
+          throw error instanceof SyntaxError ? error : new SyntaxError((error as Error)?.message ?? String(error));
+        }
+      }
     }
 
     const elems: LegacyNode[] = [];
