@@ -3,7 +3,7 @@
 <p align="center"><strong>Cheerio 0.22.0's API on a Rust engine.</strong></p>
 
 cheerox is a nearly drop-in replacement for legacy **Cheerio 0.22.0**,
-powered by the Rusteerio native engine (NAPI-RS). Parsing, DOM storage,
+powered by a native Rust engine (NAPI-RS). Parsing, DOM storage,
 selectors, and mutations run in Rust; TypeScript supplies the familiar API.
 Zero npm runtime dependencies.
 
@@ -66,7 +66,7 @@ const $ = cheerio.load('<p>typed</p>');
 
 ## Modern extras (additive)
 
-The Rusteerio engine's asynchronous, parallel capabilities stay available
+The engine's asynchronous, parallel capabilities stay available
 from the same package; they keep the legacy parsing defaults:
 
 ```ts
@@ -77,15 +77,6 @@ const $ = await loadAsync(largeHtml);
 const docs = await loadAll(pages, { threads: 4 });
 const rows = await extractAll(pages, { title: 'h1', links: [{ selector: 'a', value: 'href' }] });
 console.log(workerPoolInfo());
-```
-
-The full Cheerio 1.2.0-style facade (the former `rusteerio` API) remains
-available behind the modern entry point:
-
-```js
-import * as modern from 'cheerox/modern';
-const slim = require('cheerox/slim');
-const utils = require('cheerox/utils');
 ```
 
 ## Performance
@@ -125,10 +116,8 @@ See [PLAN.md](PLAN.md) for the implementation plan and status, and
 
 ## Credits and license
 
-Created on top of [Rusteerio](https://github.com/context-dot-dev/rusteerio)
-by the context.dev team (MIT), with thanks to
-[Cheerio](https://github.com/cheeriojs/cheerio) and its contributors for the
-API and the test suite that defines this project's behavior. The vendored
-Cheerio 0.22.0 tests keep their MIT notice
+With thanks to [Cheerio](https://github.com/cheeriojs/cheerio) and its
+contributors for the API and the test suite that defines this project's
+behavior. The vendored Cheerio 0.22.0 tests keep their MIT notice
 ([test/legacy/reference/LICENSE-MIT](test/legacy/reference/LICENSE-MIT)).
 cheerox is MIT licensed ([LICENSE](LICENSE)).

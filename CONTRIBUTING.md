@@ -1,7 +1,6 @@
-# Contributing to rusteerio
+# Contributing to cheerox
 
-Thanks for helping improve rusteerio. The project is maintained by the
-[context.dev team](https://context.dev) and is heavily inspired by
+Thanks for helping improve cheerox. The project is heavily inspired by
 [Cheerio](https://github.com/cheeriojs/cheerio).
 
 ## Local setup
@@ -65,7 +64,7 @@ The benchmark scripts and methodology are in [bench/README.md](bench/README.md).
 
 ## Reporting issues
 
-Use the repository's issue templates. Include the rusteerio version, Node
+Use the repository's issue templates. Include the cheerox version, Node
 version, OS/architecture, parser options, and the smallest HTML/XML and code
 sample that demonstrates the behavior. For compatibility reports, include
 Cheerio 1.2.0's output as well.

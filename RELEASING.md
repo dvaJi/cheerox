@@ -1,9 +1,9 @@
-# Releasing rusteerio
+# Releasing cheerox
 
-The public npm package name is **`rusteerio`**, maintained by the context.dev
-team. Releases include all eight native binaries, self-contained TypeScript
-declarations, source files and license notices. Consumers install no additional
-npm packages and need no Rust toolchain on supported platforms.
+The public npm package name is **`cheerox`**. Releases include all eight
+native binaries, self-contained TypeScript declarations, source files and
+license notices. Consumers install no additional npm packages and need no
+Rust toolchain on supported platforms.
 
 ## Trusted publishing
 
@@ -16,8 +16,8 @@ settings:
 
 | Field | Value |
 | --- | --- |
-| Organization | `context-dot-dev` |
-| Repository | `rusteerio` |
+| Organization | `dvaJi` |
+| Repository | `cheerox` |
 | Workflow filename | `publish.yml` |
 | Environment | `npm` |
 | Allowed action | Direct publishing with `npm publish` |
@@ -66,7 +66,7 @@ and npm dist-tag:
 
 ```sh
 gh workflow run publish.yml \
-  --repo context-dot-dev/rusteerio \
+  --repo dvaJi/cheerox \
   --ref main \
   -f version=0.1.1 \
   -f npm_tag=latest
@@ -110,5 +110,5 @@ The binary audit reads ELF symbol-version requirements and rejects binaries
 requiring newer glibc, a C++ runtime, or the wrong libc. Windows releases include
 both x64 and arm64; their PE machine headers are checked. The package includes
 the exact patched html5ever/markup5ever/html5gum sources and original notices alongside
-Rusteerio's source. Regenerate third-party notices after any Cargo dependency
+cheerox's source. Regenerate third-party notices after any Cargo dependency
 or compiler change.
