@@ -11,7 +11,7 @@ export default defineConfig({
   platform: 'node',
   target: 'node20',
   clean: true,
-  // The config is plain JavaScript: load it natively on every Node instead
-  // of pulling the optional `unrun` runner on runtimes without TS stripping.
+  // Plain JavaScript config, loaded natively: `--config-loader native` on
+  // the CLI (the config-file option cannot affect its own loading).
   configLoader: 'native',
 });

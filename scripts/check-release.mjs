@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 
 export const nativeTargets = ['darwin-x64', 'darwin-arm64', 'linux-x64-gnu', 'linux-arm64-gnu', 'linux-x64-musl', 'linux-arm64-musl', 'win32-x64-msvc', 'win32-arm64-msvc'];
-const requiredFiles = ['package.json', 'LICENSE', 'README.md', 'CONTRIBUTING.md', 'RELEASING.md', 'THIRD_PARTY_NOTICES.md', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'native/src/lib.rs', 'native/vendor/README.md', 'native/vendor/html5ever-0.35.0/Cargo.toml', 'native/vendor/html5ever-0.35.0/src/lib.rs', 'native/vendor/html5ever-0.35.0/LICENSE-MIT', 'native/vendor/html5ever-0.35.0/LICENSE-APACHE', 'native/vendor/markup5ever-0.35.0/Cargo.toml', 'native/vendor/markup5ever-0.35.0/lib.rs', 'native/vendor/markup5ever-0.35.0/LICENSE-MIT', 'native/vendor/markup5ever-0.35.0/LICENSE-APACHE', 'src/index.ts', 'tsconfig.json', 'tsup.config.ts', 'scripts/check-native.mjs', 'scripts/check-release.mjs', 'scripts/fix-declarations.mjs', 'scripts/generate-notices.mjs', 'scripts/notices/sources.json', 'scripts/notices/runtime.json', 'scripts/notices/cheerio-MIT.txt', 'dist/index.cjs', 'dist/index.mjs', 'dist/index.d.ts', 'dist/index.d.mts', 'dist/slim.cjs', 'dist/slim.mjs', 'dist/utils.cjs', 'dist/utils.mjs'];
+const requiredFiles = ['package.json', 'LICENSE', 'README.md', 'CONTRIBUTING.md', 'RELEASING.md', 'THIRD_PARTY_NOTICES.md', 'Cargo.toml', 'Cargo.lock', 'build.rs', 'native/src/lib.rs', 'native/vendor/README.md', 'native/vendor/html5ever-0.35.0/Cargo.toml', 'native/vendor/html5ever-0.35.0/src/lib.rs', 'native/vendor/html5ever-0.35.0/LICENSE-MIT', 'native/vendor/html5ever-0.35.0/LICENSE-APACHE', 'native/vendor/markup5ever-0.35.0/Cargo.toml', 'native/vendor/markup5ever-0.35.0/lib.rs', 'native/vendor/markup5ever-0.35.0/LICENSE-MIT', 'native/vendor/markup5ever-0.35.0/LICENSE-APACHE', 'src/index.ts', 'tsconfig.json', 'tsdown.config.mjs', 'scripts/check-native.mjs', 'scripts/check-release.mjs', 'scripts/fix-declarations.mjs', 'scripts/generate-notices.mjs', 'scripts/notices/sources.json', 'scripts/notices/runtime.json', 'scripts/notices/cheerio-MIT.txt', 'dist/index.cjs', 'dist/index.mjs', 'dist/index.d.ts', 'dist/index.d.mts', 'dist/slim.cjs', 'dist/slim.mjs', 'dist/utils.cjs', 'dist/utils.mjs'];
 const root = fileURLToPath(new URL('../', import.meta.url));
 
 export function validateVersion(version, distTag = 'latest') {
@@ -128,7 +128,7 @@ export function validatePackageFiles(files, { allTargets = true } = {}) {
   for (const path of ['native/vendor/html5gum-0.8.4/Cargo.toml', 'native/vendor/html5gum-0.8.4/src/lib.rs', 'native/vendor/html5gum-0.8.4/LICENSE']) assert.ok(files.get(path)?.length > 0, `Package is missing ${path}`);
   assert.match(files.get('LICENSE').toString(), /MIT License/);
   assert.match(files.get('THIRD_PARTY_NOTICES.md').toString(), /cheerio/i);
-  assert.match(files.get('README.md').toString(), /context\.dev/i);
+  assert.match(files.get('README.md').toString(), /drop-in replacement/i);
   const binaries = [...files].filter(([path]) => path.endsWith('.node'));
   assert.ok(binaries.length > 0, 'Package has no native binary');
   if (allTargets) for (const target of nativeTargets) assert.ok(files.has(`cheerox.${target}.node`), `Release is missing the ${target} binary`);
@@ -214,7 +214,7 @@ function run() {
     const npm = process.env.npm_execpath;
     const result = npm ? execFileSync(process.execPath, [npm, 'pack', '--dry-run', '--ignore-scripts', '--json'], { cwd: root, encoding: 'utf8' })
       : execFileSync('npm', ['pack', '--dry-run', '--ignore-scripts', '--json'], { cwd: root, encoding: 'utf8' });
-    files = new Map(JSON.parse(result)[0].files.map(({ path }) => [path, readFileSync(join(root, path))]));
+    const packed = JSON.parse(result); const packedEntry = Array.isArray(packed) ? packed[0] : packed[Object.keys(packed)[0]]; files = new Map(packedEntry.files.map(({ path }) => [path, readFileSync(join(root, path))]));
   }
   const metadata = validatePackageFiles(files, { allTargets: !options.local });
   if (options.commit) for (const [path, contents] of files) {
