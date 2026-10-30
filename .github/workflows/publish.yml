@@ -32,12 +32,12 @@ jobs:
       commit: ${{ steps.validate.outputs.commit }}
       version: ${{ steps.validate.outputs.version }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
           package-manager-cache: false
@@ -68,11 +68,11 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           ref: ${{ needs.release-ref.outputs.commit }}
           persist-credentials: false
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: '24'
           package-manager-cache: false
@@ -82,7 +82,7 @@ jobs:
         run: |
           node --input-type=module -e 'import assert from "node:assert/strict"; import { execFileSync } from "node:child_process"; const [major, minor, patch] = execFileSync("npm", ["--version"], {encoding:"utf8"}).trim().split(".").map(Number); assert.ok(major > 11 || major === 11 && (minor > 5 || minor === 5 && patch >= 1), "npm 11.5.1+ is required"); assert.ok(!process.env.NODE_AUTH_TOKEN && !process.env.NPM_TOKEN, "Use npm trusted publishing instead of a long-lived token");'
       - run: npm ci
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: npm-package
           path: release
