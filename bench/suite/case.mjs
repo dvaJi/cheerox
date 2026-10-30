@@ -17,7 +17,7 @@ if (config.engine === 'cheerio' && ['pool', 'concurrent', 'cold'].includes(confi
   pool = new CheerioPool(config.budget); await pool.ready;
 } else {
   api = await import(config.engine === 'cheerio' ? 'cheerio' : '../../dist/modern.mjs');
-  if (config.engine === 'rusteerio' && ['pool', 'cold', 'concurrent'].includes(config.kind)) api.configureWorkers?.(config.budget);
+  if (config.engine === 'cheerox' && ['pool', 'cold', 'concurrent'].includes(config.kind)) api.configureWorkers?.(config.budget);
 }
 const initializationMs = performance.now() - startupAt;
 
@@ -28,7 +28,7 @@ function poolInfo() {
 }
 function assertPoolCap() {
   const info = poolInfo();
-  if (config.requireCap && config.engine === 'rusteerio') assert.ok(info, 'Native global worker telemetry must be exported');
+  if (config.requireCap && config.engine === 'cheerox') assert.ok(info, 'Native global worker telemetry must be exported');
   if (info) {
     assert.equal(info.threads, config.budget, 'Configured global worker budget differs');
     assert.ok(info.peakActiveWorkers <= config.budget, `Global pool exceeded ${config.budget}: ${JSON.stringify(info)}`);

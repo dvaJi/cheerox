@@ -2,7 +2,7 @@
 // as parse5 (the WHATWG reference implementation in JS)?
 // Strings are compared after trimming and collapsing whitespace.
 import fs from 'node:fs';
-import * as rusteerio from 'rusteerio';
+import * as cheerox from 'cheerox';
 import { LIBS, LIB_NAMES, EXTRACT_MAP } from './libs.mjs';
 import { loadCorpus } from './common.mjs';
 
@@ -39,13 +39,13 @@ for (const name of LIB_NAMES) {
 }
 
 // The parallel path must agree with the sync path.
-const par = await rusteerio.extractAll(pages, EXTRACT_MAP);
+const par = await cheerox.extractAll(pages, EXTRACT_MAP);
 let same = 0;
 par.forEach((o, i) => {
   const a = JSON.stringify(key({ ...o, imgs: o.imgs.length }));
-  if (a === JSON.stringify(key(LIBS.rusteerio.extract(pages[i])))) same++;
+  if (a === JSON.stringify(key(LIBS.cheerox.extract(pages[i])))) same++;
 });
-results.rusteerio.parallelMatchesSyncPct = +(100 * same / pages.length).toFixed(2);
+results.cheerox.parallelMatchesSyncPct = +(100 * same / pages.length).toFixed(2);
 
 fs.writeFileSync('results/agreement_examples.json', JSON.stringify(examples, null, 1));
 console.log(JSON.stringify({ pages: pages.length, reference: 'parse5', results }));

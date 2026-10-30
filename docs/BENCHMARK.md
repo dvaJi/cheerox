@@ -31,7 +31,7 @@ absolute numbers, as the signal.
   Queries also run a candidate materialization step (context subtree +
   native `matches`) rather than css-select's compiled walkers.
 - **Serialization** walks the tree through the same per-node views. The
-  known next step (see PLAN.md) is a native port of the 0.1.x serializer,
+  known next step is a native port of the 0.1.x serializer,
   which would remove the per-node boundary hops entirely.
 
 These are the measured trade-offs of keeping a live native DOM behind the

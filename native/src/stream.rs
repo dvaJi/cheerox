@@ -83,7 +83,7 @@ impl NativeStream {
         let cancelled = Arc::new(AtomicBool::new(false));
         let worker_cancel = cancelled.clone();
         std::thread::Builder::new()
-            .name("rusteerio-stream".into())
+            .name("cheerox-stream".into())
             .spawn(move || {
                 run(
                     receiver,
@@ -227,7 +227,7 @@ fn run(
         let parse_options = html5ever::driver::ParseOpts {
             tokenizer: html5ever::tokenizer::TokenizerOpts {
                 discard_bom: false,
-                rusteerio_codec: options.get("__utf16Codec") == Some(&Value::Bool(true)),
+                cheerox_codec: options.get("__utf16Codec") == Some(&Value::Bool(true)),
                 ..Default::default()
             },
             tree_builder: html5ever::tree_builder::TreeBuilderOpts {

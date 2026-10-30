@@ -5,7 +5,7 @@ import { Readable } from 'node:stream';
 import { test } from 'node:test';
 import { FormData as UndiciFormData } from 'undici';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 async function withServer(handler, run) {
   const server = createServer(handler);
@@ -47,7 +47,7 @@ test('303 redirects preserve HEAD while replacing POST and its content headers',
       };
       const expected = await run(reference);
       assert.equal(typeof expected.result.html, 'string', JSON.stringify(expected.result));
-      assert.deepEqual(await run(rusteerio), expected, method);
+      assert.deepEqual(await run(cheerox), expected, method);
     }
   });
 });
@@ -66,7 +66,7 @@ test('300 redirects follow the same method and buffered body as Cheerio', async 
     };
     const expected = await run(reference);
     assert.equal(typeof expected.result.html, 'string', JSON.stringify(expected.result));
-    assert.deepEqual(await run(rusteerio), expected);
+    assert.deepEqual(await run(cheerox), expected);
   });
 });
 
@@ -84,7 +84,7 @@ test('307 redirects do not replay an already consumed Node request stream', asyn
     };
     const expected = await run(reference);
     assert.equal(expected.result.statusCode, 307);
-    assert.deepEqual(await run(rusteerio), expected);
+    assert.deepEqual(await run(cheerox), expected);
   });
 });
 
@@ -110,7 +110,7 @@ test('307 FormData redirects preserve a boundary consistent with each request bo
     assert.equal(typeof expected.result.html, 'string', JSON.stringify(expected.result));
     assert.equal(expected.requests.length, 2);
     assert.ok(expected.requests.every(request => request.validBoundary && request.field && request.file));
-    assert.deepEqual(await run(rusteerio), expected);
+    assert.deepEqual(await run(cheerox), expected);
   });
 });
 
@@ -124,7 +124,7 @@ test('request Content-Length mismatches reject with the Undici-compatible error'
       for (const createBody of [() => 'hello', () => Buffer.from('hello'), () => Readable.from(['he', 'llo'])]) {
         const expected = await outcome(reference, base, { method: 'POST', headers: { 'content-length': length }, body: createBody() });
         assert.equal(expected.code, 'UND_ERR_REQ_CONTENT_LENGTH_MISMATCH');
-        assert.deepEqual(await outcome(rusteerio, base, { method: 'POST', headers: { 'content-length': length }, body: createBody() }), expected);
+        assert.deepEqual(await outcome(cheerox, base, { method: 'POST', headers: { 'content-length': length }, body: createBody() }), expected);
       }
     }
   });
@@ -134,7 +134,7 @@ test('duplicate Content-Type uses its first value for successful MIME selection'
   await withServer((_request, response) => response.writeHead(200, ['Content-Type', 'application/xml; charset=utf-8', 'Content-Type', 'text/html']).end('<Root><Item>café</Item></Root>'), async base => {
     const expected = await outcome(reference, base);
     assert.equal(typeof expected.html, 'string', JSON.stringify(expected));
-    assert.deepEqual(await outcome(rusteerio, base), expected);
+    assert.deepEqual(await outcome(cheerox, base), expected);
   });
 });
 
@@ -146,6 +146,6 @@ test('non-success ResponseError retains all duplicate raw response header values
         return { name: error.name, code: error.code, statusCode: error.statusCode, headers: { type: error.headers?.['content-type'], multi: error.headers?.['x-multi'], cookies: error.headers?.['set-cookie'] } };
       }
     };
-    assert.deepEqual(await run(rusteerio), await run(reference));
+    assert.deepEqual(await run(cheerox), await run(reference));
   });
 });

@@ -20,7 +20,7 @@
       "cargo": "cargo 1.97.1 (c980f4866 2026-06-30)"
     },
     "nativeBinarySha256": {
-      "rusteerio.linux-x64-gnu.node": "ae1abae03b1f72e79a512676aff2ea0960177a914435ef28257e338bc6ec5998"
+      "cheerox.linux-x64-gnu.node": "ae1abae03b1f72e79a512676aff2ea0960177a914435ef28257e338bc6ec5998"
     },
     "nativeBuild": {
       "toolchain": {
@@ -28,12 +28,12 @@
         "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
       },
       "nativeBinarySha256": {
-        "rusteerio.linux-x64-gnu.node": "ae1abae03b1f72e79a512676aff2ea0960177a914435ef28257e338bc6ec5998"
+        "cheerox.linux-x64-gnu.node": "ae1abae03b1f72e79a512676aff2ea0960177a914435ef28257e338bc6ec5998"
       },
       "libc": {
         "buildRuntime": "glibc 2.28",
         "requirements": {
-          "rusteerio.linux-x64-gnu.node": {
+          "cheerox.linux-x64-gnu.node": {
             "versions": [
               "GCC_3.0",
               "GCC_3.3",
@@ -330,7 +330,7 @@
           "maxMs": 6.9990060000000085
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.031729,
           "fixtureBytes": 4514,
           "inputSha256": "f73ac8a36960af1dd52ed19729e2310b27f81c0e8be0d9f103be05503f357490",
@@ -623,7 +623,7 @@
           "maxMs": 7.248852999999997
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 26.129904,
           "fixtureBytes": 4514,
           "inputSha256": "f73ac8a36960af1dd52ed19729e2310b27f81c0e8be0d9f103be05503f357490",
@@ -916,7 +916,7 @@
           "maxMs": 5.979919999999993
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.749971999999996,
           "fixtureBytes": 2564,
           "inputSha256": "a2f78633603f482b5d8b7fed082a250bbe3e94f6d6a6eaeb66bd92b4e5f8b19d",
@@ -1209,7 +1209,7 @@
           "maxMs": 5.797888999999998
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.839809999999996,
           "fixtureBytes": 4514,
           "inputSha256": "f73ac8a36960af1dd52ed19729e2310b27f81c0e8be0d9f103be05503f357490",
@@ -1502,7 +1502,7 @@
           "maxMs": 41.64654799999994
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.483063,
           "fixtureBytes": 109618,
           "inputSha256": "90a7d3a8b211501fb3ac10b7d84e0b2e3da200163a972ec5216054eb33e59add",
@@ -1795,7 +1795,7 @@
           "maxMs": 43.686004000000025
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.781682,
           "fixtureBytes": 109618,
           "inputSha256": "90a7d3a8b211501fb3ac10b7d84e0b2e3da200163a972ec5216054eb33e59add",
@@ -2088,7 +2088,7 @@
           "maxMs": 14.610228000000006
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.391181,
           "fixtureBytes": 65204,
           "inputSha256": "2dfecabd871755da2445058938a6466e6e1a629374e3b2adb8923a9fc80460f2",
@@ -2381,7 +2381,7 @@
           "maxMs": 45.41293499999995
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.943865000000002,
           "fixtureBytes": 109618,
           "inputSha256": "90a7d3a8b211501fb3ac10b7d84e0b2e3da200163a972ec5216054eb33e59add",
@@ -2674,7 +2674,7 @@
           "maxMs": 154.77815600000008
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 26.797783,
           "fixtureBytes": 1109218,
           "inputSha256": "a2cd1f2605d61fef980ff5ae75e28f782dbeb4a79dd062600d1b5850e7ab5408",
@@ -2967,7 +2967,7 @@
           "maxMs": 282.659633
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.93015,
           "fixtureBytes": 1109218,
           "inputSha256": "a2cd1f2605d61fef980ff5ae75e28f782dbeb4a79dd062600d1b5850e7ab5408",
@@ -3260,7 +3260,7 @@
           "maxMs": 79.47527099999996
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.281516000000003,
           "fixtureBytes": 666704,
           "inputSha256": "d892af93e88ff2e55d8548c2299a01da69bbc5d934d50d96c0c4f4cd529aa1a2",
@@ -3553,7 +3553,7 @@
           "maxMs": 210.44917699999996
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 27.46964,
           "fixtureBytes": 1109218,
           "inputSha256": "a2cd1f2605d61fef980ff5ae75e28f782dbeb4a79dd062600d1b5850e7ab5408",
@@ -3883,7 +3883,7 @@
           "maxMs": 33.252260999999976
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 27.385082,
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
@@ -4258,7 +4258,7 @@
           "maxMs": 268.23848799999996
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 27.273994999999996,
           "fixtureBytes": 1759888,
           "inputSha256": "f2d3356ff4e9a5fb3fce51f463aa1183b0ff8e9f294a7af78825571bc1b1681b",
@@ -4633,7 +4633,7 @@
           "maxMs": 2929.1887609999976
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 30.211721999999995,
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
@@ -5008,7 +5008,7 @@
           "maxMs": 259.00569399999995
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 29.730991999999997,
           "fixtureBytes": 876944,
           "inputSha256": "f10d8e191c3dc2ab59c036208e6076a3743bd402ac39c50ff3d4d4388995d425",
@@ -5384,7 +5384,7 @@
           "maxMs": 26.369152000000042
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.528519,
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
@@ -5760,7 +5760,7 @@
           "maxMs": 223.925795
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 29.787978,
           "fixtureBytes": 1759888,
           "inputSha256": "f2d3356ff4e9a5fb3fce51f463aa1183b0ff8e9f294a7af78825571bc1b1681b",
@@ -6136,7 +6136,7 @@
           "maxMs": 2198.7348040000015
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 32.69454699999999,
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
@@ -6512,7 +6512,7 @@
           "maxMs": 199.53946299999996
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 30.359697,
           "fixtureBytes": 876944,
           "inputSha256": "f10d8e191c3dc2ab59c036208e6076a3743bd402ac39c50ff3d4d4388995d425",
@@ -6890,7 +6890,7 @@
           "maxMs": 18.41022899999996
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 29.985889,
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
@@ -7268,7 +7268,7 @@
           "maxMs": 152.22448000000009
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.888662000000004,
           "fixtureBytes": 1759888,
           "inputSha256": "f2d3356ff4e9a5fb3fce51f463aa1183b0ff8e9f294a7af78825571bc1b1681b",
@@ -7646,7 +7646,7 @@
           "maxMs": 1492.3224960000007
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.460751000000002,
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
@@ -8024,7 +8024,7 @@
           "maxMs": 116.03821800000003
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 26.005452,
           "fixtureBytes": 876944,
           "inputSha256": "f10d8e191c3dc2ab59c036208e6076a3743bd402ac39c50ff3d4d4388995d425",
@@ -8406,7 +8406,7 @@
           "maxMs": 8.08516899999995
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 24.975112,
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
@@ -8788,7 +8788,7 @@
           "maxMs": 101.91770599999995
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 30.184642000000004,
           "fixtureBytes": 1759888,
           "inputSha256": "f2d3356ff4e9a5fb3fce51f463aa1183b0ff8e9f294a7af78825571bc1b1681b",
@@ -9170,7 +9170,7 @@
           "maxMs": 853.2474430000002
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.043670000000006,
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
@@ -9552,7 +9552,7 @@
           "maxMs": 58.02642800000001
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 23.960974999999998,
           "fixtureBytes": 876944,
           "inputSha256": "f10d8e191c3dc2ab59c036208e6076a3743bd402ac39c50ff3d4d4388995d425",
@@ -9960,7 +9960,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
           "samples": [
@@ -10401,7 +10401,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
           "samples": [
@@ -10843,7 +10843,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
           "samples": [
@@ -11285,7 +11285,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
           "samples": [
@@ -11729,7 +11729,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
           "samples": [
@@ -12173,7 +12173,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
           "samples": [
@@ -12621,7 +12621,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 72464,
           "inputSha256": "4a6aa808e5ca9dab08a1f9f34a9b9160c723d54c5a1fd909c07722605964796b",
           "samples": [
@@ -13069,7 +13069,7 @@
           }
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 17807488,
           "inputSha256": "6dd38b17a817bdf6b0f2cdc29eed4567718133e3b86975e1dc7bcd206acf2f25",
           "samples": [
@@ -13450,7 +13450,7 @@
           "maxMs": 1142.145661
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 11240218,
           "inputSha256": "a59eab8d7f5164aabfa740110824887bf423446ea6732c96947ba1135dac9d8b",
           "samples": [
@@ -13762,7 +13762,7 @@
           "maxMs": 198.93055900000002
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 6816704,
           "inputSha256": "e4d3c181f0dd3ae1116662ed280165e77394874ad64eab4e24c033e5670b3f63",
           "samples": [
@@ -14081,7 +14081,7 @@
           "maxMs": 625.070422
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 11240218,
           "inputSha256": "a59eab8d7f5164aabfa740110824887bf423446ea6732c96947ba1135dac9d8b",
           "samples": [
@@ -14400,7 +14400,7 @@
           "maxMs": 126.30687599999999
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 6816704,
           "inputSha256": "e4d3c181f0dd3ae1116662ed280165e77394874ad64eab4e24c033e5670b3f63",
           "samples": [
@@ -15810,7 +15810,7 @@
           "maxMs": 610.350238
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "fixtureBytes": 212,
           "inputSha256": "d7e1410c07ba6e3263bfbfd8aa7b2e85ab4640be8488412a882e33635133c726",
           "samples": [
@@ -17248,7 +17248,7 @@
           "maxMs": 498.043091
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 29.433847000000004,
           "fixtureBytes": 525776,
           "inputSha256": "038a134cd12c370321153e0cf7ca95b12682197906f466c80588dae13f5be519",
@@ -17625,7 +17625,7 @@
           "maxMs": 352.19350600000007
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 26.990824999999997,
           "fixtureBytes": 525776,
           "inputSha256": "038a134cd12c370321153e0cf7ca95b12682197906f466c80588dae13f5be519",
@@ -18004,7 +18004,7 @@
           "maxMs": 239.894681
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.013866999999998,
           "fixtureBytes": 525776,
           "inputSha256": "038a134cd12c370321153e0cf7ca95b12682197906f466c80588dae13f5be519",
@@ -18387,7 +18387,7 @@
           "maxMs": 147.597176
         },
         {
-          "engine": "rusteerio",
+          "engine": "cheerox",
           "initializationMs": 25.031029999999998,
           "fixtureBytes": 525776,
           "inputSha256": "038a134cd12c370321153e0cf7ca95b12682197906f466c80588dae13f5be519",

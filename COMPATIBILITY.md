@@ -10,7 +10,7 @@ cheerox with the same pass/fail set as the real `cheerio@0.22.0` package.
 | Cheerio 0.22.0 suite (vendored, untouched) | `npm run test:legacy` | **576 pass / 1 fail / 1 pending** |
 | Same suite against the real cheerio@0.22.0 | `npm run test:legacy-oracle` | **576 pass / 1 fail / 1 pending** |
 | Differential harness (55 operations, real-world pages) | `npm run test:differential` | **55 pass / 0 fail** |
-| Rusteerio 1.2.0 modern runtime checks | `npm test` | **514 pass / 0 fail** |
+| Cheerox 1.2.0 modern runtime checks | `npm test` | **514 pass / 0 fail** |
 | Cheerio 1.2.0 upstream suite (modern mode) | `npm run test:upstream` | **777 pass / 0 fail** |
 | Rust engine tests | `npm run test:native` (`cargo test`) | **57 pass / 0 fail** |
 
@@ -41,10 +41,9 @@ synthetic root also keeps `name: 'root'` and an `attribs` object, as in
 0.22.0.
 
 ### 3. Internal protocol names
-`Symbol.for('rusteerio.*')` registry keys and the `RUSTEERIO_THREADS`
-environment variable are inherited from the vendored engine and kept as
-aliases (`CHEEROX_THREADS` is the documented primary). They are invisible
-through the public API.
+Internal registry keys (`Symbol.for('cheerox.*')`) and the
+`CHEEROX_THREADS` environment variable are implementation details of the
+native engine. They are invisible through the public API.
 
 ## Node shape parity
 

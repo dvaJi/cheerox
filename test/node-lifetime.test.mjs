@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import { Element as ForeignElement } from 'domhandler';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 const moduleUrl = new URL('../dist/modern.mjs', import.meta.url).href;
 const require = createRequire(import.meta.url);
@@ -25,7 +25,7 @@ function run(source) {
 }
 
 test('a large selection keeps working after its nodes move to another document', () => {
-  for (const library of [rusteerio, cheerio]) {
+  for (const library of [cheerox, cheerio]) {
     const $a = library.load(`<ul>${'<li>x</li>'.repeat(20)}</ul>`);
     const $b = library.load('<section></section>');
     const items = $a('li');
@@ -61,7 +61,7 @@ test('wrap moves a wrapper from another document around the element', () => {
     $a('p').wrap($b('span'));
     return [$a('div').html(), $b.html()];
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('nodes created into freed slots stay intact while held', () => run(`
@@ -167,7 +167,7 @@ test('tree adapter nodes of parsed fragments reach the document', () => {
     }
     return results;
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('a freed slot does not hand back the tree adapter node it held', () => run(`
@@ -190,7 +190,7 @@ test('each query gets its own root selection', () => {
     root[0] = $('#a')[0];
     return [$('span').length, $('p').end() === $('p').end()];
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('a large selection moved by replaceWith follows its nodes to a third document', () => {
@@ -205,7 +205,7 @@ test('a large selection moved by replaceWith follows its nodes to a third docume
     items.attr('title', 'set');
     return [items.text(), items[0].name, $a('[title]').length, $c('[title]').length];
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('array methods that leave holes in a large selection behave as on Cheerio selections', () => {
@@ -219,7 +219,7 @@ test('array methods that leave holes in a large selection behave as on Cheerio s
     }
     return lengths;
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('a child array read before a node moves documents follows later changes', () => {
@@ -233,7 +233,7 @@ test('a child array read before a node moves documents follows later changes', (
     $b('#x p').first().remove();
     return moved.children.map((node) => node.children[0].data);
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('tree adapter nodes keep pointing at their own nodes after moves and collections', () => run(`
@@ -288,7 +288,7 @@ test('reading an attribute of a selection starting with a non-node returns undef
     const $ = library.load('<p id="a">x</p>');
     return [$([null, $('p')[0]]).attr('id'), $(['text', $('p')[0]]).attr('id')];
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('small selections enumerate the same own keys as Cheerio selections', () => {
@@ -296,7 +296,7 @@ test('small selections enumerate the same own keys as Cheerio selections', () =>
     const $ = library.load('<p>a</p><p>b</p>');
     return [Object.keys($('p')), Object.keys($('p').first())];
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('serializing template content refreshes the template element children array', () => {
@@ -307,13 +307,13 @@ test('serializing template content refreshes the template element children array
     $('template').html();
     return template.children.map((node) => node.name);
   };
-  assert.deepEqual(read(rusteerio), read(cheerio));
+  assert.deepEqual(read(cheerox), read(cheerio));
 });
 
 test('selections inspect like Cheerio selections', async () => {
   const { inspect } = await import('node:util');
   const read = (library) => { const $ = library.load('<p>a</p><p>b</p>'); return inspect($('p'), { depth: 0 }); };
-  assert.equal(read(rusteerio), read(cheerio));
+  assert.equal(read(cheerox), read(cheerio));
 });
 
 test('a document left out of a synchronous loop\'s pending collections is collected after its next use', () => run(`

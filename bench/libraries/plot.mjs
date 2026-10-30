@@ -1,4 +1,4 @@
-// Render README charts (SVG) in the Context.dev benchmark style from final.json.
+// Render README charts (SVG) in the cheerox benchmark style from final.json.
 //   node charts/plot.mjs results/final.json <out-dir>
 import fs from 'node:fs';
 
@@ -8,8 +8,8 @@ fs.mkdirSync(outDir, { recursive: true });
 
 const BLUE = '#2563eb', INK = '#11162b', INK2 = '#344054', MUTED = '#697586', GRID = '#eef0f3';
 // one fixed shade per library so identity holds across every chart
-const SHADE = { 'rusteerio-pool': '#93b4f8', rusteerio: BLUE, cheerio: '#344054', parse5: '#5b6576', jsdom: '#7a8597', 'node-html-parser': '#98a2b3', htmlparser2: '#b4bcc8' };
-const NAME = { 'rusteerio-pool': 'rusteerio · worker pool', rusteerio: 'rusteerio', cheerio: 'cheerio', jsdom: 'jsdom', htmlparser2: 'htmlparser2', parse5: 'parse5', 'node-html-parser': 'node-html-parser' };
+const SHADE = { 'cheerox-pool': '#93b4f8', cheerox: BLUE, cheerio: '#344054', parse5: '#5b6576', jsdom: '#7a8597', 'node-html-parser': '#98a2b3', htmlparser2: '#b4bcc8' };
+const NAME = { 'cheerox-pool': 'cheerox · worker pool', cheerox: 'cheerox', cheerio: 'cheerio', jsdom: 'jsdom', htmlparser2: 'htmlparser2', parse5: 'parse5', 'node-html-parser': 'node-html-parser' };
 const n0 = (v) => Math.round(v).toLocaleString('en-US');
 const n1 = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -26,7 +26,7 @@ ${foot.map((l, i) => T(56, h - 40 + i * 15 - (foot.length - 1) * 15, l, { size: 
 </svg>`;
 }
 
-// Ranked horizontal bars; rusteerio blue, others slate by rank.
+// Ranked horizontal bars; cheerox blue, others slate by rank.
 function bars(x, y, w, { title, sub, rows, fmt, max, rowH = 52, labelW = 150, names = NAME }) {
   let s = T(x + labelW, y, title, { size: 17 }) + (sub ? T(x + labelW, y + 21, sub, { size: 15, fill: INK2 }) : '');
   const top = y + (sub ? 44 : 22), plotW = w - labelW - 90;
@@ -46,21 +46,21 @@ function bars(x, y, w, { title, sub, rows, fmt, max, rowH = 52, labelW = 150, na
 }
 
 // frame height fits the number of bar rows
-const HAS_POOL = Boolean(F.scalingPool?.rusteerio?.length);
-const SPEED_LIBS = HAS_POOL ? [...F.libs, 'rusteerio-pool'] : F.libs;
+const HAS_POOL = Boolean(F.scalingPool?.cheerox?.length);
+const SPEED_LIBS = HAS_POOL ? [...F.libs, 'cheerox-pool'] : F.libs;
 // speed/memory charts name the execution model so every comparison is explicit
-const SPEED_NAMES = { ...NAME, rusteerio: 'rusteerio · extractAll', cheerio: 'cheerio · worker pool', parse5: 'parse5 · worker pool', jsdom: 'jsdom · worker pool' };
+const SPEED_NAMES = { ...NAME, cheerox: 'cheerox · extractAll', cheerio: 'cheerio · worker pool', parse5: 'parse5 · worker pool', jsdom: 'jsdom · worker pool' };
 const BAR_H = 164 + F.libs.length * 52 + 110, SPEED_H = 164 + SPEED_LIBS.length * 52 + 110;
-const series = (l) => (l === 'rusteerio-pool' ? F.scalingPool.rusteerio : F.scaling[l]);
+const series = (l) => (l === 'cheerox-pool' ? F.scalingPool.cheerox : F.scaling[l]);
 const at = (l, c) => series(l).find((r) => r.cores === c);
 const byDesc = (f, libs = F.libs) => [...libs].map((l) => ({ lib: l, v: f(l) })).filter((r) => r.v != null).sort((a, b) => b.v - a.v);
 const byAsc = (f, libs = F.libs) => byDesc(f, libs).reverse();
 
 // 1. overview: speed on 1 CPU + speed on 16 CPUs
-fs.writeFileSync(`${outDir}/overview-v4.svg`, frame(1344, SPEED_H, 'rusteerio vs spec-compliant Node HTML parsers · same extraction job',
+fs.writeFileSync(`${outDir}/overview-v4.svg`, frame(1344, SPEED_H, 'cheerox vs spec-compliant Node HTML parsers · same extraction job',
   bars(56, 120, 620, { title: 'Pages per second, 1 CPU', sub: 'parse + extract · higher is better', rows: byDesc((l) => at(l, 1).pagesPerSec, SPEED_LIBS), fmt: n0, names: SPEED_NAMES, labelW: 220 }) +
   bars(700, 120, 620, { title: 'Pages per second, 16 CPUs', sub: 'parse + extract · higher is better', rows: byDesc((l) => at(l, 16).pagesPerSec, SPEED_LIBS), fmt: n0, names: SPEED_NAMES, labelW: 220 }),
-  [STAMP, 'Title, meta description, a[href], h1–h3 text and image count per page. CPU budget enforced with taskset. "worker pool" = N worker_threads running the sync API; "extractAll" = rusteerio\'s native batch API.']));
+  [STAMP, 'Title, meta description, a[href], h1–h3 text and image count per page. CPU budget enforced with taskset. "worker pool" = N worker_threads running the sync API; "extractAll" = cheerox\'s native batch API.']));
 
 // 2. memory: working memory at 16 CPUs + retained per MB HTML
 fs.writeFileSync(`${outDir}/memory-v4.svg`, frame(1344, SPEED_H, 'Memory footprint',
@@ -79,23 +79,23 @@ fs.writeFileSync(`${outDir}/memory-v4.svg`, frame(1344, SPEED_H, 'Memory footpri
   for (let v = lo; v <= hi; v *= 10) s += `<line x1="${x0}" x2="${x1}" y1="${Y(v)}" y2="${Y(v)}" stroke="${GRID}"/>` + T(x0 - 10, Y(v) + 5, v >= 1000 ? `${v / 1000}K` : v, { size: 14, fill: MUTED, anchor: 'end' });
   cores.forEach((c) => (s += T(X(c), y0 + 26, c, { size: 14, fill: MUTED, anchor: 'middle' })));
   s += T((x0 + x1) / 2, y0 + 50, 'CPUs', { size: 14, fill: MUTED, anchor: 'middle' });
-  const order = [...SPEED_LIBS].sort((a, b) => a.startsWith('rusteerio') - b.startsWith('rusteerio'));
+  const order = [...SPEED_LIBS].sort((a, b) => a.startsWith('cheerox') - b.startsWith('cheerox'));
   const ends = [];
   for (const l of order) {
     const color = SHADE[l];
     const pts = series(l);
-    s += `<polyline fill="none" stroke="${l === 'rusteerio-pool' ? BLUE : color}" stroke-width="${l.startsWith('rusteerio') ? 3.5 : 2}"${l === 'rusteerio-pool' ? ' stroke-dasharray="9 6"' : ''} points="${pts.map((p) => `${X(p.cores)},${Y(p.pagesPerSec)}`).join(' ')}"/>`;
-    s += pts.map((p) => `<circle cx="${X(p.cores)}" cy="${Y(p.pagesPerSec)}" r="${l.startsWith('rusteerio') ? 5.5 : 4}" fill="${l === 'rusteerio-pool' ? BLUE : color}" stroke="#fff" stroke-width="2"/>`).join('');
+    s += `<polyline fill="none" stroke="${l === 'cheerox-pool' ? BLUE : color}" stroke-width="${l.startsWith('cheerox') ? 3.5 : 2}"${l === 'cheerox-pool' ? ' stroke-dasharray="9 6"' : ''} points="${pts.map((p) => `${X(p.cores)},${Y(p.pagesPerSec)}`).join(' ')}"/>`;
+    s += pts.map((p) => `<circle cx="${X(p.cores)}" cy="${Y(p.pagesPerSec)}" r="${l.startsWith('cheerox') ? 5.5 : 4}" fill="${l === 'cheerox-pool' ? BLUE : color}" stroke="#fff" stroke-width="2"/>`).join('');
     ends.push({ l, y: Y(pts.at(-1).pagesPerSec), v: pts.at(-1).pagesPerSec, color });
   }
   ends.sort((a, b) => a.y - b.y); let prev = -1e9;
   for (const e of ends) { e.ly = Math.max(e.y, prev + 24); prev = e.ly; }
   for (const e of ends) {
     if (Math.abs(e.ly - e.y) > 2) s += `<path d="M${x1 + 8},${e.y} L${x1 + 22},${e.ly}" stroke="${MUTED}" fill="none"/>`;
-    s += T(x1 + 28, e.ly + 5, `${SPEED_NAMES[e.l]}  ${n0(e.v)}/s`, { size: 15, weight: e.l.startsWith('rusteerio') ? 700 : 400, fill: e.l.startsWith('rusteerio') ? BLUE : INK });
+    s += T(x1 + 28, e.ly + 5, `${SPEED_NAMES[e.l]}  ${n0(e.v)}/s`, { size: 15, weight: e.l.startsWith('cheerox') ? 700 : 400, fill: e.l.startsWith('cheerox') ? BLUE : INK });
   }
   fs.writeFileSync(`${outDir}/scaling-v4.svg`, frame(W, H, 'Throughput across CPU budgets', s,
-    [STAMP, 'Every thread of the process (main, workers, GC, native pool) shares N CPUs. The dashed line runs rusteerio\'s sync API in a worker_threads pool, the same setup as the JS libraries; extractAll is limited by its main thread.']));
+    [STAMP, 'Every thread of the process (main, workers, GC, native pool) shares N CPUs. The dashed line runs cheerox\'s sync API in a worker_threads pool, the same setup as the JS libraries; extractAll is limited by its main thread.']));
 }
 
 // 4. correctness: WPT conformance + feature probes
@@ -104,8 +104,8 @@ fs.writeFileSync(`${outDir}/memory-v4.svg`, frame(1344, SPEED_H, 'Memory footpri
   fs.writeFileSync(`${outDir}/correctness-v4.svg`, frame(1344, BAR_H, 'Spec conformance and features',
     bars(56, 120, 620, { title: 'WHATWG tree-construction tests passed', sub: `${n0(F.html5lib.tests)} WPT tests · higher is better`, rows: byDesc((l) => H5[l].strictPct), max: 100, fmt: (v) => `${n1(v)}%` }) +
     bars(700, 120, 620, { title: 'Feature probes passed', sub: `${FT.features.length} executable probes · higher is better`, rows: byDesc((l) => FT.results[l].score), max: FT.features.length, fmt: (v) => `${v} / ${FT.features.length}` }),
-    ['web-platform-tests html/syntax/parsing *.dat, whole-document tests · probes run real code against each library (rusteerio 1.1.6, cheerio 1.2.0, parse5 8.0.1, jsdom 30.1.3)',
-     'No library passes the 83 HTML processing-instruction tests added to WPT in 2026. rusteerio output was identical to cheerio on all 3,000 corpus pages.']));
+    ['web-platform-tests html/syntax/parsing *.dat, whole-document tests · probes run real code against each library (cheerox 1.1.6, cheerio 1.2.0, parse5 8.0.1, jsdom 30.1.3)',
+     'No library passes the 83 HTML processing-instruction tests added to WPT in 2026. cheerox output was identical to cheerio on all 3,000 corpus pages.']));
 }
 
 // 5. ops on one CPU
@@ -124,6 +124,6 @@ fs.writeFileSync(`${outDir}/memory-v4.svg`, frame(1344, SPEED_H, 'Memory footpri
   let s = bars(40, 120, 420, { title: 'Install size', sub: 'node_modules MB · lower is better', rows: byAsc((l) => fp[l].installBytes / 1e6), fmt: n1, labelW: 140 });
   s += bars(470, 120, 420, { title: 'Packages installed', sub: 'including the library · lower is better', rows: byAsc((l) => fp[l].packages), fmt: n0, labelW: 140 });
   s += bars(900, 120, 420, { title: 'Cold import', sub: 'ms, median of 15 · lower is better', rows: byAsc((l) => med(fp[l].requireMs)), fmt: n1, labelW: 140 });
-  fs.writeFileSync(`${outDir}/footprint-v4.svg`, frame(1344, BAR_H, 'Install footprint', s, ['Fresh npm i --omit=dev on Linux x64, Node 24.18.1. rusteerio bundles native binaries for 8 platforms (about 5 MB each).']));
+  fs.writeFileSync(`${outDir}/footprint-v4.svg`, frame(1344, BAR_H, 'Install footprint', s, ['Fresh npm i --omit=dev on Linux x64, Node 24.18.1. cheerox bundles native binaries for 8 platforms (about 5 MB each).']));
 }
 console.log('ok');

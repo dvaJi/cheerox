@@ -64,7 +64,7 @@ impl ForwardingEmitter for PositionedEmitter {
     fn adjusted_current_node_present_but_not_in_html_namespace(&mut self) -> bool {
         self.foreign.get()
     }
-    fn rusteerio_codec(&mut self) -> bool {
+    fn cheerox_codec(&mut self) -> bool {
         self.context.codec_enabled()
     }
     fn move_position(&mut self, offset: isize) {

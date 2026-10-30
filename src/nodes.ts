@@ -16,7 +16,7 @@ interface View { [VIEW_STATE]: DocumentState; [VIEW_LOCAL]: number; [VIEW_SELF]:
  */
 interface AttributeView extends ProxyHandler<Record<string, string>> { view: View; proxy: Record<string, string>; target: Record<string, string>; generation: number; state: DocumentState }
 
-const VIEW_CHILDREN = Symbol.for('rusteerio.node.children');
+const VIEW_CHILDREN = Symbol.for('cheerox.node.children');
 const arrayIndex = /^(?:0|[1-9]\d*)$/;
 const emptyRecord = Object.freeze({ id: -1, type: 'released', children: [] }) as unknown as NativeNodeRecord;
 

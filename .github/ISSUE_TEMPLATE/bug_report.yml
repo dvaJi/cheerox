@@ -20,6 +20,6 @@ body:
     id: environment
     attributes:
       label: Environment
-      description: Include rusteerio and Node versions, OS, architecture and worker setting.
+      description: Include cheerox and Node versions, OS, architecture and worker setting.
     validations:
       required: true

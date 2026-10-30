@@ -2,13 +2,13 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { hasChildren, isText } from 'domhandler';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 test('domhandler recognizes native parent nodes during a text-node walk', async () => {
   const input = '<main><a href="/about">About <strong>the team</strong></a><!--note--><p>Contact hello@example.test</p><script>hidden</script></main>';
   for (const options of [undefined, { xml: true }, { sourceCodeLocationInfo: true }]) {
     const expected = cheerio.load(input, options);
-    const documents = [rusteerio.load(input, options), await rusteerio.loadAsync(input, options), ...(await rusteerio.loadAll([input], options))];
+    const documents = [cheerox.load(input, options), await cheerox.loadAsync(input, options), ...(await cheerox.loadAll([input], options))];
     for (const actual of documents) {
       assert.deepEqual(walkText(actual.root()[0]), walkText(expected.root()[0]));
       assert.deepEqual(walkText(actual('main').clone()[0]), walkText(expected('main').clone()[0]));
@@ -26,7 +26,7 @@ test('domhandler recognizes native parent nodes during a text-node walk', async 
       }
     }
   }
-  const document = rusteerio.load('<root><![CDATA[text]]></root>', { xml: true });
+  const document = cheerox.load('<root><![CDATA[text]]></root>', { xml: true });
   assert.ok(hasChildren(document('root').contents()[0]));
   assert.deepEqual(walkText(document.root()[0]), ['text']);
 });
@@ -47,7 +47,7 @@ test('htmlparser2 serializes doctypes, foreign content and options like Cheerio'
   for (const input of inputs) for (const override of overrides) {
     const options = { xml: { xmlMode: false, ...override } };
     const expected = cheerio.load(input, options);
-    const actual = rusteerio.load(input, options);
+    const actual = cheerox.load(input, options);
     assert.equal(actual.html(), expected.html(), `${input} ${JSON.stringify(override)}`);
     for (const selector of ['svg', 'foreignObject', 'math', 'p']) {
       assert.equal(actual(selector).html(), expected(selector).html(), `${selector} inner HTML`);
@@ -64,7 +64,7 @@ test('htmlparser2 serialization matches Cheerio on 300 generated documents', () 
     const input = `<!doctype html><main data-id="${index}"><iframe><p>Frame ${index}</p></iframe><svg viewBox="0 0 ${index + 1} 10"><linearGradient id="g${index}"/><path fill="url(#g${index})"/><foreignObject><p title="">é &amp; ${index}</p></foreignObject></svg><math definitionURL="urn:${index}"><mi>x</mi></math><img src=""><br></main>`;
     const options = { xml: { xmlMode: false, selfClosingTags: index % 2 === 0, emptyAttrs: index % 3 === 0, encodeEntities: index % 5 === 0 ? 'utf8' : true } };
     const expected = cheerio.load(input, options);
-    const actual = rusteerio.load(input, options);
+    const actual = cheerox.load(input, options);
     assert.equal(actual.html(), expected.html(), `document ${index}`);
     assert.deepEqual(walkText(actual.root()[0]), walkText(expected.root()[0]), `text nodes ${index}`);
   }

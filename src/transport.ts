@@ -4,10 +4,10 @@ import type { NativeBinding, NativeDocument } from './native.js';
 interface TransportRegistry {
   userErrors: WeakSet<object>;
 }
-const registryKey = Symbol.for('rusteerio.native-transport.v2');
+const registryKey = Symbol.for('cheerox.native-transport.v2');
 const globals = globalThis as typeof globalThis & { [key: symbol]: TransportRegistry | undefined };
 const registry = globals[registryKey] ??= { userErrors: new WeakSet() };
-const transportedKey = Symbol.for('rusteerio.native-transport.prototype');
+const transportedKey = Symbol.for('cheerox.native-transport.prototype');
 
 const jsonMethods = new Set(['op', 'node', 'exportTree', 'parserDiagnostics', 'adopt']);
 /** String arguments each document method takes, by position, and how to encode them. */

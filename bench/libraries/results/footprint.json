@@ -1,7 +1,7 @@
 [
  {
-  "lib": "rusteerio",
-  "spec": "rusteerio@1.1.6",
+  "lib": "cheerox",
+  "spec": "cheerox@1.1.6",
   "installBytes": 40159600,
   "packages": 1,
   "requireMs": [

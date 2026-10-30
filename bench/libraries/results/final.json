@@ -1,12 +1,12 @@
 {
  "libs": [
-  "rusteerio",
+  "cheerox",
   "cheerio",
   "jsdom",
   "parse5"
  ],
  "scaling": {
-  "rusteerio": [
+  "cheerox": [
    {
     "cores": 1,
     "vms": [
@@ -696,7 +696,7 @@
   ]
  },
  "scalingPool": {
-  "rusteerio": [
+  "cheerox": [
    {
     "cores": 1,
     "vms": [
@@ -871,7 +871,7 @@
  },
  "scalingFailures": [],
  "ops": {
-  "rusteerio": {
+  "cheerox": {
    "parse": {
     "replicas": 3,
     "medianMs": 5701.8,
@@ -997,7 +997,7 @@
   }
  },
  "mem": {
-  "rusteerio": {
+  "cheerox": {
    "replicas": 3,
    "docs": 500,
    "htmlMB": 76.82,
@@ -1055,7 +1055,7 @@
   "files": 56,
   "tests": 1716,
   "summary": {
-   "rusteerio": {
+   "cheerox": {
     "total": 1716,
     "strictPass": 1591,
     "lenientPass": 1591,
@@ -1941,7 +1941,7 @@
   },
   "maxScore": 22,
   "results": {
-   "rusteerio": {
+   "cheerox": {
     "css_basic": true,
     "css_advanced": 1,
     "jquery_api": true,
@@ -2045,8 +2045,8 @@
  },
  "footprint": [
   {
-   "lib": "rusteerio",
-   "spec": "rusteerio@1.1.6",
+   "lib": "cheerox",
+   "spec": "cheerox@1.1.6",
    "installBytes": 40159600,
    "packages": 1,
    "requireMs": [
@@ -2141,7 +2141,7 @@
   "pages": 3000,
   "reference": "parse5",
   "results": {
-   "rusteerio": {
+   "cheerox": {
     "pagesIdenticalPct": 97.27,
     "errors": 0,
     "fieldPct": {

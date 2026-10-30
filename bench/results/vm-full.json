@@ -31,7 +31,7 @@
           "maxMs": 2.459272999999996
         },
         {
-          "name": "rusteerio.load + select + text + attr",
+          "name": "cheerox.load + select + text + attr",
           "rounds": 9,
           "medianMs": 0.3608849999999961,
           "p95Ms": 0.4942169999999919,
@@ -52,7 +52,7 @@
           "speedupVsCheerio": 1
         },
         {
-          "name": "rusteerio.extractAll threads=1",
+          "name": "cheerox.extractAll threads=1",
           "rounds": 9,
           "medianMs": 3.230173000000036,
           "p95Ms": 4.606381999999996,
@@ -62,7 +62,7 @@
           "speedupVsCheerio": 5.08568457478897
         },
         {
-          "name": "rusteerio.extractAll threads=8",
+          "name": "cheerox.extractAll threads=8",
           "rounds": 9,
           "medianMs": 1.1970790000000306,
           "p95Ms": 1.2734140000000025,
@@ -87,7 +87,7 @@
           "maxMs": 16.136350000000107
         },
         {
-          "name": "rusteerio.load + select + text + attr",
+          "name": "cheerox.load + select + text + attr",
           "rounds": 9,
           "medianMs": 2.585653000000093,
           "p95Ms": 3.994701999999961,
@@ -108,7 +108,7 @@
           "speedupVsCheerio": 1
         },
         {
-          "name": "rusteerio.extractAll threads=1",
+          "name": "cheerox.extractAll threads=1",
           "rounds": 9,
           "medianMs": 59.587297000000035,
           "p95Ms": 62.38609300000007,
@@ -118,7 +118,7 @@
           "speedupVsCheerio": 4.123206914386466
         },
         {
-          "name": "rusteerio.extractAll threads=8",
+          "name": "cheerox.extractAll threads=8",
           "rounds": 9,
           "medianMs": 13.277571999999964,
           "p95Ms": 15.736002000000553,
@@ -143,7 +143,7 @@
           "maxMs": 93.17802099999972
         },
         {
-          "name": "rusteerio.load + select + text + attr",
+          "name": "cheerox.load + select + text + attr",
           "rounds": 9,
           "medianMs": 28.819228000000294,
           "p95Ms": 31.6261599999998,
@@ -164,7 +164,7 @@
           "speedupVsCheerio": 1
         },
         {
-          "name": "rusteerio.extractAll threads=1",
+          "name": "cheerox.extractAll threads=1",
           "rounds": 9,
           "medianMs": 702.9685020000034,
           "p95Ms": 847.782444000004,
@@ -174,7 +174,7 @@
           "speedupVsCheerio": 5.758517868841842
         },
         {
-          "name": "rusteerio.extractAll threads=8",
+          "name": "cheerox.extractAll threads=8",
           "rounds": 9,
           "medianMs": 143.96711700000014,
           "p95Ms": 146.2108919999955,
@@ -196,7 +196,7 @@
       "eventLoopMaxMs": 4024.434687
     },
     {
-      "name": "rusteerio.extractAll threads=1",
+      "name": "cheerox.extractAll threads=1",
       "elapsedMs": 657.6954659999901,
       "timerTicksDuringWork": 125,
       "maxTimerLagMs": 7.482764000000316,
@@ -204,7 +204,7 @@
       "eventLoopMaxMs": 12.492799
     },
     {
-      "name": "rusteerio.extractAll threads=8",
+      "name": "cheerox.extractAll threads=8",
       "elapsedMs": 124.54403099999763,
       "timerTicksDuringWork": 21,
       "maxTimerLagMs": 5.942169999994803,

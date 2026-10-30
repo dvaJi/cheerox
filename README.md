@@ -111,8 +111,7 @@ npm run test:types   # consumer type checks
 npm run bench:legacy # cheerox vs cheerio@0.22.0
 ```
 
-See [PLAN.md](PLAN.md) for the implementation plan and status, and
-[UPSTREAM.md](UPSTREAM.md) for the pinned upstream revisions.
+See [COMPATIBILITY.md](COMPATIBILITY.md) for the behavioral report.
 
 ## Credits and license
 

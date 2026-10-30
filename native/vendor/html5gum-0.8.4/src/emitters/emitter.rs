@@ -135,8 +135,8 @@ pub trait Emitter {
         true
     }
 
-    /// Opt in to rusteerio's internal lossless UTF-16 source protocol.
-    fn rusteerio_codec(&mut self) -> bool { false }
+    /// Opt in to cheerox's internal lossless UTF-16 source protocol.
+    fn cheerox_codec(&mut self) -> bool { false }
 
     /// After every state change, the tokenizer calls this method to retrieve a new token that can
     /// be returned via the tokenizer's iterator interface.
@@ -150,7 +150,7 @@ pub trait Emitter {
     fn emit_string(&mut self, c: &[u8])
 
     /// Emit decoded character-reference bytes. The default is identical to
-    /// upstream emission; rusteerio overrides this boundary to escape literal
+    /// upstream emission; cheerox overrides this boundary to escape literal
     /// private-use scalars in its lossless UTF-16 transport.
     fn emit_char_ref(&mut self, value: &[u8], is_attribute: bool) {
         if is_attribute { self.push_attribute_value(value); }

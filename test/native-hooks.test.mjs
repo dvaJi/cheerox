@@ -4,7 +4,7 @@ import { Tokenizer } from 'htmlparser2-modern';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import { Element as ForeignElement, Text as ForeignText } from 'domhandler';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 function tokenizerFactory(trace, replaceText = false) {
   return class CustomTokenizer extends Tokenizer {
@@ -31,24 +31,24 @@ for (const xml of [true, { xmlMode: false, recognizeCDATA: true, recognizeSelfCl
       $('Item, item').html('<Inside>data</Inside>');
       return { initial, html: $.html(), trace };
     };
-    assert.deepEqual(run(rusteerio), run(reference));
+    assert.deepEqual(run(cheerox), run(reference));
   });
 }
 
 test('custom Tokenizer exceptions propagate and HTML5 parsing ignores Tokenizer', async () => {
   const failure = new Error('custom tokenizer failed');
   class BrokenTokenizer { constructor() { throw failure; } }
-  for (const library of [rusteerio, reference]) {
+  for (const library of [cheerox, reference]) {
     assert.throws(() => library.load('<p>X</p>', { xml: { Tokenizer: BrokenTokenizer } }), (error) => error === failure);
     assert.equal(library.load('<p>X</p>', { Tokenizer: BrokenTokenizer })('p').text(), 'X');
   }
-  await assert.rejects(rusteerio.loadAsync('<p>X</p>', { xml: { Tokenizer: BrokenTokenizer } }), (error) => error === failure);
+  await assert.rejects(cheerox.loadAsync('<p>X</p>', { xml: { Tokenizer: BrokenTokenizer } }), (error) => error === failure);
 });
 
 test('custom Tokenizer entity callbacks validate Unicode code points during write', () => {
   for (const codePoint of [-1, 0x110000, 1.5, NaN, 1n]) {
     const observed = [];
-    for (const library of [rusteerio, reference]) {
+    for (const library of [cheerox, reference]) {
       class InvalidTokenizer {
         constructor(_options, callbacks) { this.callbacks = callbacks; this.running = true; }
         write() { this.callbacks.ontextentity(codePoint, 1); }
@@ -87,12 +87,12 @@ for (const isDocument of [true, false]) {
       $('section').append('<article>original</article>');
       return { initial, final: $.html(), name: selected.name, classes: selected.constructor.name };
     };
-    assert.deepEqual(run(rusteerio), run(reference));
+    assert.deepEqual(run(cheerox), run(reference));
   });
 }
 
 test('treeAdapter gets actual parent decisions and its errors propagate', () => {
-  for (const library of [rusteerio, reference]) {
+  for (const library of [cheerox, reference]) {
     const failure = new Error('adapter failed');
     assert.throws(() => library.load('<p>X</p>', { treeAdapter: { ...adapter, createElement() { throw failure; } } }), (error) => error === failure);
     const parents = [];
@@ -109,27 +109,27 @@ test('onParseError reports parse5-compatible codes and UTF-16 locations', () => 
       library.load(html, { onParseError(error) { errors.push(error); } });
       return errors;
     };
-    assert.deepEqual(read(rusteerio), read(reference), JSON.stringify(html));
+    assert.deepEqual(read(cheerox), read(reference), JSON.stringify(html));
   }
 });
 
 test('onParseError propagates callback exceptions without losing identity', () => {
-  for (const library of [rusteerio, reference]) {
+  for (const library of [cheerox, reference]) {
     const failure = new Error('parse error callback failed');
     assert.throws(() => library.load('<p>X', { onParseError() { throw failure; } }), (error) => error === failure);
   }
 });
 
 test('default DOM views have native-backed prototypes and supplied prototypes survive', () => {
-  const $ = rusteerio.load('<p>X<!--C--></p>');
-  assert.ok($('p')[0] instanceof rusteerio.dom.Element);
-  assert.ok($('p')[0] instanceof rusteerio.dom.NodeWithChildren);
-  assert.ok($('p')[0] instanceof rusteerio.dom.Node);
-  assert.ok($('p').contents()[0] instanceof rusteerio.dom.Text);
-  assert.ok($('p').contents()[1] instanceof rusteerio.dom.Comment);
-  assert.ok($._root instanceof rusteerio.dom.Document);
+  const $ = cheerox.load('<p>X<!--C--></p>');
+  assert.ok($('p')[0] instanceof cheerox.dom.Element);
+  assert.ok($('p')[0] instanceof cheerox.dom.NodeWithChildren);
+  assert.ok($('p')[0] instanceof cheerox.dom.Node);
+  assert.ok($('p').contents()[0] instanceof cheerox.dom.Text);
+  assert.ok($('p').contents()[1] instanceof cheerox.dom.Comment);
+  assert.ok($._root instanceof cheerox.dom.Document);
   assert.equal($('p')[0].constructor.name, 'Element');
-  const node = new rusteerio.dom.Element('section', { id: 'native' }, [new rusteerio.dom.Text('created')]);
+  const node = new cheerox.dom.Element('section', { id: 'native' }, [new cheerox.dom.Text('created')]);
   $('p').append(node);
   assert.equal($('section')[0], node);
   assert.equal($('section').text(), 'created');
@@ -137,7 +137,7 @@ test('default DOM views have native-backed prototypes and supplied prototypes su
   $('p').append(foreign);
   assert.equal($('aside')[0], foreign);
   assert.ok(foreign instanceof ForeignElement);
-  assert.ok(foreign instanceof rusteerio.dom.Element);
+  assert.ok(foreign instanceof cheerox.dom.Element);
   assert.equal(foreign.children[0].parent, foreign);
 });
 
@@ -157,7 +157,7 @@ test('onParseError can change a live treeAdapter before subsequent element creat
     });
     return { html: $.html(), articleCreatedAfterError: events.find((event) => event[1] === 'article')?.[2], error: events.find((event) => event[0] === 'error') };
   };
-  assert.deepEqual(read(rusteerio), read(reference));
+  assert.deepEqual(read(cheerox), read(reference));
 });
 
 for (const xmlMode of [true, false]) {
@@ -169,7 +169,7 @@ for (const xmlMode of [true, false]) {
       const shape = (node) => ({ type: node.type, name: node.name, data: node.data, startIndex: node.startIndex, endIndex: node.endIndex, children: node.children?.map(shape) });
       return shape($._root);
     };
-    assert.deepEqual(read(rusteerio), read(reference));
+    assert.deepEqual(read(cheerox), read(reference));
   });
 }
 
@@ -184,12 +184,12 @@ for (const html of ['<p>X</p>', '<p>X', '<div><p>X</div>', '<b><i>X</b>Y</i>', '
       } });
       return { events, html: $.html() };
     };
-    assert.deepEqual(read(rusteerio), read(reference));
+    assert.deepEqual(read(cheerox), read(reference));
   });
 }
 
 test('cached native records invalidate across selection, direct-node and adoption mutations', () => {
-  const $ = rusteerio.load('<main><p id="first">one</p><p>two</p></main>');
+  const $ = cheerox.load('<main><p id="first">one</p><p>two</p></main>');
   const first = $('p')[0];
   const child = first.children[0];
   assert.equal(first.attribs.id, 'first');
@@ -199,7 +199,7 @@ test('cached native records invalidate across selection, direct-node and adoptio
   assert.equal(child.parent, null);
   first.attribs.id = 'direct';
   assert.equal($('p').first().attr('id'), 'direct');
-  const target = rusteerio.load('<aside></aside>');
+  const target = cheerox.load('<aside></aside>');
   target('aside').append(first);
   assert.equal(first.parent.name, 'aside');
   assert.equal($('p').length, 1);
@@ -208,7 +208,7 @@ test('cached native records invalidate across selection, direct-node and adoptio
 });
 
 test('borrowed DOM cloneNode uses its receiver and child array descriptors stay current', () => {
-  for (const library of [rusteerio, reference]) {
+  for (const library of [cheerox, reference]) {
     const $ = library.load('<p>A<b>B</b></p><section>C</section>');
     const first = $('p')[0];
     const second = $('section')[0];
@@ -239,7 +239,7 @@ for (const customTokenizer of [false, true]) {
       const $ = await done;
       return { html: $.html(), emittedText: customTokenizer ? trace.filter(([event]) => event === 'ontext').length : undefined };
     };
-    assert.deepEqual(await run(rusteerio), await run(reference));
+    assert.deepEqual(await run(cheerox), await run(reference));
   });
 }
 
@@ -249,7 +249,7 @@ test('streamed treeAdapter and onParseError exceptions preserve original error i
     const options = hook === 'treeAdapter' ? { treeAdapter: { ...adapter, createElement() { throw failure; } } } : { onParseError() { throw failure; } };
     let callback;
     const done = new Promise((resolve) => { callback = (error) => resolve(error); });
-    const stream = rusteerio.stringStream(options, callback);
+    const stream = cheerox.stringStream(options, callback);
     stream.on('error', () => {});
     stream.end('<p>X</p>');
     assert.equal(await done, failure);
@@ -260,7 +260,7 @@ test('streamed parse errors are delivered before their write completes', async (
   const errors = [];
   let complete;
   const done = new Promise((resolve, reject) => { complete = (error, $) => error ? reject(error) : resolve($); });
-  const stream = rusteerio.stringStream({ onParseError(error) { errors.push(error.code); } }, complete);
+  const stream = cheerox.stringStream({ onParseError(error) { errors.push(error.code); } }, complete);
   await writeChunk(stream, '<p>X</p>');
   assert.deepEqual(errors, ['missing-doctype']);
   stream.end();
@@ -284,7 +284,7 @@ test('treeAdapter source location setters and stack observers see actual token p
     } });
     return { html: $.html(), events, location: $('article')[0].sourceCodeLocation, text: $('article')[0].children[0].sourceCodeLocation };
   };
-  assert.deepEqual(read(rusteerio), read(reference));
+  assert.deepEqual(read(cheerox), read(reference));
 });
 
 test('HTML and XML attribute dictionaries retain their upstream prototype behavior', () => {
@@ -293,12 +293,12 @@ test('HTML and XML attribute dictionaries retain their upstream prototype behavi
       const attrs = library.load('<p id="x"/>', options)('p')[0].attribs;
       return { prototype: Object.getPrototypeOf(attrs) === null ? null : 'Object', hasConstructor: 'constructor' in attrs, constructor: attrs.constructor?.name, keys: Object.keys(attrs) };
     };
-    assert.deepEqual(read(rusteerio), read(reference));
+    assert.deepEqual(read(cheerox), read(reference));
   }
 });
 
 test('loading existing DOM nodes does not invoke parser-only hooks', () => {
-  for (const library of [rusteerio, reference]) {
+  for (const library of [cheerox, reference]) {
     const node = new ForeignElement('p', {}, [new ForeignText('existing')]);
     class NoParse { constructor() { throw new Error('DOM input should not be tokenized'); } }
     const $ = library.load(node, { xml: { Tokenizer: NoParse } });
@@ -317,7 +317,7 @@ test('native DOM nodes expose the same HTML/XML metadata fields as Cheerio', () 
       const shape = (node) => ({ fields: Object.fromEntries(fields.filter((field) => field in node && node[field] !== undefined).map((field) => [field, scalar(node[field])])), children: node.children?.map(shape) });
       return shape($._root);
     };
-    assert.deepEqual(read(rusteerio), read(reference));
+    assert.deepEqual(read(cheerox), read(reference));
   }
 });
 
@@ -325,7 +325,7 @@ test('treeAdapter text keeps private-use characters intact', () => {
   const literals = ['<p>&a\ue625</p>', '<p><\ue625</p>', '<p>\r\ue625</p>', '<p>&amp\ue625</p>', '<p>&notin\ue625</p>', '<table>x\ue625<tr><td>y</td></tr></table>'];
   for (const html of ['<i>&#xe625;</i>', '<i>&#xe800;</i>', '<i>&#xe000;x&#xe7ff;</i>', '<title>&#xe625;</title><p title="&#xe625;">&#xe625;</p>', ...literals]) {
     const expected = reference.load(html, { treeAdapter: adapter });
-    const actual = rusteerio.load(html, { treeAdapter: adapter });
+    const actual = cheerox.load(html, { treeAdapter: adapter });
     assert.equal(actual.html(), expected.html(), html);
     assert.equal(actual('i, p').text(), expected('i, p').text(), html);
   }

@@ -5,7 +5,7 @@ import fs from 'node:fs';
 import http from 'node:http';
 import { Writable } from 'node:stream';
 import * as cheerio from 'cheerio';
-import * as rusteerio from 'rusteerio';
+import * as cheerox from 'cheerox';
 import { JSDOM } from 'jsdom';
 import * as htmlparser2 from 'htmlparser2';
 import * as parse5 from 'parse5';
@@ -94,7 +94,7 @@ const cheerioLike = (lib, name) => ({
 });
 
 const P = {
-  rusteerio: cheerioLike(rusteerio, 'rusteerio'),
+  cheerox: cheerioLike(cheerox, 'cheerox'),
   cheerio: cheerioLike(cheerio, 'cheerio'),
   jsdom: {
     css_basic: () => new JSDOM(FIXTURE).window.document.querySelectorAll('div > p.x').length === 2,
@@ -171,7 +171,7 @@ const P = {
   },
 };
 
-const FEATURES = Object.keys(P.rusteerio);
+const FEATURES = Object.keys(P.cheerox);
 const results = {};
 for (const [lib, probes] of Object.entries(P)) {
   results[lib] = {};

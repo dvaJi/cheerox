@@ -1,5 +1,5 @@
 {
- "rusteerio": [
+ "cheerox": [
   {
    "file": "html5test-com.dat",
    "data": "<?import namespace=\"foo\" implementation=\"#bar\">",

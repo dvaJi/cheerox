@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 const fixtures = [
   '', 'plain < text &amp; emoji 🚀', '\ufeff<h1>UTF8 😀 café</h1>',
@@ -30,7 +30,7 @@ for (const [index, input] of fixtures.entries()) {
   for (const isDocument of [true, false]) {
     test(`HTML5 fixture ${index} (${isDocument ? 'document' : 'fragment'})`, () => {
       const expected = cheerio.load(input, {}, isDocument);
-      const actual = rusteerio.load(input, {}, isDocument);
+      const actual = cheerox.load(input, {}, isDocument);
       assert.equal(actual.html(), expected.html(), 'native serialization');
       assert.equal(actual.text(), expected.text(), 'native text');
       for (const selector of ['*', 'p', 'div', 'h2', 'template', 'script', 'svg a', '[data-test]']) {
@@ -50,7 +50,7 @@ for (const [index, input] of fixtures.entries()) {
 test('foreign xmlns attributes serialize like Cheerio from every serializer', () => {
   const input = '<div><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#a"/></svg><math xmlns="http://www.w3.org/1998/Math/MathML"><mi xml:lang="en">x</mi></math></div>';
   const expected = cheerio.load(input);
-  const actual = rusteerio.load(input);
+  const actual = cheerox.load(input);
   for (const selector of ['svg', 'math', 'div']) {
     assert.equal(actual(selector).prop('outerHTML'), expected(selector).prop('outerHTML'), `${selector} outerHTML`);
     assert.equal(actual.html(actual(selector)), expected.html(expected(selector)), `${selector} $.html`);
@@ -65,7 +65,7 @@ test('foreign xmlns attributes serialize like Cheerio from every serializer', ()
 test('template contents do not traverse into the host document', () => {
   const input = '<html><body><header class="host"><template><section class="top"><p><img class="inner"></p></section></template><img class="outer"></header></body></html>';
   const expected = cheerio.load(input);
-  const actual = rusteerio.load(input);
+  const actual = cheerox.load(input);
   const names = (selection) => selection.toArray().map((node) => node.name).join(',');
   const compare = (label) => {
     // Traversal always runs on the mutable tree, so one pass covers it.
@@ -79,13 +79,13 @@ test('template contents do not traverse into the host document', () => {
   };
   compare('traversal');
   const nested = '<template><div><template><span class="deep"></span></template></div></template>';
-  assert.equal(rusteerio.load(nested)('span.deep').parents().length, cheerio.load(nested)('span.deep').parents().length, 'nested template');
+  assert.equal(cheerox.load(nested)('span.deep').parents().length, cheerio.load(nested)('span.deep').parents().length, 'nested template');
 });
 
 test('htmlparser2 rendering writes stored attribute names like Cheerio', () => {
   const input = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><a xlink:href="#a">link</a></svg>';
   const options = { xml: { xmlMode: false } };
-  assert.equal(rusteerio.load(input).html(options), cheerio.load(input).html(options));
+  assert.equal(cheerox.load(input).html(options), cheerio.load(input).html(options));
 });
 
 test('the adoption agency keeps every node it moves', async () => {
@@ -97,15 +97,15 @@ test('the adoption agency keeps every node it moves', async () => {
     '<em><ul><li><a></a> <p>1</p> <p>2</p></em><li>next</ul>',
   ];
   for (const input of inputs) {
-    assert.equal(rusteerio.load(input).html(), cheerio.load(input).html(), `document ${JSON.stringify(input)}`);
-    assert.equal(rusteerio.load(input, {}, false).html(), cheerio.load(input, {}, false).html(), `fragment ${JSON.stringify(input)}`);
-    const actual = rusteerio.load('<div></div>');
+    assert.equal(cheerox.load(input).html(), cheerio.load(input).html(), `document ${JSON.stringify(input)}`);
+    assert.equal(cheerox.load(input, {}, false).html(), cheerio.load(input, {}, false).html(), `fragment ${JSON.stringify(input)}`);
+    const actual = cheerox.load('<div></div>');
     const expected = cheerio.load('<div></div>');
     actual('div').html(input);
     expected('div').html(input);
     assert.equal(actual.html(), expected.html(), `inner html ${JSON.stringify(input)}`);
     const streamed = await new Promise((resolve, reject) => {
-      const stream = rusteerio.stringStream({}, (error, $) => error ? reject(error) : resolve($.html()));
+      const stream = cheerox.stringStream({}, (error, $) => error ? reject(error) : resolve($.html()));
       stream.end(input);
     });
     assert.equal(streamed, cheerio.load(input).html(), `stream ${JSON.stringify(input)}`);
@@ -116,6 +116,6 @@ test('plain text fragments parse like any other fragment', () => {
   const inputs = ['', ' ', 'plain value 31', '  padded\n\ttext  ', 'é漢😀', '', '﻿bom', 'a > b = "c"', '\u0001ctrl', 'a\nb', ' nbsp'];
   for (const input of inputs) for (const options of [undefined, {}, { scriptingEnabled: false }]) {
     const describe = ($) => [$.html(), $.text(), $.root()[0].children.map((node) => [node.type, node.data])];
-    assert.deepEqual(describe(rusteerio.load(input, options, false)), describe(cheerio.load(input, options, false)), JSON.stringify(input));
+    assert.deepEqual(describe(cheerox.load(input, options, false)), describe(cheerio.load(input, options, false)), JSON.stringify(input));
   }
 });

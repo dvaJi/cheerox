@@ -4,8 +4,8 @@ Use a Linux VM with at least eight available CPUs, 16 GB of RAM, Node.js 20.19 o
 
 ```sh
 ssh user@vm
-git clone https://github.com/context-dot-dev/rusteerio.git
-cd rusteerio
+git clone https://github.com/dvaJi/cheerox.git
+cd cheerox
 npm ci
 npm run build
 npm test
@@ -15,7 +15,7 @@ npm run test:package
 node --test bench/suite/worker-pool.test.mjs bench/compare.test.mjs
 node --expose-gc bench/fair.mjs --require-cap --output bench/results/fair/current.json
 exit
-scp 'user@vm:~/rusteerio/bench/results/fair/current.json' bench/results/fair/
+scp 'user@vm:~/cheerox/bench/results/fair/current.json' bench/results/fair/
 ```
 
 Shut down the VM after copying the reports. `--quick` uses smaller fixtures and three samples for a smoke run; it does not produce the nine-sample recorded comparison. The recorded full suite used two sequential invocations: `--only sync,pools`, then `--append --only cold,stream,retention,concurrent`. Appending requires identical source and native binary hashes, plus identical native build metadata.
@@ -74,7 +74,7 @@ When benchmarking an addon built in a separate release container, pass `--native
 
 [`results/2026-10-14/`](results/2026-10-14/) holds the measurements the main README reports: [real pages](results/2026-10-14/corpus.json) (5,000 Common Crawl pages; page URLs omitted), [single operations](results/2026-10-14/operations-html.json) in HTML and [XML](results/2026-10-14/operations-xml.json) mode, and [the matched CPU suite](results/2026-10-14/fair.json). They measured release 1.1.6 (revision 0ee5db7) with Node 24.18.1 on an eight-CPU Linux x64 VM of the same type as the earlier record, with the addon built on the VM by Rust 1.99.0 rather than in the pinned release image, so `bench/compare.mjs` does not pair this report with the earlier baseline.
 
-Outputs matched on all 5,000 pages and in every operation and matched CPU sample. Rusteerio was 2.22× faster in total and faster on 4,963 pages in the full pass; the other 37 measured 1.20× to 2.04× faster when rerun with 25 samples each on the same machine. It was faster including load in 50 of 50 HTML and 48 of 50 XML operation measurements in each of two runs, and in all 45 matched CPU cases. The XML measurements it lost both walk every node and enumerate each element's attributes.
+Outputs matched on all 5,000 pages and in every operation and matched CPU sample. Cheerox was 2.22× faster in total and faster on 4,963 pages in the full pass; the other 37 measured 1.20× to 2.04× faster when rerun with 25 samples each on the same machine. It was faster including load in 50 of 50 HTML and 48 of 50 XML operation measurements in each of two runs, and in all 45 matched CPU cases. The XML measurements it lost both walk every node and enumerate each element's attributes.
 
 ## Recorded matched results, October 13, 2026
 
@@ -144,13 +144,13 @@ Streams contain 50,000 article or item elements and use 32 KiB chunks. RSS is th
 | Format | CPUs | Engine | Time ms | RSS MB | Lag ms | Timer ticks |
 | --- | --- | --- | --- | --- | --- | --- |
 | HTML | 1 | cheerio | 1107.78 | 698.5 | 1102.95 | 0 |
-| HTML | 1 | rusteerio | 346.21 | 372.6 | 0.90 | 68 |
+| HTML | 1 | cheerox | 346.21 | 372.6 | 0.90 | 68 |
 | XML | 1 | cheerio | 190.80 | 230.8 | 189.73 | 0 |
-| XML | 1 | rusteerio | 162.00 | 276.0 | 0.72 | 32 |
+| XML | 1 | cheerox | 162.00 | 276.0 | 0.72 | 32 |
 | HTML | 8 | cheerio | 592.34 | 709.3 | 594.22 | 0 |
-| HTML | 8 | rusteerio | 341.09 | 372.1 | 0.80 | 67 |
+| HTML | 8 | cheerox | 341.09 | 372.1 | 0.80 | 67 |
 | XML | 8 | cheerio | 119.85 | 228.7 | 115.23 | 0 |
-| XML | 8 | rusteerio | 162.28 | 275.4 | 0.63 | 32 |
+| XML | 8 | cheerox | 162.28 | 275.4 | 0.63 | 32 |
 
 Rust XML streaming at eight CPUs was slower and used more RSS than Cheerio. Its parsing ran off the JavaScript thread, allowing timers to run. In the warm large eight-CPU extraction batch, Rust used 405.5 MB sampled RSS versus Cheerio’s 2,656.3 MB, but had 24.06 ms median maximum timer lag versus 3.49 ms. Native input/result conversion still executes on the JavaScript thread.
 
@@ -161,7 +161,7 @@ The DOM stays at 32 live article elements over 4,000 append/update/remove cycles
 | Engine | Time ms | RSS at 200 cycles MB | RSS at 4,000 cycles MB | Growth 200→4,000 MB | Growth 2,000→4,000 MB |
 | --- | --- | --- | --- | --- | --- |
 | cheerio | 593.28 | 93.0 | 93.0 | 0.8 | 0.1 |
-| rusteerio | 614.76 | 82.1 | 97.6 | 15.2 | 0.4 |
+| cheerox | 614.76 | 82.1 | 97.6 | 15.2 | 0.4 |
 
 Rust’s median within-sample RSS growth from cycle 200 to 4,000 fell from 46.50 MB in the baseline to 15.21 MB. Its curve plateaued near 97 MB after warm-up: growth from cycle 2,000 to 4,000 fell from 20.95 MB to 0.40 MB. Cheerio’s growth over that later interval was 0.13 MB. The final Rust retention time was slightly higher than Cheerio’s; this workload supports improved retention rather than a universal memory bound.
 

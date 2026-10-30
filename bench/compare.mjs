@@ -26,7 +26,7 @@ export function compareReports(before, after) {
     for (const field of ['kind', 'mode', 'size', 'format', 'articles', 'budget', 'documents', 'cycles', 'checkpoint', 'concurrent', 'expectedHash']) assert.equal(previous[field], current[field], `Unmatched case ${current.id}: ${field}`);
     assert.deepEqual(previous.cpuAffinity, current.cpuAffinity, 'CPU affinity changed');
     const engines = {};
-    for (const name of ['cheerio', 'rusteerio']) {
+    for (const name of ['cheerio', 'cheerox']) {
       const old = previous.engines.find((row) => row.engine === name);
       const now = current.engines.find((row) => row.engine === name);
       assert.ok(old && now, `Missing engine ${name} in ${current.id}`);
@@ -50,7 +50,7 @@ export function compareReports(before, after) {
         engines[name].medianRssGrowthAfterFirstCheckpointBytes = median(now.samples.map((sample) => sample.timeline.at(-1).rssBytes - sample.timeline[0].rssBytes));
         engines[name].medianFinalHeapUsedBytes = median(now.samples.map((sample) => sample.timeline.at(-1).heapUsedBytes));
       }
-      if (current.kind === 'concurrent' && name === 'rusteerio') {
+      if (current.kind === 'concurrent' && name === 'cheerox') {
         for (const sample of now.samples) {
           assert.ok(sample.pool, 'Final concurrent report lacks native worker telemetry');
           assert.ok(sample.pool.peakActiveWorkers <= current.budget);
@@ -59,7 +59,7 @@ export function compareReports(before, after) {
         }
       }
     }
-    const speedupVsCheerio = engines.cheerio.currentMedianMs / engines.rusteerio.currentMedianMs;
+    const speedupVsCheerio = engines.cheerio.currentMedianMs / engines.cheerox.currentMedianMs;
     return { id: current.id, kind: current.kind, mode: current.mode, budget: current.budget, engines, speedupVsCheerio, rustFasterThanCheerio: speedupVsCheerio > 1 };
   });
   return {
@@ -85,6 +85,6 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   if (!beforePath || !afterPath) throw new Error('Usage: node bench/compare.mjs <before.json> <after.json> [output.json]');
   const report = compareReports(JSON.parse(await readFile(beforePath, 'utf8')), JSON.parse(await readFile(afterPath, 'utf8')));
   if (outputPath) await writeFile(outputPath, JSON.stringify(report, null, 2) + '\n');
-  console.table(report.cases.map((row) => ({ case: row.id, cheerioMs: row.engines.cheerio.currentMedianMs.toFixed(2), rustMs: row.engines.rusteerio.currentMedianMs.toFixed(2), speedup: row.speedupVsCheerio.toFixed(2), rustVsBefore: row.engines.rusteerio.improvementVsPrevious.toFixed(2) })));
+  console.table(report.cases.map((row) => ({ case: row.id, cheerioMs: row.engines.cheerio.currentMedianMs.toFixed(2), rustMs: row.engines.cheerox.currentMedianMs.toFixed(2), speedup: row.speedupVsCheerio.toFixed(2), rustVsBefore: row.engines.cheerox.improvementVsPrevious.toFixed(2) })));
   console.log(`${report.rustWins}/${report.caseCount} Rust wins; losses: ${report.rustLosses.join(', ') || '(none)'}`);
 }

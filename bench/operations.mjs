@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 /**
  * Per-operation comparison on freshly loaded documents. Each sample loads a
@@ -91,22 +91,22 @@ const pages = corpusDirectory
 const rows = [];
 for (const page of pages) {
   const cheerioLoad = measureLoad(cheerio, page.html);
-  const rusteerioLoad = measureLoad(rusteerio, page.html);
-  rows.push({ page: page.name, operation: 'load', cheerio: cheerioLoad, rusteerio: rusteerioLoad });
+  const cheeroxLoad = measureLoad(cheerox, page.html);
+  rows.push({ page: page.name, operation: 'load', cheerio: cheerioLoad, cheerox: cheeroxLoad });
   for (const [name, operation] of Object.entries(operations)) {
     if (only && !only.includes(name)) continue;
     const reference = measure(cheerio, page.html, operation);
-    const candidate = measure(rusteerio, page.html, operation);
+    const candidate = measure(cheerox, page.html, operation);
     assert.deepEqual(candidate.output, reference.output, `${name} output differs on ${page.name}`);
-    rows.push({ page: page.name, operation: name, cheerio: reference.median, rusteerio: candidate.median, cheerioWithLoad: reference.median + cheerioLoad, rusteerioWithLoad: candidate.median + rusteerioLoad });
+    rows.push({ page: page.name, operation: name, cheerio: reference.median, cheerox: candidate.median, cheerioWithLoad: reference.median + cheerioLoad, cheeroxWithLoad: candidate.median + cheeroxLoad });
   }
 }
 
 const format = (value) => value < 0.1 ? value.toFixed(3) : value.toFixed(2);
-console.log(`${'page'.padEnd(16)} ${'operation'.padEnd(30)} ${'cheerio ms'.padStart(11)} ${'rusteerio ms'.padStart(13)} ${'speedup'.padStart(8)} ${'with load'.padStart(10)}`);
+console.log(`${'page'.padEnd(16)} ${'operation'.padEnd(30)} ${'cheerio ms'.padStart(11)} ${'cheerox ms'.padStart(13)} ${'speedup'.padStart(8)} ${'with load'.padStart(10)}`);
 for (const row of rows) {
-  const withLoad = row.cheerioWithLoad ? `${(row.cheerioWithLoad / row.rusteerioWithLoad).toFixed(2)}x` : '';
-  console.log(`${row.page.padEnd(16)} ${row.operation.padEnd(30)} ${format(row.cheerio).padStart(11)} ${format(row.rusteerio).padStart(13)} ${`${(row.cheerio / row.rusteerio).toFixed(2)}x`.padStart(8)} ${withLoad.padStart(10)}`);
+  const withLoad = row.cheerioWithLoad ? `${(row.cheerioWithLoad / row.cheeroxWithLoad).toFixed(2)}x` : '';
+  console.log(`${row.page.padEnd(16)} ${row.operation.padEnd(30)} ${format(row.cheerio).padStart(11)} ${format(row.cheerox).padStart(13)} ${`${(row.cheerio / row.cheerox).toFixed(2)}x`.padStart(8)} ${withLoad.padStart(10)}`);
 }
 const json = flag('--json');
 if (json) writeFileSync(json, `${JSON.stringify({ samples, node: process.version, rows }, null, 2)}\n`);

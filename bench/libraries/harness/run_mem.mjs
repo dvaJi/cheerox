@@ -19,7 +19,7 @@ const t0 = performance.now();
 for (const p of pages) {
   const d = lib.parse(p);
   // Touch the tree once so lazily materialised engines pay their full cost.
-  if (libName === 'rusteerio' || libName === 'cheerio') d('a').length;
+  if (libName === 'cheerox' || libName === 'cheerio') d('a').length;
   docs.push(d);
 }
 const ms = performance.now() - t0;

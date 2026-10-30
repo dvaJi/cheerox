@@ -193,7 +193,7 @@ pub trait TreeSink {
     fn mark_script_already_started(&self, _node: &Self::Handle) {}
 
     /// Observer for insertion onto the actual stack of open elements.
-    /// Added by rusteerio for parse5-compatible user tree adapters.
+    /// Added by cheerox for parse5-compatible user tree adapters.
     fn on_stack_push(&self, _node: &Self::Handle) {}
 
     /// Observer after a parser-driven removal from the stack. EOF teardown is

@@ -59,10 +59,10 @@ pub struct TokenizerOpts {
     /// performance penalty?  Default: false
     pub exact_errors: bool,
 
-    /// Escape decoded private-use characters for rusteerio's lossless UTF-16
+    /// Escape decoded private-use characters for cheerox's lossless UTF-16
     /// transport. This extension is opt-in; ordinary html5ever users retain
     /// the upstream character-reference behavior.
-    pub rusteerio_codec: bool,
+    pub cheerox_codec: bool,
 
     /// Discard a `U+FEFF BYTE ORDER MARK` if we see one at the beginning
     /// of the stream?  Default: true
@@ -88,7 +88,7 @@ impl Default for TokenizerOpts {
     fn default() -> TokenizerOpts {
         TokenizerOpts {
             exact_errors: false,
-            rusteerio_codec: false,
+            cheerox_codec: false,
             discard_bom: true,
             profile: false,
             initial_state: None,
@@ -1699,7 +1699,7 @@ impl<Sink: TokenSink> Tokenizer<Sink> {
         for i in 0..num_chars {
             let c = chars[i as usize];
             let is_escaped =
-                self.opts.rusteerio_codec && ('\u{e000}'..='\u{e800}').contains(&c);
+                self.opts.cheerox_codec && ('\u{e000}'..='\u{e800}').contains(&c);
             match self.state.get() {
                 // The escape and its character form one text token, so a sink
                 // that forwards each token never receives them separately.

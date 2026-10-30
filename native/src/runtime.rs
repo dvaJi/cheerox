@@ -24,9 +24,7 @@ fn runtime() -> &'static Runtime {
         let default = std::thread::available_parallelism()
             .map_or(1, usize::from)
             .min(256);
-        let requested = std::env::var("CHEEROX_THREADS")
-            .or_else(|_| std::env::var("RUSTEERIO_THREADS"))
-            .ok();
+        let requested = std::env::var("CHEEROX_THREADS").ok();
         let parsed = requested
             .as_ref()
             .and_then(|value| value.parse::<usize>().ok())
@@ -214,7 +212,7 @@ pub(crate) fn start_release_thread() {
         // A thread that cannot start drops its receiver; sends then fail and
         // values drop on the caller.
         let _ = std::thread::Builder::new()
-            .name("rusteerio-release".into())
+            .name("cheerox-release".into())
             .spawn(move || {
                 for value in receiver {
                     drop(value);

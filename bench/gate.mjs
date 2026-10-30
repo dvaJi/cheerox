@@ -34,7 +34,7 @@ const knownGaps = {
   'xml per-element attribute rewrite': 0.55,
 };
 
-const directory = mkdtempSync(path.join(tmpdir(), 'rusteerio-gate-'));
+const directory = mkdtempSync(path.join(tmpdir(), 'cheerox-gate-'));
 const script = fileURLToPath(new URL('./operations.mjs', import.meta.url));
 /** Shared CI runners slow single samples down at random, so an operation below its floor is measured again before it fails. */
 const attempts = 3;
@@ -50,7 +50,7 @@ for (const mode of ['html', 'xml']) {
     below = rows.filter((row) => row.operation !== 'load').map((row) => {
       const key = `${mode} ${row.operation}`;
       const floor = knownGaps[key] ?? parityFloor;
-      return { row, key, floor, ratio: row.cheerioWithLoad / row.rusteerioWithLoad };
+      return { row, key, floor, ratio: row.cheerioWithLoad / row.cheeroxWithLoad };
     }).filter(({ ratio, floor }) => ratio < floor);
     pending = new Set(below.map(({ row }) => row.operation));
   }

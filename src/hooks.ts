@@ -157,9 +157,9 @@ export function createTreeAdapterSession(options: CheerioOptions, isDocument: bo
   let failure: unknown;
   let aborted = false;
   const bridge = (request: string): string => {
-    if (hasFailure || aborted) return '{"__rusteerioHookError":true}';
+    if (hasFailure || aborted) return '{"__cheeroxHookError":true}';
     try { return adapter.bridge(request); }
-    catch (error) { hasFailure = true; failure = error; return '{"__rusteerioHookError":true}'; }
+    catch (error) { hasFailure = true; failure = error; return '{"__cheeroxHookError":true}'; }
   };
   const parser = new binding.NativeHookStream(isDocument, JSON.stringify(cleanParserOptions(options)), bridge);
   const restoreFailure = (error: unknown): never => { if (hasFailure) throw failure; throw error; };
@@ -208,12 +208,12 @@ export function createDiagnosticSession(options: CheerioOptions, isDocument = tr
   let failure: unknown;
   let aborted = false;
   const bridge = (request: string): string => {
-    if (hasFailure || aborted) return '{"__rusteerioHookError":true}';
+    if (hasFailure || aborted) return '{"__cheeroxHookError":true}';
     try {
       const { method, args } = JSON.parse(request);
       if (method === '__parseError') options.onParseError?.(args[0]);
       return 'null';
-    } catch (error) { hasFailure = true; failure = error; return '{"__rusteerioHookError":true}'; }
+    } catch (error) { hasFailure = true; failure = error; return '{"__cheeroxHookError":true}'; }
   };
   const parser = new binding.NativeStream(JSON.stringify(cleanParserOptions(options)), isDocument, bridge);
   const restoreFailure = (error: unknown): never => { if (hasFailure) throw failure; throw error; };

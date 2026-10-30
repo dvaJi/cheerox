@@ -7,7 +7,7 @@ import { Socket } from 'node:net';
 import { test } from 'node:test';
 import { Agent } from 'undici';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 async function serverFixture(handler, work) {
   const server = createServer(handler);
@@ -37,7 +37,7 @@ test('incremental decoding matches Cheerio across sniffing and character boundar
     [Buffer.from('<meta charset="utf-8"><p>café</p>'), { encoding: { maxBytes: 2 } }],
   ];
   for (const [buffer, options] of samples) for (const step of [1, 3, 17, 1024]) {
-    const [actual, expected] = await Promise.all([streamed(rusteerio, buffer, options, step), streamed(reference, buffer, options, step)]);
+    const [actual, expected] = await Promise.all([streamed(cheerox, buffer, options, step), streamed(reference, buffer, options, step)]);
     assert.equal(actual.html(), expected.html(), `chunk size ${step}: ${buffer.toString('hex')}`);
   }
 });
@@ -46,7 +46,7 @@ test('string stream delivers parser errors before finish and propagates callback
   const errors = [];
   let completions = 0;
   const finished = new Promise((resolve, reject) => {
-    const parser = rusteerio.stringStream({ onParseError(error) { errors.push(error); } }, (error, $) => {
+    const parser = cheerox.stringStream({ onParseError(error) { errors.push(error); } }, (error, $) => {
       completions++; error ? reject(error) : resolve($);
     });
     parser.write('<p a=1 a=2>hello</p>', error => {
@@ -59,7 +59,7 @@ test('string stream delivers parser errors before finish and propagates callback
   assert.equal(completions, 1);
   const original = new Error('user hook failed');
   await new Promise(resolve => {
-    const parser = rusteerio.stringStream({ onParseError() { throw original; } }, (error) => {
+    const parser = cheerox.stringStream({ onParseError() { throw original; } }, (error) => {
       assert.equal(error, original); completions++; resolve();
     });
     parser.write('<p>', error => assert.equal(error, original));
@@ -75,12 +75,12 @@ test('fromURL streams responses, resolves redirected baseURI, and preserves stat
     response.write('<!doctype html><p>café ');
     setImmediate(() => response.end('😀</p><a href="next">next</a>'));
   }, async base => {
-    const actual = await rusteerio.fromURL(`${base}/redirect`);
+    const actual = await cheerox.fromURL(`${base}/redirect`);
     const expected = await reference.fromURL(`${base}/redirect`);
     assert.equal(actual.html(), expected.html());
     assert.equal(actual('a').prop('href'), `${base}/next`);
-    for (const api of [reference, rusteerio]) await assert.rejects(api.fromURL(`${base}/missing`), error => error.statusCode === 404 && error.code === 'UND_ERR_RESPONSE');
-    await assert.rejects(rusteerio.fromURL(`${base}/missing`, { requestOptions: { throwOnError: false } }), error => error.statusCode === 404 && error.code === 'UND_ERR_RESPONSE');
+    for (const api of [reference, cheerox]) await assert.rejects(api.fromURL(`${base}/missing`), error => error.statusCode === 404 && error.code === 'UND_ERR_RESPONSE');
+    await assert.rejects(cheerox.fromURL(`${base}/missing`, { requestOptions: { throwOnError: false } }), error => error.statusCode === 404 && error.code === 'UND_ERR_RESPONSE');
   });
 });
 
@@ -91,11 +91,11 @@ test('fromURL enforces header/body timeouts, response limits and abort signals',
     response.write('<p>');
     if (request.url === '/large') response.end('x'.repeat(4096) + '</p>');
   }, async base => {
-    await assert.rejects(rusteerio.fromURL(`${base}/headers`, { requestOptions: { headersTimeout: 30 } }), error => error.code === 'UND_ERR_HEADERS_TIMEOUT');
-    await assert.rejects(rusteerio.fromURL(`${base}/body`, { requestOptions: { bodyTimeout: 30 } }), error => error.code === 'UND_ERR_BODY_TIMEOUT');
-    await assert.rejects(rusteerio.fromURL(`${base}/large`, { requestOptions: { maxResponseSize: 100 } }), error => error.code === 'UND_ERR_RES_EXCEEDED_MAX_SIZE');
+    await assert.rejects(cheerox.fromURL(`${base}/headers`, { requestOptions: { headersTimeout: 30 } }), error => error.code === 'UND_ERR_HEADERS_TIMEOUT');
+    await assert.rejects(cheerox.fromURL(`${base}/body`, { requestOptions: { bodyTimeout: 30 } }), error => error.code === 'UND_ERR_BODY_TIMEOUT');
+    await assert.rejects(cheerox.fromURL(`${base}/large`, { requestOptions: { maxResponseSize: 100 } }), error => error.code === 'UND_ERR_RES_EXCEEDED_MAX_SIZE');
     const controller = new AbortController();
-    const pending = rusteerio.fromURL(`${base}/body`, { requestOptions: { signal: controller.signal } });
+    const pending = cheerox.fromURL(`${base}/body`, { requestOptions: { signal: controller.signal } });
     controller.abort();
     await assert.rejects(pending, { name: 'AbortError' });
   });
@@ -107,7 +107,7 @@ test('fromURL supports a caller dispatcher without installing runtime dependenci
   const dispatcher = { dispatch(options, handler) { requests.push(options); return agent.dispatch(options, handler); } };
   try {
     await serverFixture((_request, response) => response.writeHead(200, { 'content-type': 'text/html' }).end('<p>transport</p>'), async base => {
-      const $ = await rusteerio.fromURL(base, { requestOptions: { dispatcher, headersTimeout: 2000, bodyTimeout: 2000 } });
+      const $ = await cheerox.fromURL(base, { requestOptions: { dispatcher, headersTimeout: 2000, bodyTimeout: 2000 } });
       assert.equal($('p').text(), 'transport');
       assert.equal(requests.length, 1);
       assert.equal(requests[0].headersTimeout, 2000);
@@ -123,14 +123,14 @@ test('HTTP options accept Cheerio header forms, query serialization and streamin
     response.writeHead(200, { 'content-type': 'text/html' }).end(`<p>${request.url}|${request.headers['x-values']}|${body}</p>`);
   }, async base => {
     for (const headers of [{ 'x-values': ['one', 'two'] }, ['x-values', 'one', 'x-values', 'two'], new Map([['x-values', ['one', 'two']]])]) {
-      const $ = await rusteerio.fromURL(base, { requestOptions: { method: 'POST', headers, query: { q: ['one', 'two'], count: 3 }, body: Readable.from(['streamed ', 'body']) } });
+      const $ = await cheerox.fromURL(base, { requestOptions: { method: 'POST', headers, query: { q: ['one', 'two'], count: 3 }, body: Readable.from(['streamed ', 'body']) } });
       assert.equal($('p').text(), '/?q=one&q=two&count=3|one, two|streamed body');
     }
-    await assert.rejects(rusteerio.fromURL(`${base}/?existing=1`, { requestOptions: { query: { extra: 2 } } }), /query/i);
+    await assert.rejects(cheerox.fromURL(`${base}/?existing=1`, { requestOptions: { query: { extra: 2 } } }), /query/i);
   });
   await serverFixture((_request, response) => { response.writeHead(200, { 'content-type': 'text/html' }); response.write('<p>'); }, async base => {
     const signal = new EventEmitter();
-    const pending = rusteerio.fromURL(base, { requestOptions: { signal } });
+    const pending = cheerox.fromURL(base, { requestOptions: { signal } });
     signal.emit('abort');
     await assert.rejects(pending, { name: 'AbortError' });
     assert.equal(signal.listenerCount('abort'), 0);
@@ -145,12 +145,12 @@ test('URL MIME parsing follows quoted charset rules and updates supplied encodin
     for (const path of ['/quoted', '/empty']) {
       const actualOptions = { encoding: { defaultEncoding: 'utf-8' } };
       const expectedOptions = { encoding: { defaultEncoding: 'utf-8' } };
-      const actual = await rusteerio.fromURL(base + path, actualOptions);
+      const actual = await cheerox.fromURL(base + path, actualOptions);
       const expected = await reference.fromURL(base + path, expectedOptions);
       assert.equal(actual.html(), expected.html());
       assert.deepEqual(actualOptions, expectedOptions);
     }
-    for (const library of [reference, rusteerio]) await assert.rejects(library.fromURL(base + '/invalid'), { name: 'Error', message: 'Could not parse MIME type string "invalid"' });
+    for (const library of [reference, cheerox]) await assert.rejects(library.fromURL(base + '/invalid'), { name: 'Error', message: 'Could not parse MIME type string "invalid"' });
   });
 });
 
@@ -163,7 +163,7 @@ test('URL transport preserves caller header negotiation and informational callba
   }, async base => {
     for (const headers of [undefined, {}, null, [], { 'x-one': 'one' }]) {
       const actualHints = [], expectedHints = [];
-      const actual = await rusteerio.fromURL(base, { requestOptions: { method: 'GET', headers, onInfo: info => actualHints.push(info) } });
+      const actual = await cheerox.fromURL(base, { requestOptions: { method: 'GET', headers, onInfo: info => actualHints.push(info) } });
       const expected = await reference.fromURL(base, { requestOptions: { method: 'GET', headers, onInfo: info => expectedHints.push(info) } });
       assert.equal(actual.html(), expected.html());
       assert.deepEqual(actualHints, expectedHints);
@@ -171,7 +171,7 @@ test('URL transport preserves caller header negotiation and informational callba
       assert.equal(actualHints[0].statusCode, 103);
     }
     const original = new Error('informational callback');
-    await assert.rejects(rusteerio.fromURL(base, { requestOptions: { onInfo() { throw original; } } }), error => error === original);
+    await assert.rejects(cheerox.fromURL(base, { requestOptions: { onInfo() { throw original; } } }), error => error === original);
   });
 });
 
@@ -182,11 +182,11 @@ test('URL transport only calls optional socket TOS setters with a configured num
   try {
     await serverFixture((_request, response) => response.writeHead(200, { 'content-type': 'text/html' }).end('<p>socket</p>'), async base => {
       for (const options of [{}, { typeOfService: undefined }, { typeOfService: null }, { typeOfService: 0 }, { typeOfService: 16 }]) {
-        assert.equal((await rusteerio.fromURL(base, { requestOptions: options }))('p').text(), 'socket');
+        assert.equal((await cheerox.fromURL(base, { requestOptions: options }))('p').text(), 'socket');
       }
       assert.deepEqual(values, [0, 16]);
       for (const typeOfService of [-1, 256, 0.5, NaN, Infinity]) {
-        await assert.rejects(rusteerio.fromURL(base, { requestOptions: { typeOfService } }), { name: 'InvalidArgumentError', code: 'UND_ERR_INVALID_ARG' });
+        await assert.rejects(cheerox.fromURL(base, { requestOptions: { typeOfService } }), { name: 'InvalidArgumentError', code: 'UND_ERR_INVALID_ARG' });
       }
       assert.deepEqual(values, [0, 16]);
     });

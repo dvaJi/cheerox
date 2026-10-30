@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 const input = '<article data-id="1"><h2>One</h2><a href="/one">link</a></article><article data-id="2"><h2>Two</h2><a href="/two">link</a></article>';
 
@@ -23,7 +23,7 @@ test('compiled extraction prefixes preserve callback mutations, context and fiel
     const result = $.extract({ rows: [{ selector: 'article', value: nested }] });
     return { result, trace, html: $.html() };
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('extraction never speculatively invokes descriptor getters or Proxy traps', () => {
@@ -37,7 +37,7 @@ test('extraction never speculatively invokes descriptor getters or Proxy traps',
     const observed = new Proxy(map, { get(target, key, receiver) { trace.push(`get:${String(key)}`); return Reflect.get(target, key, receiver); }, ownKeys(target) { trace.push('keys'); return Reflect.ownKeys(target); } });
     return { result: library.load(input).extract(observed), trace };
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('nested extraction honors custom _make, selector, prop and extract methods', () => {
@@ -47,7 +47,7 @@ test('nested extraction honors custom _make, selector, prop and extract methods'
     $.fn.prop = function (name) { return name === 'textContent' ? 'custom:' + prop.call(this, name) : prop.apply(this, arguments); };
     return $.extract({ rows: [{ selector: 'article', value: { title: 'h2', link: { selector: 'a', value: 'href' } } }] });
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('async callback extraction keeps callback results as values and yields during long loops', async () => {
@@ -57,7 +57,7 @@ test('async callback extraction keeps callback results as values and yields duri
   const timer = setInterval(() => ticks++, 1);
   try {
     const promise = Promise.resolve('kept');
-    const result = await rusteerio.extractAll([html], { rows: [{ selector: 'article h2', value(node, key, data) {
+    const result = await cheerox.extractAll([html], { rows: [{ selector: 'article h2', value(node, key, data) {
       const until = performance.now() + 0.03;
       while (performance.now() < until) { /* Intentional callback work. */ }
       callbacks++;
@@ -77,12 +77,12 @@ test('extraction preserves special-key assignments, prototypes and key enumerati
   const makeMap = () => JSON.parse('{"before":"h2","__proto__":{"selector":"article","value":{"inherited":"h2"}},"after":"a"}');
   const describe = (value) => ({ ownKeys: Object.keys(value), values: { ...value }, inherited: value.inherited, prototypeKeys: Object.keys(Object.getPrototypeOf(value)) });
   const expected = describe(reference.load(input).extract(makeMap()));
-  assert.deepEqual(describe(rusteerio.load(input).extract(makeMap())), expected);
-  assert.deepEqual(describe((await rusteerio.extractAll([input], makeMap()))[0]), expected);
+  assert.deepEqual(describe(cheerox.load(input).extract(makeMap())), expected);
+  assert.deepEqual(describe((await cheerox.extractAll([input], makeMap()))[0]), expected);
   const map = Object.assign(Object.create({ inherited: 'a' }), { 10: 'h2', 2: 'a', title: 'h2', constructor: 'a', toString: 'h2' });
   const oracle = reference.load(input).extract(map);
-  assert.deepEqual(rusteerio.load(input).extract(map), oracle);
-  assert.deepEqual((await rusteerio.extractAll([input], map))[0], oracle);
+  assert.deepEqual(cheerox.load(input).extract(map), oracle);
+  assert.deepEqual((await cheerox.extractAll([input], map))[0], oracle);
   assert.deepEqual(Object.keys(oracle), ['2', '10', 'title', 'constructor', 'toString', 'inherited']);
 });
 
@@ -95,8 +95,8 @@ test('callback-supplied result prototypes retain their setters for subsequent fi
     return { keys: Object.keys(result), inherited: result.inherited, trace };
   };
   const expected = await run(reference, false);
-  assert.deepEqual(await run(rusteerio, false), expected);
-  assert.deepEqual(await run(rusteerio, true), expected);
+  assert.deepEqual(await run(cheerox, false), expected);
+  assert.deepEqual(await run(cheerox, true), expected);
 });
 
 test('async extraction does not assimilate callback function values under the then key', async () => {
@@ -104,7 +104,7 @@ test('async extraction does not assimilate callback function values under the th
   const then = () => { calls++; throw new Error('ordinary extracted function was called'); };
   const map = { then: { selector: 'h2', value: () => then }, nested: [{ selector: 'article', value: { then: { selector: 'h2', value: () => then } } }] };
   const expected = reference.load(input).extract(map);
-  const actual = (await rusteerio.extractAll([input], map))[0];
+  const actual = (await cheerox.extractAll([input], map))[0];
   assert.deepEqual(actual, expected);
   assert.equal(actual.then, then);
   assert.equal(actual.nested[0].then, then);
@@ -125,8 +125,8 @@ for (const useMapProxy of [false, true]) {
       return { result, trace };
     };
     const expected = await run(reference, false);
-    assert.deepEqual(await run(rusteerio, false), expected);
-    assert.deepEqual(await run(rusteerio, true), expected);
+    assert.deepEqual(await run(cheerox, false), expected);
+    assert.deepEqual(await run(cheerox, true), expected);
   });
 }
 
@@ -167,8 +167,8 @@ test('nested maps mixing native fields and callbacks extract like Cheerio', asyn
     first: { selector: 'article', value: { title: 'h2', id: { selector: 'h2', value: (element) => element.parent.attribs['data-id'] } } },
   });
   const expected = reference.load(html).extract(map());
-  assert.deepEqual(rusteerio.load(html).extract(map()), expected);
-  assert.deepEqual((await rusteerio.extractAll([html, html], map()))[1], expected);
+  assert.deepEqual(cheerox.load(html).extract(map()), expected);
+  assert.deepEqual((await cheerox.extractAll([html, html], map()))[1], expected);
 });
 
 test('batch extraction with callbacks matches Cheerio when callbacks change documents between plans', async () => {
@@ -182,11 +182,11 @@ test('batch extraction with callbacks matches Cheerio when callbacks change docu
     links: [{ selector: 'a', value: 'href' }],
   });
   const expected = pages.map((page) => reference.load(page).extract(map()));
-  for (const threads of [1, 3]) assert.deepEqual(await rusteerio.extractAll(pages, map(), { threads }), expected);
+  for (const threads of [1, 3]) assert.deepEqual(await cheerox.extractAll(pages, map(), { threads }), expected);
   const xmlPages = pages.map((page) => page.replace('<main>', '<feed>').replace('</main>', '</feed>'));
   const xmlMap = () => ({ title: 'title', rows: [{ selector: 'article', value: { name: 'h2', id: { selector: 'h2', value: (element) => element.parent.attribs['data-id'] } } }] });
-  assert.deepEqual(await rusteerio.extractAll(xmlPages, xmlMap(), { xml: true, threads: 2 }), xmlPages.map((page) => reference.load(page, { xml: true }).extract(xmlMap())));
-  const located = await rusteerio.extractAll(pages, map(), { sourceCodeLocationInfo: true, threads: 2 });
+  assert.deepEqual(await cheerox.extractAll(xmlPages, xmlMap(), { xml: true, threads: 2 }), xmlPages.map((page) => reference.load(page, { xml: true }).extract(xmlMap())));
+  const located = await cheerox.extractAll(pages, map(), { sourceCodeLocationInfo: true, threads: 2 });
   assert.deepEqual(located, pages.map((page) => reference.load(page, { sourceCodeLocationInfo: true }).extract(map())));
 });
 
@@ -198,5 +198,5 @@ test('batch extraction with callbacks reads a document changed before its first 
     title: { selector: 'title', value: (element) => element.children[0].data },
   });
   const expected = reference.load(page).extract(map());
-  assert.deepEqual(await rusteerio.extractAll([page, page], map(), { threads: 2 }), [expected, expected]);
+  assert.deepEqual(await cheerox.extractAll([page, page], map(), { threads: 2 }), [expected, expected]);
 });

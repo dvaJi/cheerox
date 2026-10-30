@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as cheerio from 'cheerio';
 import { Tokenizer } from 'htmlparser2-modern';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 const modes = {
   xml: { xml: true },
@@ -28,7 +28,7 @@ function describeTree($) {
 function assertSameParse(input, label) {
   for (const [mode, options] of Object.entries(modes)) {
     const expected = cheerio.load(input, options);
-    const actual = rusteerio.load(input, options);
+    const actual = cheerox.load(input, options);
     assert.equal(describeTree(actual), describeTree(expected), `${label} tree (${mode})`);
     assert.equal(actual.html(), expected.html(), `${label} html (${mode})`);
   }
@@ -83,7 +83,7 @@ test('htmlparser2 tokenizer matches Cheerio on generated markup', () => {
 test('attributes serialize in JavaScript object key order, like Cheerio', () => {
   const input = '<p 2="b" a="x" 1="a" 10="c" 01="d">order</p>';
   for (const options of [undefined, { xml: true }, { xml: { xmlMode: false } }]) {
-    assert.equal(rusteerio.load(input, options).html(), cheerio.load(input, options).html());
+    assert.equal(cheerox.load(input, options).html(), cheerio.load(input, options).html());
   }
 });
 
@@ -91,7 +91,7 @@ test('chunked XML streams parse like a single string', async () => {
   const input = '<root><a title="x &amp; y">1 &lt; 2</a><b>c &amp;d</b><!-- note --><![CDATA[ x < y ]]></root>';
   for (const size of [1, 3, 7]) {
     const document = await new Promise((resolve, reject) => {
-      const stream = rusteerio.stringStream({ xml: true }, (error, $) => (error ? reject(error) : resolve($)));
+      const stream = cheerox.stringStream({ xml: true }, (error, $) => (error ? reject(error) : resolve($)));
       for (let offset = 0; offset < input.length; offset += size) stream.write(input.slice(offset, offset + size));
       stream.end();
     });
@@ -103,7 +103,7 @@ test('events replayed from a JavaScript Tokenizer build the same tree as Cheerio
   for (const input of ['<aǅ ǅb="1">x</aǅ>', '<a>x</a b😀', '😀</1 p##&amp;div', '<p a=1>t</p>']) {
     for (const xmlMode of [true, false]) {
       const expected = cheerio.load(input, { xml: { xmlMode } });
-      const actual = rusteerio.load(input, { xml: { xmlMode, Tokenizer } });
+      const actual = cheerox.load(input, { xml: { xmlMode, Tokenizer } });
       assert.equal(describeTree(actual), describeTree(expected), `${JSON.stringify(input)} xmlMode=${xmlMode}`);
     }
   }

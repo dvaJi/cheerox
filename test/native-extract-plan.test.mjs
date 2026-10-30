@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 const html = '<section><a id="one" class="link" href="/path" title="hello" data-id="7" aria-label="Read">A<b>B</b></a><input name="choice" value="x" checked disabled><script>hidden</script><p>visible</p></section><section><p>last</p></section>';
 
@@ -10,7 +10,7 @@ test('native extraction plans match all supported scalar properties and missing 
   const map = Object.fromEntries(properties.flatMap(value => [[value, [{ selector: 'a,input,script,p', value }]], [`missing_${value}`, { selector: 'absent', value }]]));
   for (const options of [{}, { baseURI: 'https://example.test/base/' }, { xml: true }]) {
     const expected = reference.load(html, options).extract(map);
-    const actual = (await rusteerio.extractAll([html], map, { ...options, threads: 2 }))[0];
+    const actual = (await cheerox.extractAll([html], map, { ...options, threads: 2 }))[0];
     assert.deepEqual(actual, expected);
     assert.deepEqual(Object.keys(actual), Object.keys(expected));
     assert.ok(Object.hasOwn(actual, 'missing_href'));
@@ -24,7 +24,7 @@ test('native nested plans preserve ordered keys and independently missing nested
     after: 'p',
   };
   const expected = reference.load(html).extract(map);
-  const actual = (await rusteerio.extractAll([html], map))[0];
+  const actual = (await cheerox.extractAll([html], map))[0];
   assert.deepEqual(actual, expected);
   assert.deepEqual(Object.keys(actual), Object.keys(expected));
   assert.deepEqual(Object.keys(actual.sections[0]), Object.keys(expected.sections[0]));

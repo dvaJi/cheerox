@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 test('the production parser preserves document mode and fragment context', () => {
-  for (const library of [rusteerio, reference]) {
+  for (const library of [cheerox, reference]) {
     const $ = library.load('<table></table><textarea></textarea><svg></svg>');
     const parse = $.root()._parse.bind($.root());
     const document = parse(Buffer.from('<p>complete</p>'), $._options, true, null);
@@ -22,7 +22,7 @@ test('the production parser preserves document mode and fragment context', () =>
 });
 
 test('the production parser keeps existing roots and moves supplied nodes', () => {
-  for (const library of [rusteerio, reference]) {
+  for (const library of [cheerox, reference]) {
     const $ = library.load('<main><p>one</p><p>two</p></main>');
     const original = $._root;
     const selection = $('p');
@@ -43,5 +43,5 @@ test('the production parser selects the Rust HTML/XML tokenizer for XML', () => 
     const root = $.root()._parse('<Root><Item Id="X"/><![CDATA[A<B]]></Root>', $._options, true, null);
     return { name: root.children[0].name, item: root.children[0].children[0].name, attrs: { ...root.children[0].children[0].attribs }, cdata: root.children[0].children[1].children[0].data };
   };
-  assert.deepEqual(read(rusteerio), read(reference));
+  assert.deepEqual(read(cheerox), read(reference));
 });

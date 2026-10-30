@@ -392,7 +392,7 @@ impl NativeDocument {
         let options = html5ever::driver::ParseOpts {
             tokenizer: html5ever::tokenizer::TokenizerOpts {
                 discard_bom: false,
-                rusteerio_codec: parser_options.get("__utf16Codec") == Some(&Value::Bool(true)),
+                cheerox_codec: parser_options.get("__utf16Codec") == Some(&Value::Bool(true)),
                 ..Default::default()
             },
             tree_builder: html5ever::tree_builder::TreeBuilderOpts {

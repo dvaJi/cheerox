@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 // Compare the public callback records verbatim, including their order and
 // UTF-16 positions. Cheerio's bundled parse5 is the compatibility oracle.
@@ -63,7 +63,7 @@ for (const [group, inputs] of Object.entries(cases)) {
     for (const isDocument of [true, false]) {
       test(`parse diagnostics ${group}/${index} ${isDocument ? 'document' : 'fragment'}`, () => {
         const html = inputs[index];
-        assert.deepEqual(read(rusteerio, html, {}, isDocument), read(reference, html, {}, isDocument), JSON.stringify(html.slice(0, 256)));
+        assert.deepEqual(read(cheerox, html, {}, isDocument), read(reference, html, {}, isDocument), JSON.stringify(html.slice(0, 256)));
       });
     }
   }
@@ -77,7 +77,7 @@ for (const html of [
   '<!doctype html><head><noscript>',
 ]) {
   test(`parse diagnostics scripting-disabled ${JSON.stringify(html)}`, () => {
-    assert.deepEqual(read(rusteerio, html, { scriptingEnabled: false }, true), read(reference, html, { scriptingEnabled: false }, true));
+    assert.deepEqual(read(cheerox, html, { scriptingEnabled: false }, true), read(reference, html, { scriptingEnabled: false }, true));
   });
 }
 
@@ -100,11 +100,11 @@ async function readStream(library, html, chunkSize) {
 for (const chunkSize of [1, 7, 16_384]) {
   test(`streamed parse diagnostics preserve complete records at ${chunkSize}-character boundaries`, async () => {
     const html = '<!doctype html>😀\r\n<p a="x" a="y">&#0; &#x110000; &amp x</p><!--unterminated';
-    assert.deepEqual(await readStream(rusteerio, html, chunkSize), await readStream(reference, html, chunkSize));
+    assert.deepEqual(await readStream(cheerox, html, chunkSize), await readStream(reference, html, chunkSize));
   });
 }
 
 test('streamed leading whitespace preserves the first non-whitespace location', async () => {
   const html = `${' '.repeat(70_000)}&#32;\r\nX`;
-  assert.deepEqual(await readStream(rusteerio, html, 16_384), await readStream(reference, html, 16_384));
+  assert.deepEqual(await readStream(cheerox, html, 16_384), await readStream(reference, html, 16_384));
 });

@@ -6,7 +6,7 @@ MIT for html5gum). Their exact patched sources ship in
 the npm package and are selected by the root Cargo manifest's
 `[patch.crates-io]` entries.
 
-Rusteerio adds optional TreeSink observers for the parser's actual open-element
+Cheerox adds optional TreeSink observers for the parser's actual open-element
 stack. Stack push, pop, replacement and truncation operations notify the sink
 as they happen. These hooks allow a caller's parse5-compatible tree adapter to
 observe the same construction process used by the Rust HTML5 tree builder.
@@ -14,7 +14,7 @@ Ordinary parsing uses the default observer methods.
 
 An opt-in tokenizer flag also escapes private-use characters produced by
 character references, emitting each escape and its character as one text token.
-This preserves the distinction between literal Unicode and Rusteerio's internal
+This preserves the distinction between literal Unicode and Cheerox's internal
 representation of lone JavaScript UTF-16 surrogates.
 The flag is disabled for upstream users of these crates. The original HTML5
 character-reference decoding rules remain in place.

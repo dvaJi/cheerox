@@ -162,10 +162,7 @@
       ]
     }
   },
-  "author": {
-    "name": "Context.dev team",
-    "url": "https://context.dev"
-  },
+  "author": "Francisco Pizarro",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

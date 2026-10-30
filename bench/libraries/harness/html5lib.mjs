@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import * as cheerio from 'cheerio';
-import * as rusteerio from 'rusteerio';
+import * as cheerox from 'cheerox';
 import { JSDOM } from 'jsdom';
 import * as htmlparser2 from 'htmlparser2';
 import * as parse5 from 'parse5';
@@ -150,7 +150,7 @@ function fromNHP(nodes) {
 }
 
 const LIBS = {
-  rusteerio: (h) => fromDomhandler(rusteerio.load(h).root()[0].children),
+  cheerox: (h) => fromDomhandler(cheerox.load(h).root()[0].children),
   cheerio: (h) => fromDomhandler(cheerio.load(h).root()[0].children),
   jsdom: (h) => { const d = new JSDOM(h); const t = fromDOM(d.window.document.childNodes); d.window.close(); return t; },
   htmlparser2: (h) => fromDomhandler(htmlparser2.parseDocument(h).children),

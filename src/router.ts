@@ -101,23 +101,23 @@ export interface DocumentState {
 }
 
 /** Fields on node objects; registered symbols so ESM and CJS copies share nodes. */
-export const VIEW_STATE = Symbol.for('rusteerio.node.state');
-export const VIEW_LOCAL = Symbol.for('rusteerio.node.local');
-export const VIEW_ATTRIBUTES = Symbol.for('rusteerio.node.attributes');
+export const VIEW_STATE = Symbol.for('cheerox.node.state');
+export const VIEW_LOCAL = Symbol.for('cheerox.node.local');
+export const VIEW_ATTRIBUTES = Symbol.for('cheerox.node.attributes');
 /** Points at the node itself, so a spread copy of a node is not mistaken for it. */
-export const VIEW_SELF = Symbol.for('rusteerio.node.self');
+export const VIEW_SELF = Symbol.for('cheerox.node.self');
 // Internals are own properties under symbols: reads stay plain property
 // loads, which prototype accessors are not on selections of many documents'
 // classes, and selections enumerate like Cheerio's. Registered symbols let
 // the ESM and CommonJS builds read each other's selections.
-export const DOCUMENT: unique symbol = Symbol.for('rusteerio.selection.document');
-export const API: unique symbol = Symbol.for('rusteerio.selection.api');
-export const IDS: unique symbol = Symbol.for('rusteerio.selection.ids');
-export const VALUES: unique symbol = Symbol.for('rusteerio.selection.values');
-export const LEASE: unique symbol = Symbol.for('rusteerio.selection.lease');
-export const IS_PLAIN: unique symbol = Symbol.for('rusteerio.selection.is-plain');
+export const DOCUMENT: unique symbol = Symbol.for('cheerox.selection.document');
+export const API: unique symbol = Symbol.for('cheerox.selection.api');
+export const IDS: unique symbol = Symbol.for('cheerox.selection.ids');
+export const VALUES: unique symbol = Symbol.for('cheerox.selection.values');
+export const LEASE: unique symbol = Symbol.for('cheerox.selection.lease');
+export const IS_PLAIN: unique symbol = Symbol.for('cheerox.selection.is-plain');
 /** A node object's materialized `children` array, refilled when the node's children change. */
-export const VIEW_CHILD_TARGET = Symbol.for('rusteerio.node.child-target');
+export const VIEW_CHILD_TARGET = Symbol.for('cheerox.node.child-target');
 
 interface Registry {
   space: object;
@@ -130,9 +130,9 @@ interface Registry {
 }
 // Each installed copy of the package loads its own addon, which numbers its
 // documents independently, so only entry points of one copy share ids.
-const registryKey = Symbol.for(`rusteerio.native-documents.v5:${packageDirectory()}`);
+const registryKey = Symbol.for(`cheerox.native-documents.v5:${packageDirectory()}`);
 /** A native document's state lives on the document itself, so they share one lifetime. */
-const stateKey = Symbol.for('rusteerio.native-documents.state');
+const stateKey = Symbol.for('cheerox.native-documents.state');
 const globals = globalThis as typeof globalThis & { [key: symbol]: Registry | undefined };
 const registry: Registry = globals[registryKey] ??= (() => {
   const created: Registry = {

@@ -112,7 +112,7 @@ impl NativeHookStream {
         let cancelled = Arc::new(AtomicBool::new(false));
         let worker_cancel = cancelled.clone();
         std::thread::Builder::new()
-            .name("rusteerio-hook-stream".into())
+            .name("cheerox-hook-stream".into())
             .spawn(move || run(rx, worker_cancel, options, is_document, function, native))
             .map_err(|error| Error::new(Status::GenericFailure, error.to_string()))?;
         Ok(Self {
@@ -387,7 +387,7 @@ fn run(
         let text = rx.recv().map_err(|_| closed())?;
         callback_budget.resume()?;
         let value: Value = serde_json::from_str(&text).map_err(crate::json_error)?;
-        if value.get("__rusteerioHookError") == Some(&Value::Bool(true)) {
+        if value.get("__cheeroxHookError") == Some(&Value::Bool(true)) {
             callback_cancel.store(true, Ordering::Release);
             return Err(Error::new(
                 Status::GenericFailure,

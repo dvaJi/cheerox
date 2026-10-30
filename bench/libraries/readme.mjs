@@ -8,14 +8,14 @@ const F = JSON.parse(fs.readFileSync(inPath, 'utf8'));
 const L = F.libs;
 const n0 = (v) => Math.round(v).toLocaleString('en-US');
 const n1 = (v) => v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-const HAS_POOL = Boolean(F.scalingPool?.rusteerio?.length);
-const series = (l) => (l === 'rusteerio-pool' ? F.scalingPool.rusteerio : F.scaling[l]);
+const HAS_POOL = Boolean(F.scalingPool?.cheerox?.length);
+const series = (l) => (l === 'cheerox-pool' ? F.scalingPool.cheerox : F.scaling[l]);
 const at = (l, c) => series(l).find((r) => r.cores === c);
-const SL = HAS_POOL ? ['rusteerio', 'rusteerio-pool', ...L.filter((l) => l !== 'rusteerio')] : L;
-const LABEL = { rusteerio: '**rusteerio** · extractAll', 'rusteerio-pool': '**rusteerio** · worker pool', cheerio: 'cheerio · worker pool', parse5: 'parse5 · worker pool', jsdom: 'jsdom · worker pool' };
+const SL = HAS_POOL ? ['cheerox', 'cheerox-pool', ...L.filter((l) => l !== 'cheerox')] : L;
+const LABEL = { cheerox: '**cheerox** · extractAll', 'cheerox-pool': '**cheerox** · worker pool', cheerio: 'cheerio · worker pool', parse5: 'parse5 · worker pool', jsdom: 'jsdom · worker pool' };
 const slib = (l) => LABEL[l] ?? l;
-const bb = (l, v) => (l.startsWith('rusteerio') ? `**${v}**` : v);
-const b = (l, s) => (l === 'rusteerio' ? `**${s}**` : s);
+const bb = (l, v) => (l.startsWith('cheerox') ? `**${v}**` : v);
+const b = (l, s) => (l === 'cheerox' ? `**${s}**` : s);
 const lib = (l) => b(l, l);
 const row = (cells) => `| ${cells.join(' | ')} |`;
 const table = (head, align, rows) => [row(head), row(align), ...rows.map(row)].join('\n');
@@ -23,27 +23,27 @@ const H5 = F.html5lib.summary, FT = F.features;
 const fp = Object.fromEntries(F.footprint.map((r) => [r.lib, r]));
 const med = (a) => [...a].sort((x, y) => x - y)[a.length >> 1];
 const C = F.corpus;
-const r1 = at('rusteerio', 1).pagesPerSec, r16 = at('rusteerio', 16).pagesPerSec;
+const r1 = at('cheerox', 1).pagesPerSec, r16 = at('cheerox', 16).pagesPerSec;
 const x = (a, c) => `${n1(a / c)}×`;
 
 // ---------- summary table (top README) ----------
 const summary = table(
   ['Library', 'Pages/s, 1 CPU', 'Pages/s, 16 CPUs', 'Working memory, 16 CPUs', 'WPT parsing tests', 'Feature probes', 'Packages'],
   ['---', '---:', '---:', '---:', '---:', '---:', '---:'],
-  SL.map((l) => { const k = l === 'rusteerio-pool' ? 'rusteerio' : l; return [slib(l), bb(l, n0(at(l, 1).pagesPerSec)), bb(l, n0(at(l, 16).pagesPerSec)), bb(l, `${n1(at(l, 16).workingMB / 1000)} GB`), bb(l, `${n1(H5[k].strictPct)}%`), bb(l, `${FT.results[k].score}/${FT.features.length}`), bb(l, fp[k].packages)]; }),
+  SL.map((l) => { const k = l === 'cheerox-pool' ? 'cheerox' : l; return [slib(l), bb(l, n0(at(l, 1).pagesPerSec)), bb(l, n0(at(l, 16).pagesPerSec)), bb(l, `${n1(at(l, 16).workingMB / 1000)} GB`), bb(l, `${n1(H5[k].strictPct)}%`), bb(l, `${FT.results[k].score}/${FT.features.length}`), bb(l, fp[k].packages)]; }),
 );
 
-const fasterAt16 = L.filter((l) => l !== 'rusteerio' && at(l, 16).pagesPerSec > r16);
-const p16 = HAS_POOL ? at('rusteerio-pool', 16).pagesPerSec : 0, p1 = HAS_POOL ? at('rusteerio-pool', 1).pagesPerSec : 0;
+const fasterAt16 = L.filter((l) => l !== 'cheerox' && at(l, 16).pagesPerSec > r16);
+const p16 = HAS_POOL ? at('cheerox-pool', 16).pagesPerSec : 0, p1 = HAS_POOL ? at('cheerox-pool', 1).pagesPerSec : 0;
 const rel = (a, c, name) => (a >= c ? `${x(a, c)} faster than ${name}` : `${x(c, a)} slower than ${name}`);
-const POOL_TEXT = HAS_POOL ? ` Run as its synchronous API in a \`worker_threads\` pool, the same setup the other libraries use, rusteerio scaled ${x(p16, p1)} from 1 to 16 CPUs and reached **${n0(p16)} pages/s at 16 CPUs**: ${rel(p16, at('parse5', 16).pagesPerSec, 'parse5')} and ${rel(p16, at('cheerio', 16).pagesPerSec, 'cheerio')}, using ${n1(at('rusteerio-pool', 16).workingMB / 1000)} GB of working memory.` : '';
+const POOL_TEXT = HAS_POOL ? ` Run as its synchronous API in a \`worker_threads\` pool, the same setup the other libraries use, cheerox scaled ${x(p16, p1)} from 1 to 16 CPUs and reached **${n0(p16)} pages/s at 16 CPUs**: ${rel(p16, at('parse5', 16).pagesPerSec, 'parse5')} and ${rel(p16, at('cheerio', 16).pagesPerSec, 'cheerio')}, using ${n1(at('cheerox-pool', 16).workingMB / 1000)} GB of working memory.` : '';
 const section = `### Compared with other Node.js HTML libraries
 
-[![Pages per second on 1 and 16 CPUs for rusteerio, cheerio, parse5 and jsdom.](bench/libraries/overview-v4.svg)](bench/libraries/README.md)
+[![Pages per second on 1 and 16 CPUs for cheerox, cheerio, parse5 and jsdom.](bench/libraries/overview-v4.svg)](bench/libraries/README.md)
 
 Only parsers that build a WHATWG-compliant tree are compared. htmlparser2 and node-html-parser pass under 1% of the WPT parsing tests, so they are excluded.
 
-The same extraction job ran over ${n0(C.pages)} Common Crawl pages (${n0(C.total_bytes / 1e6)} MB): load the page, then read the title, the meta description, every \`a[href]\`, the h1–h3 text and the image count. On one CPU, rusteerio was **${x(r1, at('cheerio', 1).pagesPerSec)} faster than cheerio**, ${x(r1, at('parse5', 1).pagesPerSec)} faster than parse5 and ${n0(r1 / at('jsdom', 1).pagesPerSec)}× faster than jsdom. At 16 CPUs it used **the least working memory of the ${['', 'one', 'two', 'three', 'four', 'five', 'six'][L.length]}** (${n1(at('rusteerio', 16).workingMB / 1000)} GB vs ${n1(at('cheerio', 16).workingMB / 1000)} GB for cheerio). With \`extractAll\`, rusteerio stops scaling at about 8 CPUs because its main thread copies every page in and every result out${fasterAt16.length ? `, so at 16 CPUs ${new Intl.ListFormat('en', { type: 'conjunction' }).format(fasterAt16).replace(', and', ' and')} ${fasterAt16.length === 1 ? 'was' : 'were'} faster` : ''}.${POOL_TEXT}
+The same extraction job ran over ${n0(C.pages)} Common Crawl pages (${n0(C.total_bytes / 1e6)} MB): load the page, then read the title, the meta description, every \`a[href]\`, the h1–h3 text and the image count. On one CPU, cheerox was **${x(r1, at('cheerio', 1).pagesPerSec)} faster than cheerio**, ${x(r1, at('parse5', 1).pagesPerSec)} faster than parse5 and ${n0(r1 / at('jsdom', 1).pagesPerSec)}× faster than jsdom. At 16 CPUs it used **the least working memory of the ${['', 'one', 'two', 'three', 'four', 'five', 'six'][L.length]}** (${n1(at('cheerox', 16).workingMB / 1000)} GB vs ${n1(at('cheerio', 16).workingMB / 1000)} GB for cheerio). With \`extractAll\`, cheerox stops scaling at about 8 CPUs because its main thread copies every page in and every result out${fasterAt16.length ? `, so at 16 CPUs ${new Intl.ListFormat('en', { type: 'conjunction' }).format(fasterAt16).replace(', and', ' and')} ${fasterAt16.length === 1 ? 'was' : 'were'} faster` : ''}.${POOL_TEXT}
 
 ${summary}
 
@@ -84,9 +84,9 @@ const featT = table(['Feature', ...L.map(lib)], ['---', ...L.map(() => ':---:')]
 const footT = table(['Library', 'Version', 'Install size', 'Packages', 'Cold import (median of 15)'], ['---', '---', '---:', '---:', '---:'],
   L.map((l) => [lib(l), fp[l].spec.split('@')[1], b(l, `${n1(fp[l].installBytes / 1e6)} MB`), b(l, fp[l].packages), b(l, `${n1(med(fp[l].requireMs))} ms`)]));
 
-const bench = `# rusteerio and other Node.js HTML libraries
+const bench = `# cheerox and other Node.js HTML libraries
 
-Compared: **rusteerio 1.1.6**, cheerio 1.2.0, parse5 8.0.1 and jsdom 30.1.3, measured in October 2026. Only parsers that build a WHATWG-compliant tree are included. htmlparser2 12.0.0 (0.5% of WPT parsing tests) and node-html-parser 9.0.4 (0.1%) were measured but are excluded.
+Compared: **cheerox 1.1.6**, cheerio 1.2.0, parse5 8.0.1 and jsdom 30.1.3, measured in October 2026. Only parsers that build a WHATWG-compliant tree are included. htmlparser2 12.0.0 (0.5% of WPT parsing tests) and node-html-parser 9.0.4 (0.1%) were measured but are excluded.
 
 ## Throughput across CPU budgets
 
@@ -96,7 +96,7 @@ ${n0(C.pages)} pages from ${n0(C.pages)} different hosts in Common Crawl CC-MAIN
 
 ${scalingT}
 
-rusteerio's throughput rose ${x(r16, r1)} from 1 to 16 CPUs and stopped improving at about 8. Beyond that point the JavaScript main thread, which copies input strings into Rust and decodes results back out, was the limit: at 16 CPUs the process kept only ${n1(at('rusteerio', 16).avgCoresBusy)} cores busy. Splitting the input differently (one call with every page, or 32 or 128 pages per call) changed memory use, not this ceiling.
+cheerox's throughput rose ${x(r16, r1)} from 1 to 16 CPUs and stopped improving at about 8. Beyond that point the JavaScript main thread, which copies input strings into Rust and decodes results back out, was the limit: at 16 CPUs the process kept only ${n1(at('cheerox', 16).avgCoresBusy)} cores busy. Splitting the input differently (one call with every page, or 32 or 128 pages per call) changed memory use, not this ceiling.
 
 ![Pages per second on 1 and 16 CPUs.](overview-v4.svg)
 
@@ -129,7 +129,7 @@ jsdom has no single-CPU operation results. Parsing all 3,000 pages in one proces
 
 ${memT}
 
-Peak RSS is VmHWM for the whole process. Working memory is that peak minus RSS with the corpus resident (about ${n1(at('rusteerio', 16).baselineRssMB / 1000)} GB). Retained memory is the RSS growth after parsing the first 500 pages (${n1(F.mem.rusteerio.htmlMB)} MB of HTML) and keeping every document alive, measured after forcing GC.
+Peak RSS is VmHWM for the whole process. Working memory is that peak minus RSS with the corpus resident (about ${n1(at('cheerox', 16).baselineRssMB / 1000)} GB). Retained memory is the RSS growth after parsing the first 500 pages (${n1(F.mem.cheerox.htmlMB)} MB of HTML) and keeping every document alive, measured after forcing GC.
 
 ## Conformance and features
 
@@ -137,9 +137,9 @@ Peak RSS is VmHWM for the whole process. Working memory is that peak minus RSS w
 
 ${confT}
 
-Conformance uses the ${n0(F.html5lib.tests)} whole-document tree-construction tests in web-platform-tests \`html/syntax/parsing/resources/*.dat\`. Fragment tests, scripting-flagged tests, \`scripted_*\` files and \`pending-spec-changes*\` files are excluded. Each library's own public tree is printed in html5lib format and compared exactly. No library passes the 83 tests for HTML processing instructions, a 2026 spec change. rusteerio passes ${H5.rusteerio.strictPass - H5.parse5.strictPass} more tests than parse5.
+Conformance uses the ${n0(F.html5lib.tests)} whole-document tree-construction tests in web-platform-tests \`html/syntax/parsing/resources/*.dat\`. Fragment tests, scripting-flagged tests, \`scripted_*\` files and \`pending-spec-changes*\` files are excluded. Each library's own public tree is printed in html5lib format and compared exactly. No library passes the 83 tests for HTML processing instructions, a 2026 spec change. cheerox passes ${H5.cheerox.strictPass - H5.parse5.strictPass} more tests than parse5.
 
-Real-page agreement counts the pages where all five extracted fields match a parse5 tree walk. Known causes of the differences: cheerio and rusteerio selectors also match inside \`<template>\` content, which DOM \`querySelectorAll\` does not, and jsdom runs with scripting disabled, so it parses \`<noscript>\` contents as elements. Sampled differing pages traced to these causes; not every page was traced. rusteerio's \`.extract()\` output and \`.html()\` serialization were **identical to cheerio's on ${n0(F.rvc.extractIdentical)} of ${n0(F.rvc.pages)} pages**. All 777 of Cheerio 1.2.0's own tests pass at the v1.1.6 tag.
+Real-page agreement counts the pages where all five extracted fields match a parse5 tree walk. Known causes of the differences: cheerio and cheerox selectors also match inside \`<template>\` content, which DOM \`querySelectorAll\` does not, and jsdom runs with scripting disabled, so it parses \`<noscript>\` contents as elements. Sampled differing pages traced to these causes; not every page was traced. cheerox's \`.extract()\` output and \`.html()\` serialization were **identical to cheerio's on ${n0(F.rvc.extractIdentical)} of ${n0(F.rvc.pages)} pages**. All 777 of Cheerio 1.2.0's own tests pass at the v1.1.6 tag.
 
 Every feature was checked by running code against the library, not taken from documentation:
 
@@ -151,15 +151,15 @@ ${featT}
 
 ${footT}
 
-rusteerio ships native binaries for 8 platforms in one package (3.6–5.2 MB each), so its install is the largest even though it has no npm dependencies.
+cheerox ships native binaries for 8 platforms in one package (3.6–5.2 MB each), so its install is the largest even though it has no npm dependencies.
 
 ## Method
 
 - **Hardware:** boat.dev xlarge VMs (16 vCPU AMD Ryzen 9 9950X, 32 GB RAM, Ubuntu 24.04, Node 24.18.1). Every configuration ran on 3 different VMs, one measurement at a time per VM. Run-to-run differences between VMs reached about 40%, which is why the tables report the median across VMs.
 - **CPU budgets** are enforced with \`taskset\`: every thread the process owns shares N CPUs, including the main thread, workers, GC helpers and the native pool.
 - **JS libraries** run in a pool of N \`worker_threads\` fed 8 pages per message. Each worker's old-space heap is capped at 512 MB. Without the cap, cheerio's pool reached 30.5 GB at 16 workers, and the cap did not slow it down.
-- **rusteerio** runs two ways. *extractAll* uses its native batch API with \`threads: N\`, 128 pages per call and 4 calls in flight; passing all 3,000 pages in one call ran at the same speed and used 9 GB. *Worker pool* runs its synchronous \`load().extract()\` in the same \`worker_threads\` pool as the JS libraries, with the same chunking and heap cap.
-- **Extraction:** cheerio and rusteerio use \`.extract()\`; jsdom uses \`querySelectorAll\`; parse5 has no selector engine, so it walks the tree in document order.
+- **cheerox** runs two ways. *extractAll* uses its native batch API with \`threads: N\`, 128 pages per call and 4 calls in flight; passing all 3,000 pages in one call ran at the same speed and used 9 GB. *Worker pool* runs its synchronous \`load().extract()\` in the same \`worker_threads\` pool as the JS libraries, with the same chunking and heap cap.
+- **Extraction:** cheerio and cheerox use \`.extract()\`; jsdom uses \`querySelectorAll\`; parse5 has no selector engine, so it walks the tree in document order.
 - **Timing:** each run warms up on 500 pages, then times 5 passes over the whole corpus (3 for jsdom). The table values are medians of the per-VM medians. Single-CPU operations run with a 16 GB V8 heap limit, because jsdom exhausts the 4 GB default while the corpus is resident.
 - **Correctness:** checksums of extracted items are recorded for every run, and every VM produced the same checksum for each library.
 
@@ -173,7 +173,7 @@ rusteerio ships native binaries for 8 platforms in one package (3.6–5.2 MB eac
 # on a 16-CPU Linux VM with Node 24 and Python 3
 cd bench/libraries && mkdir -p ~/bench && cp -r harness ~/bench/bench && cd ~/bench
 bash bench/bootstrap.sh                                  # pinned versions + identical corpus (md5 checked)
-printf 'scaling rusteerio 1\\nscaling cheerio 1\\n' > jobs.txt
+printf 'scaling cheerox 1\\nscaling cheerio 1\\n' > jobs.txt
 bash bench/runjobs.sh jobs.txt my-vm                     # appends to results/*.jsonl
 node bench/html5lib.mjs /path/to/wpt                     # WPT conformance
 node bench/features.mjs                                  # feature probes

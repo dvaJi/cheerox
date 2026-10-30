@@ -148,10 +148,10 @@
       "tsup.config.ts": "4a77b1e2da6b7d5596cf6ea8a30442a2ba13b249be9f6df305cbedbb894800ff"
     },
     "priorNativeBinarySha256": {
-      "rusteerio.linux-x64-gnu.node": "a9391c29dfb69dbd858efec1370542152dad154fe024f072e9a2f3646b413d4a"
+      "cheerox.linux-x64-gnu.node": "a9391c29dfb69dbd858efec1370542152dad154fe024f072e9a2f3646b413d4a"
     },
     "currentNativeBinarySha256": {
-      "rusteerio.linux-x64-gnu.node": "ae1abae03b1f72e79a512676aff2ea0960177a914435ef28257e338bc6ec5998"
+      "cheerox.linux-x64-gnu.node": "ae1abae03b1f72e79a512676aff2ea0960177a914435ef28257e338bc6ec5998"
     },
     "currentToolchain": {
       "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1",
@@ -190,7 +190,7 @@
           "medianMaxTimerLagMs": 0.07971499999996468,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 0.49143899999999974,
           "currentMedianMs": 0.551983000000007,
@@ -224,7 +224,7 @@
           "medianMaxTimerLagMs": 0.09796000000000049,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 0.9563590000000062,
           "currentMedianMs": 0.9965039999999874,
@@ -258,7 +258,7 @@
           "medianMaxTimerLagMs": 0.09536399999996092,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 0.45320700000000613,
           "currentMedianMs": 0.5972370000000069,
@@ -292,7 +292,7 @@
           "medianMaxTimerLagMs": 0.09811900000002538,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 0.874446000000006,
           "currentMedianMs": 0.9517809999999827,
@@ -326,7 +326,7 @@
           "medianMaxTimerLagMs": 30.363380000000006,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 3.212108999999998,
           "currentMedianMs": 4.08211799999998,
@@ -360,7 +360,7 @@
           "medianMaxTimerLagMs": 34.74647200000004,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 12.843045000000018,
           "currentMedianMs": 11.59909300000001,
@@ -394,7 +394,7 @@
           "medianMaxTimerLagMs": 8.120640000000037,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 2.253275000000002,
           "currentMedianMs": 2.7115749999999963,
@@ -428,7 +428,7 @@
           "medianMaxTimerLagMs": 31.637336000000005,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 13.656278000000043,
           "currentMedianMs": 11.944558999999998,
@@ -462,7 +462,7 @@
           "medianMaxTimerLagMs": 161.6775909999999,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 34.20613000000003,
           "currentMedianMs": 41.640916999999945,
@@ -496,7 +496,7 @@
           "medianMaxTimerLagMs": 234.89940300000012,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 165.0656329999997,
           "currentMedianMs": 189.48629900000014,
@@ -530,7 +530,7 @@
           "medianMaxTimerLagMs": 62.875968,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 28.646500999999944,
           "currentMedianMs": 27.997829000000024,
@@ -564,7 +564,7 @@
           "medianMaxTimerLagMs": 199.45178299999998,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 163.17875400000003,
           "currentMedianMs": 163.81153999999992,
@@ -598,7 +598,7 @@
           "medianMaxTimerLagMs": 1.6806810000000496,
           "medianTimerTicksDuringWork": 5
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 2.3507979999999975,
           "currentMedianMs": 2.165140000000008,
@@ -632,7 +632,7 @@
           "medianMaxTimerLagMs": 3.8938210000000026,
           "medianTimerTicksDuringWork": 46
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 40.35407200000003,
           "currentMedianMs": 43.69574300000005,
@@ -666,7 +666,7 @@
           "medianMaxTimerLagMs": 5.035158000000592,
           "medianTimerTicksDuringWork": 556
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 495.2208150000006,
           "currentMedianMs": 511.4833349999999,
@@ -700,7 +700,7 @@
           "medianMaxTimerLagMs": 6.373513000000003,
           "medianTimerTicksDuringWork": 44
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 705.654477,
           "currentMedianMs": 272.2747439999998,
@@ -734,7 +734,7 @@
           "medianMaxTimerLagMs": 0.9290639999999257,
           "medianTimerTicksDuringWork": 4
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 1.3497059999999976,
           "currentMedianMs": 1.4930739999999787,
@@ -768,7 +768,7 @@
           "medianMaxTimerLagMs": 5.163378000000193,
           "medianTimerTicksDuringWork": 35
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 22.429231,
           "currentMedianMs": 25.472634000000028,
@@ -802,7 +802,7 @@
           "medianMaxTimerLagMs": 8.136450000001787,
           "medianTimerTicksDuringWork": 329
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 238.645753,
           "currentMedianMs": 306.37471099999993,
@@ -836,7 +836,7 @@
           "medianMaxTimerLagMs": 4.7561059999999316,
           "medianTimerTicksDuringWork": 33
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 443.43004900000005,
           "currentMedianMs": 254.99847699999987,
@@ -870,7 +870,7 @@
           "medianMaxTimerLagMs": 0.38672900000000254,
           "medianTimerTicksDuringWork": 2
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 1.1161670000000186,
           "currentMedianMs": 1.6806860000000086,
@@ -904,7 +904,7 @@
           "medianMaxTimerLagMs": 3.0721240000000307,
           "medianTimerTicksDuringWork": 24
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 14.690884000000011,
           "currentMedianMs": 21.388852000000043,
@@ -938,7 +938,7 @@
           "medianMaxTimerLagMs": 6.282671000000846,
           "medianTimerTicksDuringWork": 266
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 143.109895,
           "currentMedianMs": 183.678246,
@@ -972,7 +972,7 @@
           "medianMaxTimerLagMs": 2.9648839999999836,
           "medianTimerTicksDuringWork": 19
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 414.676735,
           "currentMedianMs": 219.34931199999983,
@@ -1006,7 +1006,7 @@
           "medianMaxTimerLagMs": 0.4242390000000569,
           "medianTimerTicksDuringWork": 1
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 0.8117089999999934,
           "currentMedianMs": 0.8943429999999921,
@@ -1040,7 +1040,7 @@
           "medianMaxTimerLagMs": 1.6065530000000763,
           "medianTimerTicksDuringWork": 16
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 11.001150999999993,
           "currentMedianMs": 12.659367999999972,
@@ -1074,7 +1074,7 @@
           "medianMaxTimerLagMs": 3.49062800000047,
           "medianTimerTicksDuringWork": 151
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 99.76891299999988,
           "currentMedianMs": 114.70334200000002,
@@ -1108,7 +1108,7 @@
           "medianMaxTimerLagMs": 1.0218800000000101,
           "medianTimerTicksDuringWork": 10
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 378.24937199999977,
           "currentMedianMs": 174.05908599999998,
@@ -1142,7 +1142,7 @@
           "medianMaxTimerLagMs": 3.6756230000000016,
           "medianTimerTicksDuringWork": 7
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 6.510141000000001,
           "currentMedianMs": 33.542985,
@@ -1176,7 +1176,7 @@
           "medianMaxTimerLagMs": 9.530989999999974,
           "medianTimerTicksDuringWork": 593
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 426.767766,
           "currentMedianMs": 527.0835630000001,
@@ -1210,7 +1210,7 @@
           "medianMaxTimerLagMs": 2.6519069999999942,
           "medianTimerTicksDuringWork": 5
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 5.579948000000005,
           "currentMedianMs": 28.95945999999999,
@@ -1244,7 +1244,7 @@
           "medianMaxTimerLagMs": 12.832808999999997,
           "medianTimerTicksDuringWork": 330
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 254.496936,
           "currentMedianMs": 319.325128,
@@ -1278,7 +1278,7 @@
           "medianMaxTimerLagMs": 1.5456380000000252,
           "medianTimerTicksDuringWork": 3
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 5.305845999999999,
           "currentMedianMs": 27.826961000000008,
@@ -1312,7 +1312,7 @@
           "medianMaxTimerLagMs": 13.953676000000002,
           "medianTimerTicksDuringWork": 219
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 165.20718799999997,
           "currentMedianMs": 214.46653799999999,
@@ -1346,7 +1346,7 @@
           "medianMaxTimerLagMs": 0.7797460000000171,
           "medianTimerTicksDuringWork": 3
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 5.498377999999999,
           "currentMedianMs": 27.370277,
@@ -1380,7 +1380,7 @@
           "medianMaxTimerLagMs": 11.315990999999997,
           "medianTimerTicksDuringWork": 190
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "coldInitializationAndWorkMs",
           "previousMedianMs": 126.430586,
           "currentMedianMs": 168.101232,
@@ -1414,7 +1414,7 @@
           "medianMaxTimerLagMs": 1102.946817,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 289.349465,
           "currentMedianMs": 346.214836,
@@ -1448,7 +1448,7 @@
           "medianMaxTimerLagMs": 189.730129,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 105.479439,
           "currentMedianMs": 161.999614,
@@ -1482,7 +1482,7 @@
           "medianMaxTimerLagMs": 594.216553,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 289.623932,
           "currentMedianMs": 341.086352,
@@ -1516,7 +1516,7 @@
           "medianMaxTimerLagMs": 115.23202799999999,
           "medianTimerTicksDuringWork": 0
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 106.07265100000001,
           "currentMedianMs": 162.278246,
@@ -1552,7 +1552,7 @@
           "medianRssGrowthAfterFirstCheckpointBytes": 761856,
           "medianFinalHeapUsedBytes": 13377616
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 544.925885,
           "currentMedianMs": 614.7605629999999,
@@ -1588,7 +1588,7 @@
           "medianMaxTimerLagMs": 5.487985999999637,
           "medianTimerTicksDuringWork": 89
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 98.667487,
           "currentMedianMs": 106.58366999999998,
@@ -1622,7 +1622,7 @@
           "medianMaxTimerLagMs": 6.703078999999889,
           "medianTimerTicksDuringWork": 56
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 55.73439999999994,
           "currentMedianMs": 59.95460700000001,
@@ -1656,7 +1656,7 @@
           "medianMaxTimerLagMs": 4.112630999999965,
           "medianTimerTicksDuringWork": 37
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 32.575109,
           "currentMedianMs": 34.28081700000001,
@@ -1690,7 +1690,7 @@
           "medianMaxTimerLagMs": 2.2597039999999424,
           "medianTimerTicksDuringWork": 22
         },
-        "rusteerio": {
+        "cheerox": {
           "metric": "elapsedMs",
           "previousMedianMs": 20.033762999999965,
           "currentMedianMs": 19.06641300000001,

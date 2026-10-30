@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { Tokenizer } from 'htmlparser2-modern';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 const fixtures = [
   ['valid scalars', 'café 😀 終'],
@@ -31,7 +31,7 @@ for (const [name, value] of fixtures) {
   for (const xml of [false, true]) {
     test(`UTF-16 input values round-trip through ${xml ? 'XML' : 'HTML'} (${name})`, () => {
       const options = { xml, baseURI: 'https://example.test/base/' };
-      assert.deepEqual(loadResult(rusteerio, value, options), loadResult(reference, value, options));
+      assert.deepEqual(loadResult(cheerox, value, options), loadResult(reference, value, options));
     });
   }
 
@@ -53,7 +53,7 @@ for (const [name, value] of fixtures) {
       target('section').append(clone);
       return { source: source.html(), target: target.html(), observed, data: target('p').first().data('opaque') };
     };
-    assert.deepEqual(run(rusteerio), run(reference));
+    assert.deepEqual(run(cheerox), run(reference));
   });
 
   test(`UTF-16 parse-error records preserve code units and order (${name})`, () => {
@@ -62,7 +62,7 @@ for (const [name, value] of fixtures) {
       const $ = library.load(`<!doctype html>😀\r\n<p title="${value}">${value}</p>`, { onParseError(error) { errors.push(error); } });
       return { errors, html: $.html(), location: $('p')[0].sourceCodeLocation };
     };
-    assert.deepEqual(run(rusteerio), run(reference));
+    assert.deepEqual(run(cheerox), run(reference));
   });
 }
 
@@ -76,7 +76,7 @@ test('UTF-16 selector substrings can match either half of a valid surrogate pair
       substring: $(`p[title*="${value}"]`).length,
     }));
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('private-use text and attributes stay distinct from lone surrogate values', () => {
@@ -88,17 +88,17 @@ test('private-use text and attributes stay distinct from lone surrogate values',
       attribute: $(`p[title*="${value}"]`).map((_, node) => $(node).attr('id')).get(),
     }));
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('async loading and extraction preserve lone surrogate values', async () => {
   const value = '\ud800😀\udfff\ue000';
   const html = `<p title="${value}">${value}</p>`;
-  const loaded = await rusteerio.loadAsync(html);
+  const loaded = await cheerox.loadAsync(html);
   assert.deepEqual({ text: loaded('p').text(), title: loaded('p').attr('title'), html: loaded.html() }, loadResultForAsync(reference, html));
   const map = { text: 'p', title: { selector: 'p', value: 'title' }, callback: { selector: 'p', value: (node) => node.attribs.title } };
   const expected = [reference.load(html).extract(map)];
-  assert.deepEqual(await rusteerio.extractAll([html], map, { threads: 1 }), expected);
+  assert.deepEqual(await cheerox.extractAll([html], map, { threads: 1 }), expected);
 });
 
 function loadResultForAsync(library, html) {
@@ -122,12 +122,12 @@ async function streamResult(library, pieces, options) {
 for (const xml of [false, true]) {
   test(`stream boundaries preserve paired and unpaired UTF-16 code units (${xml ? 'XML' : 'HTML'})`, async () => {
     const pieces = ['<p title="', '\ud83d', '\ude00', '\ud800', '">', '\ud83d', '\ude00', '\udfff', '</p>'];
-    assert.deepEqual(await streamResult(rusteerio, pieces, { xml }), await streamResult(reference, pieces, { xml }));
+    assert.deepEqual(await streamResult(cheerox, pieces, { xml }), await streamResult(reference, pieces, { xml }));
   });
 }
 
 test('an unpaired high surrogate at stream EOF remains a code unit', async () => {
-  assert.deepEqual(await streamResult(rusteerio, ['<p>', '\ud800']), await streamResult(reference, ['<p>', '\ud800']));
+  assert.deepEqual(await streamResult(cheerox, ['<p>', '\ud800']), await streamResult(reference, ['<p>', '\ud800']));
 });
 
 test('all 65,536 UTF-16 code units survive native mutation and data access', () => {
@@ -137,7 +137,7 @@ test('all 65,536 UTF-16 code units survive native mutation and data access', () 
     $('p').text(value).attr('title', value).data('value', value);
     return { text: $('p').text(), textContent: $('p').prop('textContent'), nodeData: $('p')[0].children[0].data, attribute: $('p').attr('title'), attributeView: $('p')[0].attribs.title, data: $('p').data('value') };
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('UTF-16 attribute names, extraction keys and JSON data strings stay distinct', () => {
@@ -147,7 +147,7 @@ test('UTF-16 attribute names, extraction keys and JSON data strings stay distinc
     const map = { ['\udfff']: { selector: 'p', value: 'title\ue800' }, ['\ue000']: { selector: 'p', value: (node) => node.attribs['title\ue800'] } };
     return { attributes: $('p').attr(), proxyKeys: Object.keys($('p')[0].attribs), data: $('p').data('\ud800'), extracted: $.extract(map) };
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('numeric private-use and invalid scalar entities stay distinct in every parser mode', () => {
@@ -157,7 +157,7 @@ test('numeric private-use and invalid scalar entities stay distinct in every par
       const $ = library.load(html, { xml });
       return { text: $('p').text(), attribute: $('p').attr('a'), html: $.html(), containsSurrogate: $('p:contains("\ud800")').length, containsPrivateUse: $('p:contains("\ue000")').length };
     };
-    assert.deepEqual(run(rusteerio), run(reference));
+    assert.deepEqual(run(cheerox), run(reference));
   }
 });
 
@@ -167,7 +167,7 @@ test('HTML entity compatibility keeps legacy text and attribute contexts separat
     const $ = library.load(html, { xml: { xmlMode: false } });
     return { text: $('p').text(), attribute: $('p').attr('a'), html: $.html() };
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('CSS escapes preserve UTF-16 units, private-use literals, null and Unicode case folding', () => {
@@ -178,7 +178,7 @@ test('CSS escapes preserve UTF-16 units, private-use literals, null and Unicode 
     $('p').each((index, node) => $(node).attr('title', values[index]));
     return selectors.map((selector) => $(selector).map((_, node) => $(node).attr('id')).get());
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('custom Tokenizer source indices and decoded private-use entities preserve UTF-16', () => {
@@ -192,7 +192,7 @@ test('custom Tokenizer source indices and decoded private-use entities preserve 
     const $ = library.load('<p a="&#xe000;\ud800">\ud800&#xe000;&amp;</p><!--\ue000\udfff-->', { xml: { xmlMode: true, Tokenizer: InspectTokenizer, withStartIndices: true, withEndIndices: true } });
     return { trace, html: $.html(), text: $('p').text(), attribute: $('p').attr('a'), span: [$('p')[0].startIndex, $('p')[0].endIndex] };
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('live treeAdapter callbacks receive and return lossless UTF-16 values', () => {
@@ -215,7 +215,7 @@ test('live treeAdapter callbacks receive and return lossless UTF-16 values', () 
     const $ = library.load('<p title="\ud800">\ud800\ue000</p>', { treeAdapter });
     return { observed, html: $.html(), text: $('p').text(), attribute: $('p').attr('title') };
   };
-  assert.deepEqual(run(rusteerio), run(reference));
+  assert.deepEqual(run(cheerox), run(reference));
 });
 
 test('CJS and ESM share Unicode node identity across document moves', () => {
@@ -224,7 +224,7 @@ test('CJS and ESM share Unicode node identity across document moves', () => {
   const source = cjs.load('<p></p>');
   source('p').text('\ud800\ue000😀').data('value', '\udfff\ue800');
   const node = source('p')[0];
-  const target = rusteerio.load('<main></main>');
+  const target = cheerox.load('<main></main>');
   target('main').append(node);
   assert.equal(target('p')[0], node);
   assert.equal(target('p').text(), '\ud800\ue000😀');
@@ -242,6 +242,6 @@ test('form URL encoding preserves Unicode scalars and rejects unpaired UTF-16 un
     return { array: $('form').serializeArray(), serialized };
   };
   for (const [name, value] of [['café\ue000', '😀\ue800 space'], ['field', '\ud800'], ['\udfff', 'value'], ['\ud800\ue000', '\udfff😀']]) {
-    assert.deepEqual(run(rusteerio, name, value), run(reference, name, value));
+    assert.deepEqual(run(cheerox, name, value), run(reference, name, value));
   }
 });

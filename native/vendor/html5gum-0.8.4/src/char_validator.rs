@@ -80,7 +80,7 @@ impl CharValidator {
 
     #[inline]
     fn validate_last_4_bytes<E: Emitter>(&mut self, emitter: &mut E, last_4_bytes: u32) {
-        if emitter.rusteerio_codec() {
+        if emitter.cheerox_codec() {
             let encoded = last_4_bytes.to_be_bytes();
             if encoded[1] == 0xee && encoded[2] & 0xc0 == 0x80 && encoded[3] & 0xc0 == 0x80 {
                 let scalar = (((encoded[1] & 15) as u32) << 12)

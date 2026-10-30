@@ -5,7 +5,7 @@
 // Selector libraries use their own query API; parser-only libraries
 // (parse5, htmlparser2) do the equivalent document-order tree walk.
 import * as cheerio from 'cheerio';
-import * as rusteerio from 'rusteerio';
+import * as cheerox from 'cheerox';
 import { JSDOM } from 'jsdom';
 import * as htmlparser2 from 'htmlparser2';
 import * as parse5 from 'parse5';
@@ -77,11 +77,11 @@ function hp2Extract(doc) {
 }
 
 export const LIBS = {
-  rusteerio: {
-    pkg: 'rusteerio',
-    parse: (html) => rusteerio.load(html),
-    extract: (html) => fromExtract(rusteerio.load(html).extract(EXTRACT_MAP)),
-    serialize: (html) => rusteerio.load(html).html(),
+  cheerox: {
+    pkg: 'cheerox',
+    parse: (html) => cheerox.load(html),
+    extract: (html) => fromExtract(cheerox.load(html).extract(EXTRACT_MAP)),
+    serialize: (html) => cheerox.load(html).html(),
   },
   cheerio: {
     pkg: 'cheerio',

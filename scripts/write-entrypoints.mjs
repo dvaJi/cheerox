@@ -22,7 +22,7 @@ writeFileSync(dist + 'index.cjs', `'use strict';
 const legacy = require('./legacy.cjs');
 const modern = require('./modern.cjs');
 const cheerio = legacy.cheerio || legacy.default;
-// Rusteerio's asynchronous extensions stay available additively.
+// Cheerox's asynchronous extensions stay available additively.
 for (const key of ${JSON.stringify(namedModern)}) {
   if (cheerio[key] === undefined) cheerio[key] = modern[key];
 }

@@ -4,7 +4,7 @@
     "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
   },
   "nativeBinarySha256": {
-    "rusteerio.linux-x64-gnu.node": "a9391c29dfb69dbd858efec1370542152dad154fe024f072e9a2f3646b413d4a"
+    "cheerox.linux-x64-gnu.node": "a9391c29dfb69dbd858efec1370542152dad154fe024f072e9a2f3646b413d4a"
   },
   "libc": {
     "buildRuntime": "glibc 2.28"

@@ -5,7 +5,7 @@
  * itself (scripts/write-entrypoints.mjs installs the wrapper), so calling
  * the required module directly and using its `load` property both work as in
  * the original library. ESM consumers get named exports plus the callable
- * default. Rusteerio's modern asynchronous extensions remain available as
+ * default. Cheerox's modern asynchronous extensions remain available as
  * additive exports; the 1.2.0-style facade itself lives behind the modern
  * entry point.
  */

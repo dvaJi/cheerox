@@ -1,9 +1,9 @@
-import * as rusteerio from 'cheerox/modern';
+import * as cheerox from 'cheerox/modern';
 import { Tokenizer as ReferenceTokenizer } from 'htmlparser2-modern';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import type { ParserError as ReferenceParserError } from 'parse5';
 
-const typedAdapter: rusteerio.TreeAdapter = {
+const typedAdapter: cheerox.TreeAdapter = {
   ...adapter,
   createElement(name, namespace, attributes) {
     const tag: string = name;
@@ -22,18 +22,18 @@ const typedAdapter: rusteerio.TreeAdapter = {
     void [name, invalid];
   },
   onItemPop(_element, newTop) {
-    const parent: rusteerio.ParentNode = newTop;
+    const parent: cheerox.ParentNode = newTop;
     void parent;
   },
 };
 const upstreamAdapter: typeof adapter = typedAdapter;
-const importedAdapter: rusteerio.TreeAdapter = adapter;
+const importedAdapter: cheerox.TreeAdapter = adapter;
 
-rusteerio.load('<p>typed hooks', {
+cheerox.load('<p>typed hooks', {
   treeAdapter: typedAdapter,
   onParseError(error) {
     const offset: number = error.startOffset;
-    const code: rusteerio.ParserErrorCode = error.code;
+    const code: cheerox.ParserErrorCode = error.code;
     const upstreamError: ReferenceParserError = error;
     // @ts-expect-error Parser diagnostics are typed without any.
     const invalidOffset: string = error.startOffset;
@@ -43,10 +43,10 @@ rusteerio.load('<p>typed hooks', {
   },
 });
 declare const upstreamError: ReferenceParserError;
-const importedError: rusteerio.ParserError = upstreamError;
+const importedError: cheerox.ParserError = upstreamError;
 
-const callbacks: rusteerio.TokenizerCallbacks = {
-  ...({} as rusteerio.TokenizerCallbacks),
+const callbacks: cheerox.TokenizerCallbacks = {
+  ...({} as cheerox.TokenizerCallbacks),
   ontext(start, endIndex) {
     const offset: number = start;
     // @ts-expect-error Tokenizer positions are numbers.
@@ -54,7 +54,7 @@ const callbacks: rusteerio.TokenizerCallbacks = {
     void [offset, invalid];
   },
 };
-const Constructor: rusteerio.TokenizerConstructor = ReferenceTokenizer;
+const Constructor: cheerox.TokenizerConstructor = ReferenceTokenizer;
 const upstreamConstructor: typeof ReferenceTokenizer = Constructor;
 const tokenizer = new Constructor({}, callbacks);
 const running: boolean = tokenizer.running;
@@ -62,9 +62,9 @@ const running: boolean = tokenizer.running;
 const invalidRunning: number = tokenizer.running;
 tokenizer.write('typed');
 class CustomTokenizer extends ReferenceTokenizer {
-  constructor(options: rusteerio.TokenizerOptions, callbacks: rusteerio.TokenizerCallbacks) { super(options, callbacks); }
+  constructor(options: cheerox.TokenizerOptions, callbacks: cheerox.TokenizerCallbacks) { super(options, callbacks); }
 }
-rusteerio.load('<Root/>', { xml: { Tokenizer: CustomTokenizer } });
+cheerox.load('<Root/>', { xml: { Tokenizer: CustomTokenizer } });
 // @ts-expect-error Parser error code aliases have no phantom runtime export.
-void rusteerio.ParserErrorCode;
+void cheerox.ParserErrorCode;
 void [upstreamAdapter, importedAdapter, importedError, upstreamConstructor, running, invalidRunning];

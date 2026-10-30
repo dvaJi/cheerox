@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { once } from 'node:events';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 test('native buffer decoding preserves encoding precedence and XML declarations', () => {
   const utf8 = Buffer.from('<meta charset="windows-1252"><p>café 😀</p>');
@@ -19,7 +19,7 @@ test('native buffer decoding preserves encoding precedence and XML declarations'
     [Buffer.from('<meta charset="x-user-defined"><p>caf\xe9</p>', 'latin1'), {}],
   ];
   for (const [buffer, options] of samples) {
-    assert.equal(rusteerio.loadBuffer(buffer, options)('p').text(), reference.loadBuffer(buffer, options)('p').text());
+    assert.equal(cheerox.loadBuffer(buffer, options)('p').text(), reference.loadBuffer(buffer, options)('p').text());
   }
 });
 
@@ -27,13 +27,13 @@ test('native decode streams preserve multibyte characters and BOMs across single
   const html = '<p>café 😀</p>';
   const buffer = Buffer.concat([Buffer.from([0xfe, 0xff]), Buffer.from(html, 'utf16le').swap16()]);
   const document = await new Promise((resolve, reject) => {
-    const stream = rusteerio.decodeStream({}, (error, document) => error ? reject(error) : resolve(document));
+    const stream = cheerox.decodeStream({}, (error, document) => error ? reject(error) : resolve(document));
     for (const byte of buffer) stream.write(Buffer.from([byte]));
     stream.end();
   });
   assert.equal(document('p').text(), 'café 😀');
   const strings = await new Promise((resolve, reject) => {
-    const stream = rusteerio.stringStream({}, (error, document) => error ? reject(error) : resolve(document));
+    const stream = cheerox.stringStream({}, (error, document) => error ? reject(error) : resolve(document));
     for (let offset = 0; offset < html.length; offset += 1) stream.write(html.slice(offset, offset + 1));
     stream.end();
   });
@@ -56,11 +56,11 @@ test('native URL loading honors user encodings, request headers and redirect lim
   const { port } = server.address();
   try {
     const options = { requestOptions: { method: 'GET', headers: { 'x-test': 'native' } }, encoding: { userEncoding: 'utf-8' } };
-    const actual = await rusteerio.fromURL(`http://127.0.0.1:${port}/`, options);
+    const actual = await cheerox.fromURL(`http://127.0.0.1:${port}/`, options);
     const expected = await reference.fromURL(`http://127.0.0.1:${port}/`, options);
     assert.equal(actual('p').text(), expected('p').text());
     assert.equal(actual('p').text(), 'café');
-    await assert.rejects(rusteerio.fromURL(`http://127.0.0.1:${port}/loop`), /redirect/i);
+    await assert.rejects(cheerox.fromURL(`http://127.0.0.1:${port}/loop`), /redirect/i);
     assert.ok(redirects <= 6);
   } finally {
     server.closeAllConnections();

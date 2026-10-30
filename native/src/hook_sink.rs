@@ -175,7 +175,7 @@ impl Transport {
             Self::Direct(bridge) => bridge.call(&json!({"method":method,"args":args}).to_string()),
             Self::Threaded(bridge) => bridge(method, args),
         }?;
-        if result.get("__rusteerioHookError").and_then(Value::as_bool) == Some(true) {
+        if result.get("__cheeroxHookError").and_then(Value::as_bool) == Some(true) {
             Err(Error::new(
                 Status::GenericFailure,
                 "User treeAdapter hook failed",
@@ -673,7 +673,7 @@ fn parser(
     let parse_options = html5ever::driver::ParseOpts {
         tokenizer: html5ever::tokenizer::TokenizerOpts {
             discard_bom: false,
-            rusteerio_codec: options.get("__utf16Codec") == Some(&Value::Bool(true)),
+            cheerox_codec: options.get("__utf16Codec") == Some(&Value::Bool(true)),
             ..Default::default()
         },
         tree_builder: html5ever::tree_builder::TreeBuilderOpts {

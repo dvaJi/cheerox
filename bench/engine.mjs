@@ -4,9 +4,9 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
-assert.equal(rusteerio.nativeStatus().available, true);
+assert.equal(cheerox.nativeStatus().available, true);
 const rounds = process.argv.includes('--quick') ? 3 : 9;
 const html = '<main>' + Array.from({ length: 2000 }, (_, i) => `<article class="card ${i % 3 ? '' : 'featured'}"><h2>Article ${i}</h2><p>Body ${i}</p></article>`).join('') + '</main>';
 const xml = '<Root>' + Array.from({ length: 4000 }, (_, i) => `<Item Id="${i}"><Title>Item ${i} &amp; detail</Title></Item>`).join('') + '</Root>';
@@ -55,7 +55,7 @@ const results = {
 for (const [name, workload] of Object.entries(workloads)) {
   const expected = workload(cheerio);
   const rows = [];
-  for (const [engine, api] of [['cheerio', cheerio], ['rusteerio', rusteerio]]) {
+  for (const [engine, api] of [['cheerio', cheerio], ['cheerox', cheerox]]) {
     assert.deepEqual(workload(api), expected, `${name} ${engine} warm-up`);
     const timings = [];
     for (let round = 0; round < rounds; round++) {

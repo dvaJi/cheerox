@@ -6,7 +6,7 @@ import { monitorEventLoopDelay, performance } from 'node:perf_hooks';
 import { setTimeout as pause } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/modern.mjs';
+import * as cheerox from '../dist/modern.mjs';
 
 const quick = process.argv.includes('--quick');
 const outputFlag = process.argv.indexOf('--output');
@@ -18,7 +18,7 @@ const extraction = {
   titles: ['article h2'],
   links: [{ selector: 'article a', value: 'href' }],
 };
-const nativeStatus = rusteerio.nativeStatus();
+const nativeStatus = cheerox.nativeStatus();
 assert.equal(nativeStatus.available, true, `Native Rust addon is required: ${nativeStatus.error ?? ''}`);
 
 function documentOf(articleCount) {
@@ -131,13 +131,13 @@ for (const [size, articleCount] of [['small', 20], ['medium', 500], ['large', 50
   const html = documentOf(articleCount);
   const expected = selectResult(cheerio, html);
   const serial = await measure('cheerio.load + select + text + attr', () => selectResult(cheerio, html), expected);
-  const native = await measure('rusteerio.load + select + text + attr', () => selectResult(rusteerio, html), expected);
+  const native = await measure('cheerox.load + select + text + attr', () => selectResult(cheerox, html), expected);
   const documents = Array.from({ length: batchSize }, () => html);
   const expectedBatch = documents.map(extractCheerio);
   const batch = [
     await measure('cheerio serial extraction', () => documents.map(extractCheerio), expectedBatch),
-    await measure('rusteerio.extractAll threads=1', () => rusteerio.extractAll(documents, extraction, { threads: 1 }), expectedBatch),
-    await measure(`rusteerio.extractAll threads=${threads}`, () => rusteerio.extractAll(documents, extraction, { threads }), expectedBatch),
+    await measure('cheerox.extractAll threads=1', () => cheerox.extractAll(documents, extraction, { threads: 1 }), expectedBatch),
+    await measure(`cheerox.extractAll threads=${threads}`, () => cheerox.extractAll(documents, extraction, { threads }), expectedBatch),
   ];
   const workload = {
     size,
@@ -161,8 +161,8 @@ for (const [size, articleCount] of [['small', 20], ['medium', 500], ['large', 50
   if (size === 'large') {
     results.eventLoop.push(
       await responsiveness('cheerio serial extraction', () => documents.map(extractCheerio), expectedBatch),
-      await responsiveness('rusteerio.extractAll threads=1', () => rusteerio.extractAll(documents, extraction, { threads: 1 }), expectedBatch),
-      await responsiveness(`rusteerio.extractAll threads=${threads}`, () => rusteerio.extractAll(documents, extraction, { threads }), expectedBatch),
+      await responsiveness('cheerox.extractAll threads=1', () => cheerox.extractAll(documents, extraction, { threads: 1 }), expectedBatch),
+      await responsiveness(`cheerox.extractAll threads=${threads}`, () => cheerox.extractAll(documents, extraction, { threads }), expectedBatch),
     );
   }
 }

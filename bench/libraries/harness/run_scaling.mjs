@@ -1,6 +1,6 @@
 // Multi-core throughput: the full extraction job over the whole corpus.
 //   node run_scaling.mjs <lib> <cores> <mode> [repeats]
-//   mode = native : rusteerio.extractAll with a native thread budget of <cores>
+//   mode = native : cheerox.extractAll with a native thread budget of <cores>
 //   mode = pool   : <cores> worker_threads, each running lib.extract (sync API),
 //                   pages dispatched dynamically in chunks of CHUNK
 // One process per (lib, cores, mode) so memory and thread budgets never leak.
@@ -25,7 +25,7 @@ resetPeak();
 let runOnce, shutdown = async () => {};
 
 if (mode === 'native') {
-  const r = await import('rusteerio');
+  const r = await import('cheerox');
   r.configureWorkers({ threads: cores });
   const shape = (o) => ({ title: o.title, desc: o.desc, links: o.links, headings: o.headings, imgs: o.imgs.length });
   runOnce = async (input) => {

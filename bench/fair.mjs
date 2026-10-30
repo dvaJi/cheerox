@@ -126,7 +126,7 @@ async function runChild(config) {
   const commandArgs = [...(affinity.length ? ['-c', affinity.slice(0, config.budget).join(','), process.execPath] : []), '--expose-gc', fileURLToPath(new URL('./suite/case.mjs', import.meta.url)), JSON.stringify(config)];
   const started = performance.now();
   return new Promise((resolve, reject) => {
-    const child = spawn(command, commandArgs, { cwd: root, env: { ...process.env, RUSTEERIO_THREADS: String(config.budget) }, stdio: ['ignore', 'pipe', 'pipe'] });
+    const child = spawn(command, commandArgs, { cwd: root, env: { ...process.env, CHEEROX_THREADS: String(config.budget) }, stdio: ['ignore', 'pipe', 'pipe'] });
     let stdout = '', stderr = '';
     child.stdout.on('data', (data) => { stdout += data; }); child.stderr.on('data', (data) => { stderr += data; });
     const timeout = setTimeout(() => child.kill('SIGKILL'), 180000);
@@ -144,7 +144,7 @@ for (const [index, config] of configs().entries()) {
   if (report.cases.some((row) => row.id === id)) continue;
   const expectedHashValue = expectedHash(config);
   globalThis.gc();
-  const engines = index % 2 ? ['rusteerio', 'cheerio'] : ['cheerio', 'rusteerio'];
+  const engines = index % 2 ? ['cheerox', 'cheerio'] : ['cheerio', 'cheerox'];
   const rows = [];
   for (const engine of engines) {
     const base = { ...config, engine, expectedHash: expectedHashValue, requireCap: args.includes('--require-cap') && config.kind === 'concurrent' };
@@ -164,7 +164,7 @@ for (const [index, config] of configs().entries()) {
     await save();
   }
   rows.sort((a, b) => a.engine.localeCompare(b.engine));
-  report.cases.push({ id, ...config, expectedHash: expectedHashValue, cpuAffinity: affinity.slice(0, config.budget), engines: rows, ...(rows.length === 2 ? { speedupVsCheerio: rows.find((row) => row.engine === 'cheerio').medianMs / rows.find((row) => row.engine === 'rusteerio').medianMs } : {}) });
+  report.cases.push({ id, ...config, expectedHash: expectedHashValue, cpuAffinity: affinity.slice(0, config.budget), engines: rows, ...(rows.length === 2 ? { speedupVsCheerio: rows.find((row) => row.engine === 'cheerio').medianMs / rows.find((row) => row.engine === 'cheerox').medianMs } : {}) });
   await save();
 }
 report.completedAt = new Date().toISOString(); await save();

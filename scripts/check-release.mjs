@@ -25,8 +25,7 @@ export function validateMetadata(metadata, cargo) {
   validateVersion(metadata.version, metadata.version.includes('-') ? 'next' : 'latest');
   assert.equal(metadata.license, 'MIT');
   assert.notEqual(metadata.private, true, 'The release package cannot be private');
-  assert.equal(metadata.author?.name, 'Context.dev team');
-  assert.equal(metadata.author?.url, 'https://context.dev');
+  assert.equal(metadata.author, 'Francisco Pizarro');
   assert.equal(metadata.repository?.url, 'git+https://github.com/dvaJi/cheerox.git');
   assert.equal(metadata.engines?.node, '>=20.19.0');
   assert.equal(metadata.publishConfig?.access, 'public');
