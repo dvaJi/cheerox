@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 const input = '<main><ul><li class="a" data-x="First">one</li><li class="b">two <b>B</b></li><li class="a">three</li><li>four</li></ul><p id="escaped:id">end</p></main>';
 const selectors = ['li:first', 'li:last', 'li:eq(1)', 'li:eq(-1)', 'li:lt(2)', 'li:gt(1)', 'li:even', 'li:odd', 'li:not(:first)', 'li:not(.a)', 'li:is(.a,.b)', 'ul:has(b)', 'li:contains(two)', 'li:icontains(THREE)', 'li:nth-child(2n+1)', 'li:nth-last-child(2)', 'li:first-child', 'li:last-child', 'li:only-child', 'li.a + li', 'li.b ~ li', '[data-x="first" i]', '#escaped\\:id'];

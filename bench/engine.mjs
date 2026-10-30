@@ -4,7 +4,7 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import os from 'node:os';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 assert.equal(rusteerio.nativeStatus().available, true);
 const rounds = process.argv.includes('--quick') ? 3 : 9;

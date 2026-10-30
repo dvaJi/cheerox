@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { load } from '../dist/index.mjs';
+import { load } from '../dist/modern.mjs';
 
 const documents = [
   readFileSync(new URL('./upstream/__fixtures__/fixtures.ts', import.meta.url), 'utf8').match(/`[^`]*<[^`]*`/g).map((source) => source.slice(1, -1)).join('\n'),

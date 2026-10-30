@@ -16,7 +16,7 @@ const startupAt = performance.now();
 if (config.engine === 'cheerio' && ['pool', 'concurrent', 'cold'].includes(config.kind)) {
   pool = new CheerioPool(config.budget); await pool.ready;
 } else {
-  api = await import(config.engine === 'cheerio' ? 'cheerio' : '../../dist/index.mjs');
+  api = await import(config.engine === 'cheerio' ? 'cheerio' : '../../dist/modern.mjs');
   if (config.engine === 'rusteerio' && ['pool', 'cold', 'concurrent'].includes(config.kind)) api.configureWorkers?.(config.budget);
 }
 const initializationMs = performance.now() - startupAt;

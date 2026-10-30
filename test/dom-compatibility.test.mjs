@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { hasChildren, isText } from 'domhandler';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 test('domhandler recognizes native parent nodes during a text-node walk', async () => {
   const input = '<main><a href="/about">About <strong>the team</strong></a><!--note--><p>Contact hello@example.test</p><script>hidden</script></main>';

@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ['src/index.ts', 'src/slim.ts', 'src/utils.ts'],
+  entry: ['src/index.ts', 'src/legacy.ts', 'src/modern.ts', 'src/slim.ts', 'src/utils.ts'],
   format: ['cjs', 'esm'],
   outExtension({ format }) { return { js: format === 'esm' ? '.mjs' : '.cjs' }; },
   target: 'node20',

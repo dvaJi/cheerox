@@ -3,7 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
-import { extractAll, nativeStatus } from '../dist/index.mjs';
+import { extractAll, nativeStatus } from '../dist/modern.mjs';
 
 const batchCount = Number(process.env.STRESS_BATCHES ?? 20);
 const documentCount = Number(process.env.STRESS_DOCUMENTS ?? 64);

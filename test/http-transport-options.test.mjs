@@ -5,7 +5,7 @@ import { Readable } from 'node:stream';
 import { test } from 'node:test';
 import { FormData as UndiciFormData } from 'undici';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 async function withServer(handler, run) {
   const server = createServer(handler);

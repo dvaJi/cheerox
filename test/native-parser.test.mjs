@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 test('the production parser preserves document mode and fragment context', () => {
   for (const library of [rusteerio, reference]) {

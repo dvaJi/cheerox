@@ -6,7 +6,7 @@ import { monitorEventLoopDelay, performance } from 'node:perf_hooks';
 import { setTimeout as pause } from 'node:timers/promises';
 import { fileURLToPath } from 'node:url';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 const quick = process.argv.includes('--quick');
 const outputFlag = process.argv.indexOf('--output');

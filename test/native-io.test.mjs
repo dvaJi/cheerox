@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { once } from 'node:events';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 test('native buffer decoding preserves encoding precedence and XML declarations', () => {
   const utf8 = Buffer.from('<meta charset="windows-1252"><p>café 😀</p>');

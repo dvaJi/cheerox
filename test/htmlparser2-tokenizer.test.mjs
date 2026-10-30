@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as cheerio from 'cheerio';
-import { Tokenizer } from 'htmlparser2';
-import * as rusteerio from '../dist/index.mjs';
+import { Tokenizer } from 'htmlparser2-modern';
+import * as rusteerio from '../dist/modern.mjs';
 
 const modes = {
   xml: { xml: true },

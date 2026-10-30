@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
-import { load } from '../dist/index.mjs';
+import { load } from '../dist/modern.mjs';
 
 test('cross-document moves preserve nodes, descendants and held selections', () => {
   const target = load('<div></div>');
@@ -111,7 +111,7 @@ test('moved selections retain their options and opaque JavaScript data', () => {
 });
 
 test('discarded documents are collectible and moved handles retain their new native owner', (context) => {
-  const moduleUrl = new URL('../dist/index.mjs', import.meta.url).href;
+  const moduleUrl = new URL('../dist/modern.mjs', import.meta.url).href;
   const script = `
     import assert from 'node:assert/strict';
     import { load } from ${JSON.stringify(moduleUrl)};

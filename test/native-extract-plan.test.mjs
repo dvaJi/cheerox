@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 const html = '<section><a id="one" class="link" href="/path" title="hello" data-id="7" aria-label="Read">A<b>B</b></a><input name="choice" value="x" checked disabled><script>hidden</script><p>visible</p></section><section><p>last</p></section>';
 

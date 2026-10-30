@@ -7,7 +7,7 @@ import { Socket } from 'node:net';
 import { test } from 'node:test';
 import { Agent } from 'undici';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 async function serverFixture(handler, work) {
   const server = createServer(handler);

@@ -185,11 +185,11 @@ export function viewAt(state: DocumentState, local: number): AnyNode | undefined
   if (parsed) { state.adapterNodes![local] = undefined; return adoptObject(state, local, parsed); }
   const snapshot = structureSnapshot(state, local);
   let constructor: ViewConstructor;
-  if (snapshot && !snapshot.hasExtraFields(local)) constructor = viewConstructor(snapshot.typeOf(local), false);
+  if (snapshot && !snapshot.hasExtraFields(local)) constructor = viewConstructor(state, snapshot.typeOf(local), false);
   else {
     const record = recordAt(state, local);
     if (!record) return undefined;
-    constructor = viewConstructor(record.type, record.sourceCodeLocation !== undefined);
+    constructor = viewConstructor(state, record.type, record.sourceCodeLocation !== undefined);
   }
   const view = new constructor(state, local);
   cacheView(state, local, view);
@@ -204,7 +204,7 @@ export function rootNode(document: NativeDocument, id: number): AnyNode {
   const existing = cachedView(state, local);
   if (existing) return existing as AnyNode;
   if (state.adapterNodes?.[local] || state.options.sourceCodeLocationInfo) return viewAt(state, local) as AnyNode;
-  const view = new (viewConstructor('root', false))(state, local);
+  const view = new (viewConstructor(state, 'root', false))(state, local);
   cacheView(state, local, view);
   return view as unknown as AnyNode;
 }
@@ -423,7 +423,7 @@ function fillFromSnapshot(state: DocumentState, snapshot: NodeSnapshot, local: n
   const childIds = snapshot.childIds;
   const views = state.views;
   const isStrong = !state.adapterNodes;
-  const constructors = snapshotConstructors(snapshot);
+  const constructors = snapshotConstructors(state, snapshot);
   for (let index = 0; index < count; index++) {
     const child = childIds[first + index];
     let node = (views[child] ?? (state.weakViews.size ? cachedView(state, child) : undefined)) as AnyNode | undefined;
@@ -437,11 +437,11 @@ function fillFromSnapshot(state: DocumentState, snapshot: NodeSnapshot, local: n
   truncate(target, count);
 }
 
-function snapshotConstructors(snapshot: NodeSnapshot): (reference: number) => ViewConstructor {
+function snapshotConstructors(state: DocumentState, snapshot: NodeSnapshot): (reference: number) => ViewConstructor {
   let lookup = snapshot.viewConstructors as ((reference: number) => ViewConstructor) | undefined;
   if (!lookup) {
     const byReference: ViewConstructor[] = [];
-    lookup = (reference) => byReference[reference] ??= viewConstructor(snapshot.name(reference), false);
+    lookup = (reference) => byReference[reference] ??= viewConstructor(state, snapshot.name(reference), false);
     snapshot.viewConstructors = lookup;
   }
   return lookup;
@@ -513,14 +513,70 @@ type ViewConstructor = new (state: DocumentState, local: number) => View;
 const viewConstructors = new Map<string, ViewConstructor>();
 const plainConstructors: Record<string, ViewConstructor | undefined> = Object.create(null);
 
+/**
+ * Legacy (Cheerio 0.22.0) node-shape rules, enabled per document through the
+ * `_legacyDom` option:
+ * - a top-level node's `parent` reads as null; its document root is exposed
+ *   through the separate `root` field instead;
+ * - every node carries a writable `root` field, stored on the JavaScript side
+ *   exactly like the plain-object field of the original library;
+ * - the synthetic root keeps its `name` of "root" and an `attribs` object.
+ */
+const rootReferences = new WeakMap<object, unknown>();
+const legacyParentAccessor: Accessor = {
+  get() {
+    const state = this[VIEW_STATE];
+    const local = this[VIEW_LOCAL];
+    const snapshot = structureSnapshot(state, local);
+    const parentLocal = snapshot ? snapshot.linkOf(local, 1) : viewRecord(this).parent;
+    if (parentLocal == null) return null;
+    if (parentLocal === state.rootLocal) return null;
+    return linkedView(this, parentLocal);
+  },
+  set(value) { setPointer(this, 'parent', value); },
+};
+const legacyRootAccessor: Accessor = {
+  get() { return rootReferences.get(this); },
+  set(value) { rootReferences.set(this, value); },
+};
+
+function legacyAccessors(type: string): Record<string, Accessor> {
+  const accessors: Record<string, Accessor> = { parent: legacyParentAccessor, root: legacyRootAccessor };
+  if (type === 'root') accessors.name = { get: () => 'root', set(value) { setField(this, 'name', value); } };
+  // domhandler 2.4.2 defines the DOM Lvl 1 aliases on every node prototype.
+  accessors.tagName = { get() { return this.name || null; }, set(value) { this.name = value; } };
+  accessors.nodeValue = { get() { return this.data || null; }, set(value) { this.data = value; } };
+  return accessors;
+}
+
+/**
+ * The own fields of a 0.22.0 node object, per node kind. Legacy views define
+ * these as own enumerable accessor properties so that enumeration
+ * (`Object.keys(node)`) and deep-equality checks behave like they do on the
+ * original plain-object nodes.
+ */
+const legacyOwnFields: Record<string, string[]> = {
+  root: ['type', 'name', 'attribs', 'children', 'parent', 'prev', 'next'],
+  tag: ['type', 'name', 'attribs', 'children', 'parent', 'prev', 'next'],
+  script: ['type', 'name', 'attribs', 'children', 'parent', 'prev', 'next'],
+  style: ['type', 'name', 'attribs', 'children', 'parent', 'prev', 'next'],
+  cdata: ['type', 'children', 'parent', 'prev', 'next'],
+  directive: ['type', 'name', 'data', 'parent', 'prev', 'next'],
+  text: ['type', 'data', 'parent', 'prev', 'next'],
+  comment: ['type', 'data', 'parent', 'prev', 'next'],
+};
+
 /** One constructor per node shape so node objects share a hidden class and prototype. */
-function viewConstructor(type: string, hasLocation: boolean): ViewConstructor {
-  if (!hasLocation) { const plain = plainConstructors[type]; if (plain) return plain; }
-  const key = hasLocation ? `${type}:location` : type;
+function viewConstructor(state: DocumentState, type: string, hasLocation: boolean): ViewConstructor {
+  const legacy = state.options._legacyDom === true;
+  const suffix = hasLocation ? ':location' : '';
+  const key = legacy ? `${type}${suffix}:legacy` : `${type}${suffix}`;
+  if (!hasLocation && !legacy) { const plain = plainConstructors[type]; if (plain) return plain; }
   let constructor = viewConstructors.get(key);
   if (constructor) return constructor;
   const prototype = Object.create(nodePrototype(type));
-  const accessors = hasLocation ? { ...accessorsFor(type), sourceCodeLocation: locationAccessor } : accessorsFor(type);
+  let accessors = hasLocation ? { ...accessorsFor(type), sourceCodeLocation: locationAccessor } : accessorsFor(type);
+  if (legacy) accessors = { ...accessors, ...legacyAccessors(type), ...(type === 'root' ? { attribs: elementAccessors.attribs } : {}) };
   const childrenDescriptor = 'children' in accessors ? { ...childAccessors.children, configurable: true, enumerable: true } : undefined;
   for (const [field, accessor] of Object.entries(accessors)) Object.defineProperty(prototype, field, { ...accessor, configurable: true, enumerable: false });
   constructor = function (this: View, state: DocumentState, local: number) {
@@ -531,11 +587,24 @@ function viewConstructor(type: string, hasLocation: boolean): ViewConstructor {
     this[VIEW_CHILDREN] = undefined;
     this[VIEW_CHILD_TARGET] = undefined;
     if (childrenDescriptor) Object.defineProperty(this, 'children', childrenDescriptor);
+    if (legacy) {
+      // Own enumerable fields for the 0.22.0 node shape, reading and writing
+      // through the live accessors.
+      const fields = legacyOwnFields[type];
+      if (fields) {
+        for (const field of fields) {
+          const descriptor = Object.getOwnPropertyDescriptor(prototype, field);
+          if (descriptor && (descriptor.get || descriptor.set)) {
+            Object.defineProperty(this, field, { get: descriptor.get, set: descriptor.set, configurable: true, enumerable: true });
+          }
+        }
+      }
+    }
   } as unknown as ViewConstructor;
   Object.defineProperty(prototype, inspectSymbol, { configurable: true, writable: true, value: inspectNode });
   constructor.prototype = prototype;
   viewConstructors.set(key, constructor);
-  if (!hasLocation) plainConstructors[type] = constructor;
+  if (!hasLocation && !legacy) plainConstructors[type] = constructor;
   return constructor;
 }
 

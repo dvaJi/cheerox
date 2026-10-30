@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createRequire } from 'node:module';
-import { Tokenizer } from 'htmlparser2';
+import { Tokenizer } from 'htmlparser2-modern';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 const fixtures = [
   ['valid scalars', 'café 😀 終'],
@@ -220,7 +220,7 @@ test('live treeAdapter callbacks receive and return lossless UTF-16 values', () 
 
 test('CJS and ESM share Unicode node identity across document moves', () => {
   const require = createRequire(import.meta.url);
-  const cjs = require('../dist/index.cjs');
+  const cjs = require('../dist/modern.cjs');
   const source = cjs.load('<p></p>');
   source('p').text('\ud800\ue000😀').data('value', '\udfff\ue800');
   const node = source('p')[0];

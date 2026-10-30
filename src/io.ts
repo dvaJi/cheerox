@@ -4,7 +4,7 @@ import { request as requestHTTPS } from 'node:https';
 import { stringify as stringifyQuery } from 'node:querystring';
 import type { EventEmitter } from 'node:events';
 import { MIMEType } from 'node:util';
-import { createAPI, flattenOptions, load } from './index.js';
+import { createAPI, flattenOptions, load } from './modern.js';
 import { requireNative, type NativeStream } from './native.js';
 import { createDiagnosticSession, createTokenizerSession, createTreeAdapterSession, deliverParseErrors, parserOptions } from './hooks.js';
 import { routeDocument } from './router.js';

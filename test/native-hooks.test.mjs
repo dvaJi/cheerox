@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { Tokenizer } from 'htmlparser2';
+import { Tokenizer } from 'htmlparser2-modern';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import { Element as ForeignElement, Text as ForeignText } from 'domhandler';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 function tokenizerFactory(trace, replaceText = false) {
   return class CustomTokenizer extends Tokenizer {

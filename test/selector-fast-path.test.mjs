@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as cheerio from 'cheerio';
-import { load } from '../dist/index.mjs';
+import { load } from '../dist/modern.mjs';
 
 const documents = [
   '<main id="m" class="a b"><div class="card\tc1" id="d1"><p class="x">1</p><P CLASS="X" ID="UP">2</P></div><img src="a.png" ALT="t" data-x></main>',

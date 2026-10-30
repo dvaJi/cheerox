@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 // Compare the public callback records verbatim, including their order and
 // UTF-16 positions. Cheerio's bundled parse5 is the compatibility oracle.

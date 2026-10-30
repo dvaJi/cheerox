@@ -1,8 +1,8 @@
-import { load as loadNative, contains, merge } from './index.js';
+import { load as loadNative, contains, merge } from './modern.js';
 import type { CheerioAPI, CheerioOptions, LoadContent } from './types.js';
 
 export { contains, merge };
-export { dom } from './index.js';
+export { dom } from './modern.js';
 export type * from './types.js';
 export type { Cheerio } from './selection.js';
 

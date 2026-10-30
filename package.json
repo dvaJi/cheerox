@@ -33,6 +33,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./modern": {
+      "import": {
+        "types": "./dist/modern.d.mts",
+        "default": "./dist/modern.mjs"
+      },
+      "require": {
+        "types": "./dist/modern.d.ts",
+        "default": "./dist/modern.cjs"
+      }
+    },
     "./package.json": "./package.json",
     "./slim": {
       "import": {
@@ -86,10 +96,14 @@
   "scripts": {
     "build": "npm run build:native && npm run build:ts",
     "build:native": "napi build --platform --release --js false --dts native-binding.d.ts",
-    "build:ts": "tsup && node scripts/fix-declarations.mjs",
+    "build:ts": "tsup && node scripts/fix-declarations.mjs && node scripts/write-entrypoints.mjs",
     "check": "tsc --noEmit",
     "test": "node --test test/*.test.mjs bench/*.test.mjs bench/suite/*.test.mjs",
+    "test:legacy": "node scripts/check-legacy.mjs && mocha --config test/legacy/.mocharc.cjs",
+    "test:legacy-oracle": "node scripts/write-legacy-oracle.mjs && mocha --config test/.mocharc-oracle.cjs",
     "test:types": "tsc -p test/tsconfig.json --noEmit",
+    "test:native": "cargo test",
+    "test:compat": "npm run test:legacy && npm run test:upstream",
     "bench": "node bench/benchmark.mjs",
     "prepack": "npm run build:ts && node scripts/check-native.mjs",
     "prepublishOnly": "npm run release:check",
@@ -106,13 +120,29 @@
   "devDependencies": {
     "@napi-rs/cli": "^2.18.4",
     "@types/node": "^22.19.0",
-    "tsup": "^8.5.1",
-    "typescript": "^5.9.3",
-    "vitest": "4.1.11",
     "cheerio": "1.2.0",
+    "cheerio-legacy-reference": "npm:cheerio@^0.22.0",
     "domhandler": "^5.0.3",
     "domutils": "^3.2.2",
-    "encoding-sniffer": "^0.2.1"
+    "encoding-sniffer": "^0.2.1",
+    "expect.js": "^0.3.1",
+    "htmlparser2": "^3.10.1",
+    "htmlparser2-modern": "npm:htmlparser2@^10.1.0",
+    "lodash.assignin": "^4.2.0",
+    "lodash.defaults": "^4.2.0",
+    "lodash.filter": "^4.6.0",
+    "lodash.flatten": "^4.4.0",
+    "lodash.foreach": "^4.5.0",
+    "lodash.map": "^4.6.0",
+    "lodash.merge": "^4.6.2",
+    "lodash.pick": "^4.4.0",
+    "lodash.reduce": "^4.6.0",
+    "lodash.reject": "^4.6.0",
+    "lodash.some": "^4.6.0",
+    "mocha": "^10.8.2",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "4.1.11"
   },
   "napi": {
     "name": "cheerox",

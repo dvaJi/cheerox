@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 const fixtures = [
   '', 'plain < text &amp; emoji 🚀', '\ufeff<h1>UTF8 😀 café</h1>',

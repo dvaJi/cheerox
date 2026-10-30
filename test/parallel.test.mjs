@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createRequire } from 'node:module';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 const html = '<!doctype html><title>Example</title><main><h2 data-id="1">One &amp; two</h2><h2>Three</h2><a href="/relative">Link</a></main>';
 
@@ -11,12 +11,25 @@ test('the test suite uses the actual Rust addon', () => {
 });
 
 test('ESM and CommonJS expose the Cheerio entry points', () => {
-  const cjs = createRequire(import.meta.url)('../dist/index.cjs');
+  const cjs = createRequire(import.meta.url)('../dist/modern.cjs');
   for (const key of Object.keys(cheerio)) {
     assert.equal(typeof rusteerio[key], typeof cheerio[key], key);
     assert.equal(typeof cjs[key], typeof cheerio[key], key);
   }
   assert.equal(cjs.load(html)('h2').text(), 'One & twoThree');
+});
+
+test('the legacy root entry keeps the callable 0.22.0 surface', () => {
+  const requireCjs = createRequire(import.meta.url);
+  const cjs = requireCjs('../dist/index.cjs');
+  assert.equal(typeof cjs, 'function');
+  assert.equal(cjs.version, requireCjs('../package.json').version);
+  for (const key of ['load', 'html', 'xml', 'text', 'parseHTML', 'root', 'contains', 'version']) {
+    assert.ok(key in cjs, key);
+  }
+  assert.equal('fn' in cjs, false, 'the bare module has no fn until load() is called');
+  const $ = cjs.load(html);
+  assert.equal($('h2').text(), 'One & twoThree');
 });
 
 test('async loading and parallel loading produce equivalent mutable documents', async () => {

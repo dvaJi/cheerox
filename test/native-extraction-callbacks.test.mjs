@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { spawnSync } from 'node:child_process';
 import * as reference from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
 const input = '<article data-id="1"><h2>One</h2><a href="/one">link</a></article><article data-id="2"><h2>Two</h2><a href="/two">link</a></article>';
 
@@ -132,7 +132,7 @@ for (const useMapProxy of [false, true]) {
 
 
 test('extraction honors inherited setters and readonly result keys without changing global test state', () => {
-  const moduleUrl = new URL('../dist/index.mjs', import.meta.url).href;
+  const moduleUrl = new URL('../dist/modern.mjs', import.meta.url).href;
   const script = `
     import assert from 'node:assert/strict';
     import * as reference from 'cheerio';

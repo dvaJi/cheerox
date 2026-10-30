@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { test } from 'node:test';
 
-const moduleUrl = new URL('../dist/index.mjs', import.meta.url).href;
+const moduleUrl = new URL('../dist/modern.mjs', import.meta.url).href;
 
 function run(source, timeout = 30000) {
   const result = spawnSync(process.execPath, ['--expose-gc', '--input-type=module', '-e', `

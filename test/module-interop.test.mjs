@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { test } from 'node:test';
-import { load } from '../dist/index.mjs';
+import { load } from '../dist/modern.mjs';
 import * as slim from '../dist/slim.mjs';
 
-const commonjs = createRequire(import.meta.url)('../dist/index.cjs');
+const commonjs = createRequire(import.meta.url)('../dist/modern.cjs');
 
 test('ESM and CommonJS share moved node and opaque data identities', () => {
   const source = commonjs.load('<p>Source</p>');
@@ -52,7 +52,7 @@ test('two installed copies of the package keep their nodes apart', async () => {
     // A fresh process numbers the first document of each copy alike.
     const result = spawnSync(process.execPath, ['--input-type=module', '-e', `
       import assert from 'node:assert/strict';
-      const own = await import(${JSON.stringify(new URL('../dist/index.mjs', import.meta.url).href)});
+      const own = await import(${JSON.stringify(new URL('../dist/modern.mjs', import.meta.url).href)});
       const other = await import(${JSON.stringify(pathToFileURL(join(copy, 'dist', 'index.mjs')).href)});
       const $a = own.load('<ul><li>a1</li><li>a2</li></ul><div id="target"></div>');
       const $b = other.load('<p>B text</p><span id="sb">from B</span>');

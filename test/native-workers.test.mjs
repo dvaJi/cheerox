@@ -4,7 +4,7 @@ import { promisify } from 'node:util';
 import { test } from 'node:test';
 
 const execute = promisify(execFile);
-const moduleURL = new URL('../dist/index.mjs', import.meta.url).href;
+const moduleURL = new URL('../dist/modern.mjs', import.meta.url).href;
 async function isolated(source, environment = {}) {
   return execute(process.execPath, ['--input-type=module', '-e', `import assert from 'node:assert/strict'; import * as r from ${JSON.stringify(moduleURL)}; ${source}`], {
     env: { ...process.env, ...environment }, timeout: 30000,

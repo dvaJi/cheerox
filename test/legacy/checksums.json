@@ -1,0 +1,26 @@
+{
+  "upstream": {
+    "repository": "https://github.com/cheeriojs/cheerio",
+    "tag": "0.22.0",
+    "commit": "49b477e7fe98b74f61f77acd06a0ef4edb5c333e",
+    "license": "MIT",
+    "note": "checksums are SHA-256 of the pristine upstream files in reference/ (UTF-8). Adapted copies in this directory may differ only in documented import-path rewrites; scripts/check-legacy.mjs enforces this."
+  },
+  "adaptations": [
+    "test/cheerio.js, test/xml.js, test/parse.js: require('../') and require('..') -> require('../../')",
+    "test/api/*.js: require('../..') -> require('../../../')",
+    "test/parse.js: require('../lib/parse') -> require('../../dist/legacy-parse.cjs')"
+  ],
+  "files": {
+    "cheerio.js": "93418c5cae54ee83d6000fb077af54ad40c759c52391f897847f0d4b572a6a84",
+    "parse.js": "65ebf7f26ed6a3e1b744da151a8d90ad0d5c2ac5414ad216dda73740b049b4e3",
+    "xml.js": "1a149eaf639703b836c97f6e22060bc12b931e13078207174d8915a5895e1ec1",
+    "fixtures.js": "022b237d8ca7655f1df67da462c8cfcfd2f8899b95033bf247436b80b036aea3",
+    "api/attributes.js": "ed2e011d2feedd60ca003f223a2315a15cd867930dbaf16d44acac062880e59b",
+    "api/css.js": "129d13e330abcf74d7a42eb3ced8ee491d96359c8ba99c0464a81d4a4db70348",
+    "api/forms.js": "523cadf1e2d629493c0a3e72ba0ca3fb04374afd7f986bb38c6dda62abd0af61",
+    "api/manipulation.js": "70696b24262fcb5cb690941dbe3a0a797cef22552635942108bed29586ccaec7",
+    "api/traversing.js": "c296733d4fd7e1c36d98fff1a2b83df7d5dc3f89a09cc49164108b4a856c7100",
+    "api/utils.js": "7418228b5fedc174525ecaa73a4def138d029ad8e25fd8b2c2040886202d602b"
+  }
+}

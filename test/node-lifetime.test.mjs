@@ -6,9 +6,9 @@ import { test } from 'node:test';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import { Element as ForeignElement } from 'domhandler';
 import * as cheerio from 'cheerio';
-import * as rusteerio from '../dist/index.mjs';
+import * as rusteerio from '../dist/modern.mjs';
 
-const moduleUrl = new URL('../dist/index.mjs', import.meta.url).href;
+const moduleUrl = new URL('../dist/modern.mjs', import.meta.url).href;
 const require = createRequire(import.meta.url);
 const adapterUrl = pathToFileURL(require.resolve('parse5-htmlparser2-tree-adapter')).href;
 
