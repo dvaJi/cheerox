@@ -1,33 +1,39 @@
-import assert from 'node:assert/strict';
+/**
+ * The declaration bundler can drop `type` when re-exporting classes or
+ * enums. Scan the public entry declarations and add `type ` to bare
+ * specifiers of the known type-only names. Text-level on purpose: it must
+ * not depend on a TypeScript compiler API whose shape changes across
+ * compiler generations.
+ *
+ * Run: node scripts/fix-declarations.mjs (part of npm run build:ts)
+ */
 import { readFileSync, writeFileSync } from 'node:fs';
-import ts from 'typescript';
+import { fileURLToPath } from 'node:url';
 
-// The declaration bundler can drop `type` when re-exporting classes or enums.
-// Keep the public entry points faithful to source `export type` statements.
 const typeOnly = new Set(['Cheerio', 'ElementType']);
-for (const entry of ['index', 'slim', 'modern']) {
-  for (const extension of ['d.ts', 'd.mts']) {
-    const file = new URL(`../dist/${entry}.${extension}`, import.meta.url);
+const entries = ['index', 'slim', 'modern'];
+const dist = fileURLToPath(new URL('../dist/', import.meta.url));
+
+let fixed = 0;
+for (const entry of entries) {
+  for (const extension of ['d.ts', 'd.mts', 'd.cts']) {
+    const file = dist + `${entry}.${extension}`;
     let text;
     try {
       text = readFileSync(file, 'utf8');
     } catch {
       continue;
     }
-    const source = ts.createSourceFile(file.pathname, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
-    const edits = [];
-    const found = new Set();
-    for (const statement of source.statements) {
-      if (!ts.isExportDeclaration(statement) || !statement.exportClause || !ts.isNamedExports(statement.exportClause)) continue;
-      for (const specifier of statement.exportClause.elements) {
-        if (!typeOnly.has(specifier.name.text)) continue;
-        found.add(specifier.name.text);
-        if (!statement.isTypeOnly && !specifier.isTypeOnly) edits.push(specifier.getStart(source));
-      }
-    }
-    // Entries that do not re-export these classes have nothing to fix.
-    if (!edits.length) continue;
-    for (const position of edits.sort((left, right) => right - left)) text = text.slice(0, position) + 'type ' + text.slice(position);
-    if (edits.length) writeFileSync(file, text);
+    const updated = text.replace(/export\s*\{([^}]*)\}/g, (statement, specifiers) => {
+      const parts = specifiers.split(',').map((part) => part.trim());
+      const next = parts.map((part) => {
+        const bare = typeOnly.has(part) ? `type ${part}` : part;
+        if (bare !== part) fixed++;
+        return bare;
+      });
+      return `export {${next.join(', ')}}`;
+    });
+    if (updated !== text) writeFileSync(file, updated);
   }
 }
+console.log(`fix-declarations: ${fixed} specifier(s) adjusted.`);
