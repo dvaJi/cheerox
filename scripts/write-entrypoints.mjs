@@ -16,7 +16,11 @@ import { fileURLToPath } from 'node:url';
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 
 const namedLegacy = ['cheerio', 'load', 'html', 'xml', 'text', 'parseHTML', 'root', 'contains'];
-const namedModern = ['loadAsync', 'loadAll', 'extractAll', 'configureWorkers', 'workerPoolInfo'];
+const namedModern = [
+  'loadAsync', 'loadAll', 'extractAll', 'configureWorkers', 'workerPoolInfo',
+  'nativeStatus', 'dom', 'merge', 'flattenOptions', 'createAPI',
+  'loadBuffer', 'stringStream', 'decodeStream', 'fromURL',
+];
 
 writeFileSync(dist + 'index.cjs', `'use strict';
 const legacy = require('./legacy.cjs');

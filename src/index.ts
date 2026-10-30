@@ -28,6 +28,21 @@ export {
 } from './legacy.js';
 export type { CheerioInstance, CheerioConstructor, LegacyNode, LegacyOptions } from './legacy.js';
 
-export { loadAsync, loadAll, extractAll, configureWorkers, workerPoolInfo } from './modern.js';
+export {
+  loadAsync,
+  loadAll,
+  extractAll,
+  configureWorkers,
+  workerPoolInfo,
+  nativeStatus,
+  dom,
+  merge,
+  flattenOptions,
+  createAPI,
+  loadBuffer,
+  stringStream,
+  decodeStream,
+  fromURL,
+} from './modern.js';
 
 export const version: string = (legacy as unknown as { version: string }).version;

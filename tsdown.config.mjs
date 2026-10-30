@@ -1,8 +1,7 @@
 import { defineConfig } from 'tsdown';
 
-// Replaces the retired tsup: bundles the public entries to CJS + ESM with
-// declarations, keeping the file names the package exports map and the
-// post-build scripts (fix-declarations, write-entrypoints) expect.
+// Plain JavaScript on purpose: a TypeScript config would make tsdown pull a
+// TypeScript runner (unrun) on runtimes without native type stripping.
 export default defineConfig({
   entry: ['src/index.ts', 'src/legacy.ts', 'src/modern.ts', 'src/slim.ts', 'src/utils.ts'],
   format: ['cjs', 'esm'],

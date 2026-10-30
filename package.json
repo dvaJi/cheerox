@@ -1,6 +1,6 @@
 {
   "name": "cheerox",
-  "version": "0.22.0",
+  "version": "0.1.0",
   "description": "Cheerio 0.22.0-compatible HTML/XML processing on a Rust engine, with parallel, non-blocking extraction",
   "license": "MIT",
   "repository": {
@@ -74,7 +74,7 @@
     "Cargo.lock",
     "build.rs",
     "tsconfig.json",
-    "tsdown.config.ts",
+    "tsdown.config.mjs",
     "scripts/check-native.mjs",
     "scripts/check-release.mjs",
     "scripts/fix-declarations.mjs",
