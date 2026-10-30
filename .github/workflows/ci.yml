@@ -189,21 +189,27 @@ jobs:
     needs: gnu
     runs-on: ubuntu-24.04
     strategy:
+      fail-fast: false
       matrix:
         node: ['20.19.0', '24']
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.sha }}
+      # The build toolchain (tsdown) needs Node >= 22.18; the built package
+      # runs on Node >= 20.19, which the matrix then tests against.
       - uses: actions/setup-node@v7
         with:
-          node-version: ${{ matrix.node }}
+          node-version: 22
           cache: ${{ !inputs.release && 'npm' || '' }}
       - uses: actions/download-artifact@v8
         with:
           name: native-x86_64-unknown-linux-gnu
       - run: npm ci
       - run: npm run build:ts
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
       - run: npm test
       - run: npm run test:upstream
 

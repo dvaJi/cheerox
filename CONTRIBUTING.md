@@ -5,7 +5,9 @@ Thanks for helping improve cheerox. The project is heavily inspired by
 
 ## Local setup
 
-Use Node.js 20.19 or newer and stable Rust. Clone the repository, then run:
+Use Node.js 22.18 or newer (to run the build tooling) and stable Rust.
+The published package itself runs on Node.js 20.19 or newer. Clone the
+repository, then run:
 
 ```sh
 npm ci
