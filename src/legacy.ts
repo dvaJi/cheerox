@@ -76,6 +76,25 @@ type CheerioConstructor = {
 
 type CheerioPrototype = Record<string, any>;
 
+/**
+ * A loaded `$`: the callable initialize function with the static methods,
+ * the stored root and options, and `fn` for plugins — as in 0.22.0.
+ */
+export type CheerioStatic = CheerioConstructor & {
+  load(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): CheerioStatic;
+  html(dom?: any, options?: LegacyOptions): string;
+  xml(dom?: any): string;
+  text(elems?: ArrayLike<LegacyNode>): string;
+  parseHTML(data?: string | null, context?: unknown, keepScripts?: boolean): LegacyNode[] | null;
+  root(): CheerioInstance;
+  contains(container?: LegacyNode, contained?: LegacyNode): boolean;
+  version: string;
+  _root: LegacyNode;
+  _options: LegacyOptions;
+  fn: CheerioPrototype;
+  prototype: CheerioPrototype;
+};
+
 const isTag = (elem: unknown): boolean => {
   const type = typeof elem === 'object' && elem !== null ? (elem as { type?: string }).type : elem;
   return (type !== undefined && (tags as Record<string, boolean>)[type as string]) || false;
@@ -389,8 +408,61 @@ function combinatorAnchored(node: LegacyNode, combinator: string, contextIds: Se
   return false;
 }
 
+/**
+ * The pseudo-classes css-select 1.2.0 (Cheerio 0.22.0's selector engine)
+ * understands; anything else throws, exactly as the original library did.
+ */
+const legacyPseudos = new Set([
+  // filters
+  'nth-child', 'nth-last-child', 'nth-of-type', 'nth-last-of-type',
+  'first-child', 'last-child', 'first-of-type', 'last-of-type',
+  'only-of-type', 'only-child',
+  // pseudos and jQuery extensions of the time
+  'empty', 'link', 'visited', 'selected', 'disabled', 'enabled', 'checked',
+  'required', 'optional', 'parent', 'header', 'button', 'input', 'text',
+  'contains', 'icontains', 'checkbox', 'file', 'password', 'radio', 'reset',
+  'image', 'submit', 'root', 'not', 'has', 'matches', 'scope',
+]);
+
+/** Reject pseudo-classes that only exist in later Cheerio lines. */
+function validateLegacySelector(selector: string): void {
+  let depth = 0;
+  let quote = '';
+  let escape = false;
+  for (let i = 0; i < selector.length; i++) {
+    const character = selector[i];
+    if (escape) { escape = false; continue; }
+    if (character === '\\') { escape = true; continue; }
+    if (quote) { if (character === quote) quote = ''; continue; }
+    if (character === '"' || character === "'") { quote = character; continue; }
+    if (character === '[') { depth++; continue; }
+    if (character === ']') { depth = Math.max(0, depth - 1); continue; }
+    if (depth || character !== ':') continue;
+    const match = /^:([a-zA-Z][a-zA-Z0-9-]*)/.exec(selector.slice(i));
+    if (!match) continue;
+    if (!legacyPseudos.has(match[1])) {
+      throw new SyntaxError(`unmatched pseudo-class ${match[0]}`);
+    }
+    // Skip a balanced argument so nested selectors are not scanned twice.
+    if (selector[i + match[0].length] === '(') {
+      let parens = 0;
+      let innerQuote = '';
+      for (let j = i + match[0].length; j < selector.length; j++) {
+        const inner = selector[j];
+        if (innerQuote) { if (inner === innerQuote) innerQuote = ''; continue; }
+        if (inner === '"' || inner === "'") { innerQuote = inner; continue; }
+        if (inner === '(') parens++;
+        else if (inner === ')') { parens--; if (!parens) { i = j; break; } }
+      }
+    } else {
+      i += match[0].length;
+    }
+  }
+}
+
 /** Native matching for a batch of ids, with 0.22.0's SyntaxError behavior. */
 function matchesSelector(document: NativeDocument, ids: number[], selector: string, options: LegacyOptions): number[] {
+  validateLegacySelector(selector);
   try {
     return operation<number[]>(document, 'matches', { ids, selector, options: { xmlMode: options.xmlMode } }) ?? [];
   } catch (error) {
@@ -511,7 +583,7 @@ function makeCheerio(): CheerioConstructor {
 
     // #id, .class, tag
     return context.find(selector);
-  } as unknown as CheerioConstructor;
+  } as unknown as CheerioStatic;
 
   Cheerio.prototype.cheerio = '[cheerio object]';
   Cheerio.prototype.options = defaultOpts;
@@ -1967,7 +2039,7 @@ function staticContains(container?: LegacyNode, contained?: LegacyNode): boolean
 }
 
 /** $.load(str) */
-function load(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): CheerioConstructor {
+function load(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): CheerioStatic {
   const Cheerio = moduleCheerio;
 
   options = defaults({ ...(options ?? {}) }, Cheerio.prototype.options) as LegacyOptions;
@@ -1980,7 +2052,7 @@ function load(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, opt
     }
     opts = defaults(opts || {}, options);
     return Cheerio.call(this, selector, context, r || root, opts);
-  } as unknown as CheerioConstructor;
+  } as unknown as CheerioStatic;
 
   // Ensure that selections created by the "loaded" `initialize` function are
   // true Cheerio instances.
@@ -2020,14 +2092,14 @@ const staticExports = {
  * Module assembly — the callable 0.22.0 module export.
  */
 
-const moduleCheerio = makeCheerio();
+const moduleCheerio = makeCheerio() as unknown as CheerioStatic;
 for (const api of [attributesApi, traversingApi, manipulationApi, cssApi, formsApi]) {
   Object.assign(moduleCheerio.prototype, api);
 }
 Object.assign(moduleCheerio, staticExports);
-(moduleCheerio as any).version = packageVersion;
+moduleCheerio.version = packageVersion;
 
 export default moduleCheerio;
 export { moduleCheerio as cheerio, load, staticHtml as html, staticXml as xml, staticText as text, staticParseHTML as parseHTML, staticRoot as root, staticContains as contains };
 export { staticExports as legacyStatics };
-export type { CheerioInstance, CheerioConstructor, LegacyNode, LegacyOptions };
+export type { CheerioInstance, CheerioConstructor, CheerioPrototype, LegacyNode, LegacyOptions };

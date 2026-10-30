@@ -1,6 +1,6 @@
-import * as rusteerio from 'rusteerio';
+import * as rusteerio from 'cheerox/modern';
 import type { Cheerio, CheerioAPI, CheerioOptions, CheerioRequestOptions, load as cheerioLoad, fromURL as cheerioFromURL } from 'cheerio';
-import * as rusteerioSlim from 'rusteerio/slim';
+import * as rusteerioSlim from 'cheerox/slim';
 
 // @ts-expect-error Cheerio is exported only as a type, as in upstream Cheerio.
 void rusteerio.Cheerio;

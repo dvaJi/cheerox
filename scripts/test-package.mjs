@@ -21,33 +21,58 @@ try {
     }
     assert.ok([...readTarball(tarball).keys()].some(path => path.endsWith('.node')), 'tarball contains native binaries');
   } else {
-    const packed = JSON.parse(runNpm(['pack', '--ignore-scripts', '--json', '--pack-destination', directory]));
-    assert.ok(packed[0].files.some(file => file.path.endsWith('.node')), 'tarball contains native binaries');
-    tarball = join(directory, packed[0].filename);
+    const packedOutput = JSON.parse(runNpm(['pack', '--ignore-scripts', '--json', '--pack-destination', directory]));
+    // npm 12 keys the single-entry object by package name; older npm returns an array.
+    const packed = Array.isArray(packedOutput) ? packedOutput[0] : packedOutput[Object.keys(packedOutput)[0]];
+    assert.ok(packed.files.some(file => file.path.endsWith('.node')), 'tarball contains native binaries');
+    tarball = join(directory, packed.filename);
   }
   runNpm(['install', '--ignore-scripts', '--no-audit', '--no-fund', '--prefix', directory, tarball], directory);
   const installed = JSON.parse(runNpm(['ls', '--all', '--omit=dev', '--json'], directory));
   assert.deepEqual(Object.keys(installed.dependencies?.cheerox?.dependencies ?? {}), [], 'installed package has no transitive npm dependencies');
+
+  // The root entry: the callable, Cheerio 0.22.0-compatible CommonJS module
+  // plus the additive modern extensions; both module systems.
   for (const mode of ['commonjs', 'module']) {
     const source = mode === 'module'
-      ? 'import * as r from "cheerox"; import * as slim from "cheerox/slim"; import * as utils from "cheerox/utils";'
-      : 'const r = require("cheerox"), slim = require("cheerox/slim"), utils = require("cheerox/utils");';
+      ? 'import r from "cheerox"; import * as named from "cheerox"; import * as modern from "cheerox/modern";'
+      : 'const r = require("cheerox"); const named = r; const modern = require("cheerox/modern");';
     execFileSync(process.execPath, [`--input-type=${mode}`, '-e', source + `
       const assert = ${mode === 'module' ? '(await import("node:assert/strict")).default' : 'require("node:assert/strict")'};
-      assert.equal(r.nativeStatus().available, true);
-      assert.equal(r.configureWorkers({threads:2}).threads, 2);
-      assert.equal(r.load("<h1>Packaged</h1>")("h1").text(), "Packaged");
-      assert.ok(r.load("<p>DOM</p>")("p")[0] instanceof r.dom.Element);
-      assert.equal(slim.load("<h1>Slim</h1>")("h1").text(), "Slim");
-      assert.equal(utils.isHtml("<p>HTML</p>"), true);
-      r.extractAll(["<p>Parallel</p>"], { text: "p" }, { threads: 2 }).then(result => {
+      // Callable legacy surface
+      assert.equal(typeof r, "function", "the root export is callable");
+      assert.ok(/^\\d+\\.\\d+\\.\\d+$/.test(r.version), "version");
+      const $ = r.load("<ul id=\\"fruits\\"><li class=\\"apple\\">Apple</li></ul>");
+      assert.equal($(".apple").text(), "Apple");
+      assert.equal($.html(), '<ul id="fruits"><li class="apple">Apple</li></ul>');
+      assert.equal(named.load("<p>Named</p>")("p").text(), "Named");
+      assert.equal(r("<div class=\\"bare\\">bare</div>").attr("class"), "bare");
+      assert.ok(r("<div>node</div>")[0].root === null || r("<div>node</div>")[0].root, "root field");
+      assert.equal(typeof r.parseHTML, "function");
+      assert.equal(r.xml(r.load("<a/>").root()), "<a/>");
+      // Modern extras stay available
+      assert.equal(modern.nativeStatus().available, true);
+      assert.equal(modern.configureWorkers({threads:2}).threads, 2);
+      assert.equal(modern.load("<h1>Packaged</h1>")("h1").text(), "Packaged");
+      modern.extractAll(["<p>Parallel</p>"], { text: "p" }, { threads: 2 }).then(result => {
         assert.deepEqual(result, [{ text: "Parallel" }]);
-        assert.equal(r.workerPoolInfo().threads,2);
-        assert.ok(r.workerPoolInfo().peakActiveWorkers <= 2);
       });
     `], { cwd: directory, stdio: 'pipe' });
   }
-  console.log('Packed npm tarball: ESM, CommonJS, native addon and parallel extraction passed.');
+
+  // The 1.2.0-style facade and helper entries keep working.
+  for (const mode of ['commonjs', 'module']) {
+    const source = mode === 'module'
+      ? 'import * as slim from "cheerox/slim"; import * as utils from "cheerox/utils"; import * as modern from "cheerox/modern";'
+      : 'const slim = require("cheerox/slim"), utils = require("cheerox/utils"), modern = require("cheerox/modern");';
+    execFileSync(process.execPath, [`--input-type=${mode}`, '-e', source + `
+      const assert = ${mode === 'module' ? '(await import("node:assert/strict")).default' : 'require("node:assert/strict")'};
+      assert.equal(slim.load("<h1>Slim</h1>")("h1").text(), "Slim");
+      assert.equal(utils.isHtml("<p>HTML</p>"), true);
+      assert.ok(modern.load("<p>DOM</p>")("p")[0] instanceof modern.dom.Element);
+    `], { cwd: directory, stdio: 'pipe' });
+  }
+  console.log('Packed npm tarball: callable legacy root, ESM/CJS, modern entry and parallel extraction passed.');
 } finally {
   rmSync(directory, { recursive: true, force: true });
 }

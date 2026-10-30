@@ -101,6 +101,7 @@
     "test": "node --test test/*.test.mjs bench/*.test.mjs bench/suite/*.test.mjs",
     "test:legacy": "node scripts/check-legacy.mjs && mocha --config test/legacy/.mocharc.cjs",
     "test:legacy-oracle": "node scripts/write-legacy-oracle.mjs && mocha --config test/.mocharc-oracle.cjs",
+    "test:differential": "node scripts/differential.mjs",
     "test:types": "tsc -p test/tsconfig.json --noEmit",
     "test:native": "cargo test",
     "test:compat": "npm run test:legacy && npm run test:upstream",

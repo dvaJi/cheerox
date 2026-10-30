@@ -7,5 +7,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["consumer.mts", "consumer.cts", "consumer-parser.mts"]
+  "include": ["consumer.mts", "consumer.cts", "consumer-parser.mts", "consumer-legacy.mts", "consumer-legacy.cts"]
 }
