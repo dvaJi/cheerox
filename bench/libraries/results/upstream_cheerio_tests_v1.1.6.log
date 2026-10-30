@@ -1,0 +1,7 @@
+0ee5db786d36b4acb96b1c60ab4eca3f38f87d49 Release 1.1.6 (#18)
+  "version": "1.1.6",
+/home/user/up116.sh: line 2: /home/user/.cargo/env: No such file or directory
+DTS dist/types-CJsc0PH-.d.mts 29.49 KB
+Upstream integrity passed: 14 specs and fixture match the Cheerio 1.2.0 manifest (CRLF normalized to LF).
+[2m Test Files [22m [1m[32m14 passed[39m[22m[90m (14)[39m
+[2m      Tests [22m [1m[32m777 passed[39m[22m[90m (777)[39m

@@ -1,0 +1,1632 @@
+{
+  "schemaVersion": 1,
+  "releases": {
+    "1.96.1": {
+      "source": "https://github.com/rust-lang/rust/tree/1.96.1/library",
+      "lockSource": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/library/Cargo.lock",
+      "lockSha256": "c7fbe8811bd7b2a3737deb1bc5d1ec2ee6d631bc00221d3d8a58d05814b3e965",
+      "annotationsSource": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/license-metadata.json",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-172020dbfd5b53a226df.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-b71bd43a069ca0641a9e.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSE-MIT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSE-APACHE"
+        },
+        {
+          "name": "compiler-builtins LICENSE.txt",
+          "cache": "runtime-ab6eec6caf0fa5775e41.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/library/compiler-builtins/LICENSE.txt"
+        },
+        {
+          "name": "LICENSES/Unicode-3.0.txt",
+          "cache": "runtime-f5062c9a188d81dfe66b.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSES/Unicode-3.0.txt"
+        },
+        {
+          "name": "LICENSES/BSD-2-Clause.txt",
+          "cache": "runtime-f32fb3b417a194167cfa.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSES/BSD-2-Clause.txt"
+        }
+      ],
+      "inTreeAttributions": [
+        {
+          "path": ".",
+          "copyright": [
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/backtrace",
+          "copyright": [
+            "2014 Alex Crichton",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/core/src/unicode/unicode_data.rs",
+          "copyright": [
+            "1991-2024 Unicode, Inc"
+          ],
+          "spdx": "Unicode-3.0"
+        },
+        {
+          "path": "library/std/src/sync/mpmc",
+          "copyright": [
+            "2019 The Crossbeam Project Developers",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/std/src/sys/sync/mutex/fuchsia.rs",
+          "copyright": [
+            "2016 The Fuchsia Authors",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "BSD-2-Clause AND (Apache-2.0 OR MIT)"
+        }
+      ],
+      "packages": [
+        "addr2line@0.25.1",
+        "adler2@2.0.1",
+        "cc@1.2.0",
+        "cfg-if@1.0.4",
+        "dlmalloc@0.2.11",
+        "foldhash@0.2.0",
+        "fortanix-sgx-abi@0.6.1",
+        "getopts@0.2.24",
+        "gimli@0.32.3",
+        "hashbrown@0.16.1",
+        "hermit-abi@0.5.2",
+        "libc@0.2.183",
+        "memchr@2.7.6",
+        "miniz_oxide@0.8.9",
+        "moto-rt@0.16.0",
+        "object@0.37.3",
+        "r-efi-alloc@2.1.0",
+        "r-efi@5.3.0",
+        "rand@0.9.2",
+        "rand_core@0.9.3",
+        "rand_xorshift@0.4.0",
+        "rustc-demangle@0.1.27",
+        "rustc-literal-escaper@0.0.7",
+        "shlex@1.3.0",
+        "unwinding@0.2.8",
+        "vex-sdk@0.27.1",
+        "wasi@0.11.1+wasi-snapshot-preview1",
+        "wasi@0.14.4+wasi-0.2.4",
+        "windows-link@0.2.1",
+        "windows-sys@0.60.2",
+        "windows-targets@0.53.5",
+        "windows_aarch64_gnullvm@0.53.1",
+        "windows_aarch64_msvc@0.53.1",
+        "windows_i686_gnu@0.53.1",
+        "windows_i686_gnullvm@0.53.1",
+        "windows_i686_msvc@0.53.1",
+        "windows_x86_64_gnu@0.53.1",
+        "windows_x86_64_gnullvm@0.53.1",
+        "windows_x86_64_msvc@0.53.1",
+        "wit-bindgen@0.45.1"
+      ]
+    },
+    "1.97.1": {
+      "source": "https://github.com/rust-lang/rust/tree/1.97.1/library",
+      "lockSource": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/library/Cargo.lock",
+      "lockSha256": "02120dd57c4c5fd70c81fd92472681c8de5cc2dd78258276da37bb2253666061",
+      "annotationsSource": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/license-metadata.json",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-172020dbfd5b53a226df.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-b71bd43a069ca0641a9e.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSE-MIT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSE-APACHE"
+        },
+        {
+          "name": "compiler-builtins LICENSE.txt",
+          "cache": "runtime-ab6eec6caf0fa5775e41.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/library/compiler-builtins/LICENSE.txt"
+        },
+        {
+          "name": "LICENSES/Unicode-3.0.txt",
+          "cache": "runtime-f5062c9a188d81dfe66b.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSES/Unicode-3.0.txt"
+        },
+        {
+          "name": "LICENSES/BSD-2-Clause.txt",
+          "cache": "runtime-f32fb3b417a194167cfa.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSES/BSD-2-Clause.txt"
+        }
+      ],
+      "inTreeAttributions": [
+        {
+          "path": ".",
+          "copyright": [
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/backtrace",
+          "copyright": [
+            "2014 Alex Crichton",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/core/src/unicode/unicode_data.rs",
+          "copyright": [
+            "1991-2024 Unicode, Inc"
+          ],
+          "spdx": "Unicode-3.0"
+        },
+        {
+          "path": "library/std/src/sync/mpmc",
+          "copyright": [
+            "2019 The Crossbeam Project Developers",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/std/src/sys/sync/mutex/fuchsia.rs",
+          "copyright": [
+            "2016 The Fuchsia Authors",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "BSD-2-Clause AND (Apache-2.0 OR MIT)"
+        }
+      ],
+      "packages": [
+        "addr2line@0.25.1",
+        "adler2@2.0.1",
+        "cc@1.2.0",
+        "cfg-if@1.0.4",
+        "dlmalloc@0.2.13",
+        "foldhash@0.2.0",
+        "fortanix-sgx-abi@0.6.1",
+        "getopts@0.2.24",
+        "gimli@0.32.3",
+        "hashbrown@0.17.1",
+        "hermit-abi@0.5.2",
+        "libc@0.2.185",
+        "memchr@2.7.6",
+        "miniz_oxide@0.8.9",
+        "moto-rt@0.16.0",
+        "object@0.37.3",
+        "r-efi-alloc@2.1.0",
+        "r-efi@5.3.0",
+        "rand@0.9.2",
+        "rand_core@0.9.3",
+        "rand_xorshift@0.4.0",
+        "rustc-demangle@0.1.27",
+        "rustc-literal-escaper@0.0.7",
+        "shlex@1.3.0",
+        "unwinding@0.2.8",
+        "vex-sdk@0.27.1",
+        "wasip1@1.0.0",
+        "wasip2@1.0.3+wasi-0.2.9",
+        "wasip3@0.6.0+wasi-0.3.0-rc-2026-03-15",
+        "wit-bindgen@0.57.1"
+      ]
+    },
+    "1.99.0": {
+      "source": "https://github.com/rust-lang/rust/tree/1.99.0/library",
+      "lockSource": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/library/Cargo.lock",
+      "lockSha256": "53d9ccff0c906de434b65af90d5c30063894b940fc839261f1fb06ef2e69e3d3",
+      "annotationsSource": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/license-metadata.json",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-172020dbfd5b53a226df.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-b71bd43a069ca0641a9e.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-MIT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-APACHE"
+        },
+        {
+          "name": "compiler-builtins LICENSE.txt",
+          "cache": "runtime-ab6eec6caf0fa5775e41.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/library/compiler-builtins/LICENSE.txt"
+        },
+        {
+          "name": "LICENSES/Unicode-3.0.txt",
+          "cache": "runtime-f5062c9a188d81dfe66b.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSES/Unicode-3.0.txt"
+        },
+        {
+          "name": "LICENSES/BSD-2-Clause.txt",
+          "cache": "runtime-f32fb3b417a194167cfa.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSES/BSD-2-Clause.txt"
+        }
+      ],
+      "inTreeAttributions": [
+        {
+          "path": ".",
+          "copyright": [
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/core/src/unicode",
+          "copyright": [
+            "1991-2024 Unicode, Inc"
+          ],
+          "spdx": "Unicode-3.0"
+        },
+        {
+          "path": "library/core/src/unicode/mod.rs",
+          "copyright": [
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/backtrace",
+          "copyright": [
+            "2014 Alex Crichton",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/std/src/sync/mpmc",
+          "copyright": [
+            "2019 The Crossbeam Project Developers",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "Apache-2.0 OR MIT"
+        },
+        {
+          "path": "library/std/src/sys/sync/mutex/fuchsia.rs",
+          "copyright": [
+            "2016 The Fuchsia Authors",
+            "The Rust Project Developers (see https://thanks.rust-lang.org)"
+          ],
+          "spdx": "BSD-2-Clause AND (Apache-2.0 OR MIT)"
+        }
+      ],
+      "packages": [
+        "addr2line@0.27.1",
+        "adler2@2.0.1",
+        "cc@1.2.0",
+        "cfg-if@1.0.4",
+        "dlmalloc@0.2.14",
+        "foldhash@0.2.0",
+        "fortanix-sgx-abi@0.6.1",
+        "getopts@0.2.24",
+        "gimli@0.34.0",
+        "hashbrown@0.17.1",
+        "hermit-abi@0.5.2",
+        "libc@0.2.189",
+        "memchr@2.8.3",
+        "miniz_oxide@0.9.1",
+        "moto-rt@0.16.4",
+        "object@0.39.1",
+        "r-efi-alloc@2.1.0",
+        "r-efi@5.3.0",
+        "rand@0.9.5",
+        "rand_core@0.9.5",
+        "rand_xorshift@0.4.0",
+        "rustc-demangle@0.1.28",
+        "rustc-literal-escaper@0.0.8",
+        "shlex@1.3.0",
+        "unwinding@0.2.10",
+        "vex-sdk@0.27.1",
+        "wasip1@1.0.0",
+        "wasip2@1.0.4+wasi-0.2.12",
+        "wasip3@0.7.0+wasi-0.3.0",
+        "wit-bindgen@0.57.1"
+      ]
+    }
+  },
+  "packages": {
+    "addr2line@0.25.1": {
+      "name": "addr2line",
+      "version": "0.25.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/addr2line/0.25.1/download",
+      "checksum": "1b5d307320b3181d6d7954e663bd7c774a838b8220fe0593c86d9fb09f498b4b",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/addr2line/0.25.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-e99d88d232bf57d70f0f.txt",
+          "source": "https://docs.rs/crate/addr2line/0.25.1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "addr2line@0.27.1": {
+      "name": "addr2line",
+      "version": "0.27.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/addr2line/0.27.1/download",
+      "checksum": "e567177890eb1617b1f774005b66b26b2377afd138a2ca37aae7d8f0c81429d4",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/addr2line/0.27.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-e99d88d232bf57d70f0f.txt",
+          "source": "https://docs.rs/crate/addr2line/0.27.1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "adler2@2.0.1": {
+      "name": "adler2",
+      "version": "2.0.1",
+      "license": "0BSD OR MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/adler2/2.0.1/download",
+      "checksum": "320119579fcad9c21884f5c4861d16174d0e06250625266f50fe6898340abefa",
+      "notices": [
+        {
+          "name": "LICENSE-0BSD",
+          "cache": "runtime-861399f8c21c042b1105.txt",
+          "source": "https://docs.rs/crate/adler2/2.0.1/source/LICENSE-0BSD"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-8ada45cd9f843acf64e4.txt",
+          "source": "https://docs.rs/crate/adler2/2.0.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/adler2/2.0.1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "cc@1.2.0": {
+      "name": "cc",
+      "version": "1.2.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/cc/1.2.0/download",
+      "checksum": "1aeb932158bd710538c73702db6945cb68a8fb08c519e6e12706b94263b36db8",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/cc/1.2.0/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-378f5840b258e2779c39.txt",
+          "source": "https://docs.rs/crate/cc/1.2.0/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "cfg-if@1.0.4": {
+      "name": "cfg-if",
+      "version": "1.0.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/cfg-if/1.0.4/download",
+      "checksum": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/cfg-if/1.0.4/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-378f5840b258e2779c39.txt",
+          "source": "https://docs.rs/crate/cfg-if/1.0.4/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "dlmalloc@0.2.11": {
+      "name": "dlmalloc",
+      "version": "0.2.11",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/dlmalloc/0.2.11/download",
+      "checksum": "06cdfe340b16dd990c54cce79743613fa09fbb16774f33a77c9fd196f8f3fa30",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/dlmalloc/0.2.11/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-378f5840b258e2779c39.txt",
+          "source": "https://docs.rs/crate/dlmalloc/0.2.11/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "dlmalloc@0.2.13": {
+      "name": "dlmalloc",
+      "version": "0.2.13",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/dlmalloc/0.2.13/download",
+      "checksum": "9f5b01c17f85ee988d832c40e549a64bd89ab2c9f8d8a613bdf5122ae507e294",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/dlmalloc/0.2.13/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-378f5840b258e2779c39.txt",
+          "source": "https://docs.rs/crate/dlmalloc/0.2.13/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "dlmalloc@0.2.14": {
+      "name": "dlmalloc",
+      "version": "0.2.14",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/dlmalloc/0.2.14/download",
+      "checksum": "ad5208a115eaba24916f7456929832e310a81518c641f93fee4f89aa93aa3675",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/dlmalloc/0.2.14/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-378f5840b258e2779c39.txt",
+          "source": "https://docs.rs/crate/dlmalloc/0.2.14/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "foldhash@0.2.0": {
+      "name": "foldhash",
+      "version": "0.2.0",
+      "license": "Zlib",
+      "source": "https://crates.io/api/v1/crates/foldhash/0.2.0/download",
+      "checksum": "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "cache": "runtime-b1181a40b2a7b25cf66f.txt",
+          "source": "https://docs.rs/crate/foldhash/0.2.0/source/LICENSE"
+        }
+      ]
+    },
+    "fortanix-sgx-abi@0.6.1": {
+      "name": "fortanix-sgx-abi",
+      "version": "0.6.1",
+      "license": "MPL-2.0",
+      "source": "https://crates.io/api/v1/crates/fortanix-sgx-abi/0.6.1/download",
+      "checksum": "5efc85edd5b83e8394f4371dd0da6859dff63dd387dab8568fece6af4cde6f84",
+      "notices": [
+        {
+          "name": "LICENSE (upstream repository)",
+          "cache": "runtime-fab3dd6bdab226f1c086.txt",
+          "source": "https://raw.githubusercontent.com/fortanix/rust-sgx/adcc6cdb981bcf2101437edbd3ef6144246621d3/LICENSE"
+        }
+      ]
+    },
+    "getopts@0.2.24": {
+      "name": "getopts",
+      "version": "0.2.24",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/getopts/0.2.24/download",
+      "checksum": "cfe4fbac503b8d1f88e6676011885f34b7174f46e59956bba534ba83abded4df",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/getopts/0.2.24/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-6485b8ed310d3f0340bf.txt",
+          "source": "https://docs.rs/crate/getopts/0.2.24/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "gimli@0.32.3": {
+      "name": "gimli",
+      "version": "0.32.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/gimli/0.32.3/download",
+      "checksum": "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/gimli/0.32.3/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-7b63ecd5f1902af1b637.txt",
+          "source": "https://docs.rs/crate/gimli/0.32.3/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "gimli@0.34.0": {
+      "name": "gimli",
+      "version": "0.34.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/gimli/0.34.0/download",
+      "checksum": "1033caf0b349c518623b5396bfb2cf0bddf44f0306d543a250e5743297aafd10",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/gimli/0.34.0/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-7b63ecd5f1902af1b637.txt",
+          "source": "https://docs.rs/crate/gimli/0.34.0/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "hashbrown@0.16.1": {
+      "name": "hashbrown",
+      "version": "0.16.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/hashbrown/0.16.1/download",
+      "checksum": "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/hashbrown/0.16.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-ff8f68cb076caf8cefe7.txt",
+          "source": "https://docs.rs/crate/hashbrown/0.16.1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "hashbrown@0.17.1": {
+      "name": "hashbrown",
+      "version": "0.17.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/hashbrown/0.17.1/download",
+      "checksum": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/hashbrown/0.17.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-ff8f68cb076caf8cefe7.txt",
+          "source": "https://docs.rs/crate/hashbrown/0.17.1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "hermit-abi@0.5.2": {
+      "name": "hermit-abi",
+      "version": "0.5.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/hermit-abi/0.5.2/download",
+      "checksum": "fc0fef456e4baa96da950455cd02c081ca953b141298e41db3fc7e36b1da849c",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/hermit-abi/0.5.2/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/hermit-abi/0.5.2/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "libc@0.2.183": {
+      "name": "libc",
+      "version": "0.2.183",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/libc/0.2.183/download",
+      "checksum": "b5b646652bf6661599e1da8901b3b9522896f01e736bad5f723fe7a3a27f899d",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://docs.rs/crate/libc/0.2.183/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-123a331b5dbf04c30097.txt",
+          "source": "https://docs.rs/crate/libc/0.2.183/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "libc@0.2.185": {
+      "name": "libc",
+      "version": "0.2.185",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/libc/0.2.185/download",
+      "checksum": "52ff2c0fe9bc6cb6b14a0592c2ff4fa9ceb83eea9db979b0487cd054946a2b8f",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://docs.rs/crate/libc/0.2.185/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-123a331b5dbf04c30097.txt",
+          "source": "https://docs.rs/crate/libc/0.2.185/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "libc@0.2.189": {
+      "name": "libc",
+      "version": "0.2.189",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/libc/0.2.189/download",
+      "checksum": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://docs.rs/crate/libc/0.2.189/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-123a331b5dbf04c30097.txt",
+          "source": "https://docs.rs/crate/libc/0.2.189/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "memchr@2.7.6": {
+      "name": "memchr",
+      "version": "2.7.6",
+      "license": "Unlicense OR MIT",
+      "source": "https://crates.io/api/v1/crates/memchr/2.7.6/download",
+      "checksum": "f52b00d39961fc5b2736ea853c9cc86238e165017a493d1d5c8eac6bdc4cc273",
+      "notices": [
+        {
+          "name": "COPYING",
+          "cache": "runtime-01c266bced4a434da005.txt",
+          "source": "https://docs.rs/crate/memchr/2.7.6/source/COPYING"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-0f96a83840e146e43c0e.txt",
+          "source": "https://docs.rs/crate/memchr/2.7.6/source/LICENSE-MIT"
+        },
+        {
+          "name": "UNLICENSE",
+          "cache": "runtime-7e12e5df4bae12cb2158.txt",
+          "source": "https://docs.rs/crate/memchr/2.7.6/source/UNLICENSE"
+        }
+      ]
+    },
+    "memchr@2.8.3": {
+      "name": "memchr",
+      "version": "2.8.3",
+      "license": "Unlicense OR MIT",
+      "source": "https://crates.io/api/v1/crates/memchr/2.8.3/download",
+      "checksum": "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98",
+      "notices": [
+        {
+          "name": "COPYING",
+          "cache": "runtime-01c266bced4a434da005.txt",
+          "source": "https://docs.rs/crate/memchr/2.8.3/source/COPYING"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-0f96a83840e146e43c0e.txt",
+          "source": "https://docs.rs/crate/memchr/2.8.3/source/LICENSE-MIT"
+        },
+        {
+          "name": "UNLICENSE",
+          "cache": "runtime-7e12e5df4bae12cb2158.txt",
+          "source": "https://docs.rs/crate/memchr/2.8.3/source/UNLICENSE"
+        }
+      ]
+    },
+    "miniz_oxide@0.8.9": {
+      "name": "miniz_oxide",
+      "version": "0.8.9",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/miniz_oxide/0.8.9/download",
+      "checksum": "1fa76a2c86f704bdb222d66965fb3d63269ce38518b83cb0575fca855ebb6316",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "cache": "runtime-4108245a1f2df9d4e94d.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE"
+        },
+        {
+          "name": "LICENSE-APACHE.md",
+          "cache": "runtime-0d542e0c8804e39aa7f3.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE-APACHE.md"
+        },
+        {
+          "name": "LICENSE-MIT.md",
+          "cache": "runtime-799e9ca9d179295ef372.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE-MIT.md"
+        },
+        {
+          "name": "LICENSE-ZLIB.md",
+          "cache": "runtime-0a54e647fe54104658b5.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE-ZLIB.md"
+        }
+      ]
+    },
+    "miniz_oxide@0.9.1": {
+      "name": "miniz_oxide",
+      "version": "0.9.1",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/miniz_oxide/0.9.1/download",
+      "checksum": "b63fbc4a50860e98e7b2aa7804ded1db5cbc3aff9193adaff57a6931bf7c4b4c",
+      "notices": [
+        {
+          "name": "LICENSE",
+          "cache": "runtime-4108245a1f2df9d4e94d.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE"
+        },
+        {
+          "name": "LICENSE-APACHE.md",
+          "cache": "runtime-0d542e0c8804e39aa7f3.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE-APACHE.md"
+        },
+        {
+          "name": "LICENSE-MIT.md",
+          "cache": "runtime-799e9ca9d179295ef372.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE-MIT.md"
+        },
+        {
+          "name": "LICENSE-ZLIB.md",
+          "cache": "runtime-0a54e647fe54104658b5.txt",
+          "source": "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE-ZLIB.md"
+        }
+      ]
+    },
+    "moto-rt@0.16.0": {
+      "name": "moto-rt",
+      "version": "0.16.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/moto-rt/0.16.0/download",
+      "checksum": "29aea9f7dfeb258e030a84e0ec38a9c2ec2063d4f45eb2db31445cfc40b3dba1",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-69fef7b0f322a6555415.txt",
+          "source": "https://docs.rs/crate/moto-rt/0.16.0/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-a7c936ff1ed8fa340172.txt",
+          "source": "https://docs.rs/crate/moto-rt/0.16.0/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "moto-rt@0.16.4": {
+      "name": "moto-rt",
+      "version": "0.16.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/moto-rt/0.16.4/download",
+      "checksum": "0aadbab5a5ca5a01ec1ff4bc03c2c3a7643f0e1d97ad5a4a5b58ce78504e17da",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-69fef7b0f322a6555415.txt",
+          "source": "https://docs.rs/crate/moto-rt/0.16.4/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-a7c936ff1ed8fa340172.txt",
+          "source": "https://docs.rs/crate/moto-rt/0.16.4/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "object@0.37.3": {
+      "name": "object",
+      "version": "0.37.3",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/object/0.37.3/download",
+      "checksum": "ff76201f031d8863c38aa7f905eca4f53abbfa15f609db4277d44cd8938f33fe",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/object/0.37.3/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-0b74dfa0bcee5c420c6b.txt",
+          "source": "https://docs.rs/crate/object/0.37.3/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "object@0.39.1": {
+      "name": "object",
+      "version": "0.39.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/object/0.39.1/download",
+      "checksum": "2e5a6c098c7a3b6547378093f5cc30bc54fd361ce711e05293a5cc589562739b",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/object/0.39.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-0b74dfa0bcee5c420c6b.txt",
+          "source": "https://docs.rs/crate/object/0.39.1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "r-efi-alloc@2.1.0": {
+      "name": "r-efi-alloc",
+      "version": "2.1.0",
+      "license": "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
+      "source": "https://crates.io/api/v1/crates/r-efi-alloc/2.1.0/download",
+      "checksum": "dc2f58ef3ca9bb0f9c44d9aa8537601bcd3df94cc9314a40178cadf7d4466354",
+      "notices": [
+        {
+          "name": "AUTHORS",
+          "cache": "runtime-fba3318d0c600380177e.txt",
+          "source": "https://docs.rs/crate/r-efi-alloc/2.1.0/source/AUTHORS"
+        },
+        {
+          "name": "Upstream README licensing notice",
+          "cache": "runtime-f9070a832833fa7488fd.txt",
+          "source": "https://raw.githubusercontent.com/r-efi/r-efi-alloc/2341569232a4f4f8196421c71cf94914352dc72b/README.md"
+        },
+        {
+          "name": "Apache-2.0 alternative license text",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-APACHE"
+        }
+      ]
+    },
+    "r-efi@5.3.0": {
+      "name": "r-efi",
+      "version": "5.3.0",
+      "license": "MIT OR Apache-2.0 OR LGPL-2.1-or-later",
+      "source": "https://crates.io/api/v1/crates/r-efi/5.3.0/download",
+      "checksum": "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f",
+      "notices": [
+        {
+          "name": "AUTHORS",
+          "cache": "runtime-ff92bed461f50338dd70.txt",
+          "source": "https://docs.rs/crate/r-efi/5.3.0/source/AUTHORS"
+        },
+        {
+          "name": "Upstream README licensing notice",
+          "cache": "runtime-f9070a832833fa7488fd.txt",
+          "source": "https://raw.githubusercontent.com/r-efi/r-efi/97b55bed1c2c91dcbf787674849f05337ff80b33/README.md"
+        },
+        {
+          "name": "Apache-2.0 alternative license text",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-APACHE"
+        }
+      ]
+    },
+    "rand@0.9.2": {
+      "name": "rand",
+      "version": "0.9.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/rand/0.9.2/download",
+      "checksum": "6db2770f06117d490610c7488547d543617b21bfa07796d7a12f6f1bd53850d1",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-90eb64f0279b0d9432ac.txt",
+          "source": "https://docs.rs/crate/rand/0.9.2/source/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-35242e7a83f69875e6ed.txt",
+          "source": "https://docs.rs/crate/rand/0.9.2/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-209fbbe0ad52d9235e37.txt",
+          "source": "https://docs.rs/crate/rand/0.9.2/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rand@0.9.5": {
+      "name": "rand",
+      "version": "0.9.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/rand/0.9.5/download",
+      "checksum": "b9ef1d0d795eb7d84685bca4f72f3649f064e6641543d3a8c415898726a57b41",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-90eb64f0279b0d9432ac.txt",
+          "source": "https://docs.rs/crate/rand/0.9.5/source/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-35242e7a83f69875e6ed.txt",
+          "source": "https://docs.rs/crate/rand/0.9.5/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-209fbbe0ad52d9235e37.txt",
+          "source": "https://docs.rs/crate/rand/0.9.5/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rand_core@0.9.3": {
+      "name": "rand_core",
+      "version": "0.9.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/rand_core/0.9.3/download",
+      "checksum": "99d9a13982dcf210057a8a78572b2217b667c3beacbf3a0d8b454f6f82837d38",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-90eb64f0279b0d9432ac.txt",
+          "source": "https://docs.rs/crate/rand_core/0.9.3/source/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-6df43f6f4b5d4587f3d8.txt",
+          "source": "https://docs.rs/crate/rand_core/0.9.3/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-209fbbe0ad52d9235e37.txt",
+          "source": "https://docs.rs/crate/rand_core/0.9.3/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rand_core@0.9.5": {
+      "name": "rand_core",
+      "version": "0.9.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/rand_core/0.9.5/download",
+      "checksum": "76afc826de14238e6e8c374ddcc1fa19e374fd8dd986b0d2af0d02377261d83c",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-90eb64f0279b0d9432ac.txt",
+          "source": "https://docs.rs/crate/rand_core/0.9.5/source/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-6df43f6f4b5d4587f3d8.txt",
+          "source": "https://docs.rs/crate/rand_core/0.9.5/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-209fbbe0ad52d9235e37.txt",
+          "source": "https://docs.rs/crate/rand_core/0.9.5/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rand_xorshift@0.4.0": {
+      "name": "rand_xorshift",
+      "version": "0.4.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/rand_xorshift/0.4.0/download",
+      "checksum": "513962919efc330f829edb2535844d1b912b0fbe2ca165d613e4e8788bb05a5a",
+      "notices": [
+        {
+          "name": "COPYRIGHT",
+          "cache": "runtime-90eb64f0279b0d9432ac.txt",
+          "source": "https://docs.rs/crate/rand_xorshift/0.4.0/source/COPYRIGHT"
+        },
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-35242e7a83f69875e6ed.txt",
+          "source": "https://docs.rs/crate/rand_xorshift/0.4.0/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-209fbbe0ad52d9235e37.txt",
+          "source": "https://docs.rs/crate/rand_xorshift/0.4.0/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rustc-demangle@0.1.27": {
+      "name": "rustc-demangle",
+      "version": "0.1.27",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/rustc-demangle/0.1.27/download",
+      "checksum": "b50b8869d9fc858ce7266cce0194bd74df58b9d0e3f6df3a9fc8eb470d95c09d",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/rustc-demangle/0.1.27/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-378f5840b258e2779c39.txt",
+          "source": "https://docs.rs/crate/rustc-demangle/0.1.27/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rustc-demangle@0.1.28": {
+      "name": "rustc-demangle",
+      "version": "0.1.28",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/rustc-demangle/0.1.28/download",
+      "checksum": "b74b56ffa8bb2830709a538c2cbcae9aa062db0d2a42563bfb09bdaae44020eb",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/rustc-demangle/0.1.28/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-378f5840b258e2779c39.txt",
+          "source": "https://docs.rs/crate/rustc-demangle/0.1.28/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rustc-literal-escaper@0.0.7": {
+      "name": "rustc-literal-escaper",
+      "version": "0.0.7",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/rustc-literal-escaper/0.0.7/download",
+      "checksum": "8be87abb9e40db7466e0681dc8ecd9dcfd40360cb10b4c8fe24a7c4c3669b198",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://docs.rs/crate/rustc-literal-escaper/0.0.7/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/rustc-literal-escaper/0.0.7/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "rustc-literal-escaper@0.0.8": {
+      "name": "rustc-literal-escaper",
+      "version": "0.0.8",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/rustc-literal-escaper/0.0.8/download",
+      "checksum": "bfe6f213fb658c8fb95baabd5420393438cf5a98d707f5dd701d9197c705f71e",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://docs.rs/crate/rustc-literal-escaper/0.0.8/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/rustc-literal-escaper/0.0.8/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "shlex@1.3.0": {
+      "name": "shlex",
+      "version": "1.3.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/shlex/1.3.0/download",
+      "checksum": "0fda2ff0d084019ba4d7c6f371c95d8fd75ce3524c3cb8fb653a3023f6323e64",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-553fffcd9b1cb158bc3e.txt",
+          "source": "https://docs.rs/crate/shlex/1.3.0/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-4455bf75a91154108304.txt",
+          "source": "https://docs.rs/crate/shlex/1.3.0/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "unwinding@0.2.10": {
+      "name": "unwinding",
+      "version": "0.2.10",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/unwinding/0.2.10/download",
+      "checksum": "4b134ada16dda9e435abe2a6d76a01d497bc60707357845a15f9b0ed42dc88ce",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://docs.rs/crate/unwinding/0.2.10/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/unwinding/0.2.10/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "unwinding@0.2.8": {
+      "name": "unwinding",
+      "version": "0.2.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/unwinding/0.2.8/download",
+      "checksum": "60612c845ef41699f39dc8c5391f252942c0a88b7d15da672eff0d14101bbd6d",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-62c7a1e35f56406896d7.txt",
+          "source": "https://docs.rs/crate/unwinding/0.2.8/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/unwinding/0.2.8/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "vex-sdk@0.27.1": {
+      "name": "vex-sdk",
+      "version": "0.27.1",
+      "license": "MIT",
+      "source": "https://crates.io/api/v1/crates/vex-sdk/0.27.1/download",
+      "checksum": "79e5fe15afde1305478b35e2cb717fff59f485428534cf49cfdbfa4723379bf6",
+      "notices": [
+        {
+          "name": "LICENSE.md (upstream repository)",
+          "cache": "runtime-7bc7d5de2a0b793d4e1a.txt",
+          "source": "https://raw.githubusercontent.com/vexide/vex-sdk/6c0b83d35b6fc31a7607efe456e387df45476314/LICENSE.md"
+        }
+      ]
+    },
+    "wasi@0.11.1+wasi-snapshot-preview1": {
+      "name": "wasi",
+      "version": "0.11.1+wasi-snapshot-preview1",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wasi/0.11.1+wasi-snapshot-preview1/download",
+      "checksum": "ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wasi/0.11.1+wasi-snapshot-preview1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wasi/0.11.1+wasi-snapshot-preview1/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wasi/0.11.1+wasi-snapshot-preview1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "wasi@0.14.4+wasi-0.2.4": {
+      "name": "wasi",
+      "version": "0.14.4+wasi-0.2.4",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wasi/0.14.4+wasi-0.2.4/download",
+      "checksum": "88a5f4a424faf49c3c2c344f166f0662341d470ea185e939657aaff130f0ec4a",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wasi/0.14.4+wasi-0.2.4/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wasi/0.14.4+wasi-0.2.4/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wasi/0.14.4+wasi-0.2.4/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "wasip1@1.0.0": {
+      "name": "wasip1",
+      "version": "1.0.0",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wasip1/1.0.0/download",
+      "checksum": "b5e26842486624357dbeb8f0381cf1fb42f022291fd787d4a816768fec8cc760",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE (upstream repository)",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://raw.githubusercontent.com/bytecodealliance/wasi/e55b3b02fcda2a016f5df14573ff05c5b1e313d6/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception (upstream repository)",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://raw.githubusercontent.com/bytecodealliance/wasi/e55b3b02fcda2a016f5df14573ff05c5b1e313d6/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT (upstream repository)",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://raw.githubusercontent.com/bytecodealliance/wasi/e55b3b02fcda2a016f5df14573ff05c5b1e313d6/LICENSE-MIT"
+        }
+      ]
+    },
+    "wasip2@1.0.3+wasi-0.2.9": {
+      "name": "wasip2",
+      "version": "1.0.3+wasi-0.2.9",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wasip2/1.0.3+wasi-0.2.9/download",
+      "checksum": "20064672db26d7cdc89c7798c48a0fdfac8213434a1186e5ef29fd560ae223d6",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wasip2/1.0.3+wasi-0.2.9/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wasip2/1.0.3+wasi-0.2.9/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wasip2/1.0.3+wasi-0.2.9/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "wasip2@1.0.4+wasi-0.2.12": {
+      "name": "wasip2",
+      "version": "1.0.4+wasi-0.2.12",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wasip2/1.0.4+wasi-0.2.12/download",
+      "checksum": "b67efb37e106e55ce722a510d6b5f9c17f083e5fc79afc2badeb12cc313d9487",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wasip2/1.0.4+wasi-0.2.12/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wasip2/1.0.4+wasi-0.2.12/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wasip2/1.0.4+wasi-0.2.12/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "wasip3@0.6.0+wasi-0.3.0-rc-2026-03-15": {
+      "name": "wasip3",
+      "version": "0.6.0+wasi-0.3.0-rc-2026-03-15",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wasip3/0.6.0+wasi-0.3.0-rc-2026-03-15/download",
+      "checksum": "ed83456dd6a0b8581998c0365e4651fa2997e5093b49243b7f35391afaa7a3d9",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wasip3/0.6.0+wasi-0.3.0-rc-2026-03-15/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wasip3/0.6.0+wasi-0.3.0-rc-2026-03-15/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wasip3/0.6.0+wasi-0.3.0-rc-2026-03-15/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "wasip3@0.7.0+wasi-0.3.0": {
+      "name": "wasip3",
+      "version": "0.7.0+wasi-0.3.0",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wasip3/0.7.0+wasi-0.3.0/download",
+      "checksum": "07aa681120704bf09828d1f7cf7e763666c1dc6a36e5096efd0ad9aadfb302d3",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wasip3/0.7.0+wasi-0.3.0/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wasip3/0.7.0+wasi-0.3.0/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wasip3/0.7.0+wasi-0.3.0/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "windows-link@0.2.1": {
+      "name": "windows-link",
+      "version": "0.2.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows-link/0.2.1/download",
+      "checksum": "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows-link/0.2.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows-link/0.2.1/source/license-mit"
+        }
+      ]
+    },
+    "windows-sys@0.60.2": {
+      "name": "windows-sys",
+      "version": "0.60.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows-sys/0.60.2/download",
+      "checksum": "f2f500e4d28234f72040990ec9d39e3a6b950f9f22d3dba18416c35882612bcb",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows-sys/0.60.2/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows-sys/0.60.2/source/license-mit"
+        }
+      ]
+    },
+    "windows-targets@0.53.5": {
+      "name": "windows-targets",
+      "version": "0.53.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows-targets/0.53.5/download",
+      "checksum": "4945f9f551b88e0d65f3db0bc25c33b8acea4d9e41163edf90dcd0b19f9069f3",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows-targets/0.53.5/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows-targets/0.53.5/source/license-mit"
+        }
+      ]
+    },
+    "windows_aarch64_gnullvm@0.53.1": {
+      "name": "windows_aarch64_gnullvm",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_aarch64_gnullvm/0.53.1/download",
+      "checksum": "a9d8416fa8b42f5c947f8482c43e7d89e73a173cead56d044f6a56104a6d1b53",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_aarch64_gnullvm/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_aarch64_gnullvm/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "windows_aarch64_msvc@0.53.1": {
+      "name": "windows_aarch64_msvc",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_aarch64_msvc/0.53.1/download",
+      "checksum": "b9d782e804c2f632e395708e99a94275910eb9100b2114651e04744e9b125006",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_aarch64_msvc/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_aarch64_msvc/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "windows_i686_gnu@0.53.1": {
+      "name": "windows_i686_gnu",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_i686_gnu/0.53.1/download",
+      "checksum": "960e6da069d81e09becb0ca57a65220ddff016ff2d6af6a223cf372a506593a3",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_i686_gnu/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_i686_gnu/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "windows_i686_gnullvm@0.53.1": {
+      "name": "windows_i686_gnullvm",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_i686_gnullvm/0.53.1/download",
+      "checksum": "fa7359d10048f68ab8b09fa71c3daccfb0e9b559aed648a8f95469c27057180c",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_i686_gnullvm/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_i686_gnullvm/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "windows_i686_msvc@0.53.1": {
+      "name": "windows_i686_msvc",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_i686_msvc/0.53.1/download",
+      "checksum": "1e7ac75179f18232fe9c285163565a57ef8d3c89254a30685b57d83a38d326c2",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_i686_msvc/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_i686_msvc/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "windows_x86_64_gnu@0.53.1": {
+      "name": "windows_x86_64_gnu",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_x86_64_gnu/0.53.1/download",
+      "checksum": "9c3842cdd74a865a8066ab39c8a7a473c0778a3f29370b5fd6b4b9aa7df4a499",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_x86_64_gnu/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_x86_64_gnu/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "windows_x86_64_gnullvm@0.53.1": {
+      "name": "windows_x86_64_gnullvm",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_x86_64_gnullvm/0.53.1/download",
+      "checksum": "0ffa179e2d07eee8ad8f57493436566c7cc30ac536a3379fdf008f47f6bb7ae1",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_x86_64_gnullvm/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_x86_64_gnullvm/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "windows_x86_64_msvc@0.53.1": {
+      "name": "windows_x86_64_msvc",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/api/v1/crates/windows_x86_64_msvc/0.53.1/download",
+      "checksum": "d6bbff5f0aada427a1e5a6da5f1f98158182f26556f345ac9e04d36d0ebed650",
+      "notices": [
+        {
+          "name": "license-apache-2.0",
+          "cache": "runtime-c16f8dcf1a368b83be78.txt",
+          "source": "https://docs.rs/crate/windows_x86_64_msvc/0.53.1/source/license-apache-2.0"
+        },
+        {
+          "name": "license-mit",
+          "cache": "runtime-c2cfccb812fe482101a8.txt",
+          "source": "https://docs.rs/crate/windows_x86_64_msvc/0.53.1/source/license-mit"
+        }
+      ]
+    },
+    "wit-bindgen@0.45.1": {
+      "name": "wit-bindgen",
+      "version": "0.45.1",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wit-bindgen/0.45.1/download",
+      "checksum": "5c573471f125075647d03df72e026074b7203790d41351cd6edc96f46bcccd36",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wit-bindgen/0.45.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wit-bindgen/0.45.1/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wit-bindgen/0.45.1/source/LICENSE-MIT"
+        }
+      ]
+    },
+    "wit-bindgen@0.57.1": {
+      "name": "wit-bindgen",
+      "version": "0.57.1",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/api/v1/crates/wit-bindgen/0.57.1/download",
+      "checksum": "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e",
+      "notices": [
+        {
+          "name": "LICENSE-APACHE",
+          "cache": "runtime-a60eea817514531668d7.txt",
+          "source": "https://docs.rs/crate/wit-bindgen/0.57.1/source/LICENSE-APACHE"
+        },
+        {
+          "name": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+          "cache": "runtime-268872b9816f90fd8e85.txt",
+          "source": "https://docs.rs/crate/wit-bindgen/0.57.1/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+        },
+        {
+          "name": "LICENSE-MIT",
+          "cache": "runtime-23f18e03dc49df91622f.txt",
+          "source": "https://docs.rs/crate/wit-bindgen/0.57.1/source/LICENSE-MIT"
+        }
+      ]
+    }
+  }
+}

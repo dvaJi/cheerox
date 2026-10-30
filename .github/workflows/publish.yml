@@ -1,0 +1,101 @@
+name: Publish to npm
+
+# Publication is always a separate, explicit maintainer action. The version tag
+# must already identify the exact main commit executing this workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact package version, for example 0.1.1 (tag v0.1.1 must exist)
+        required: true
+        type: string
+      npm_tag:
+        description: npm dist-tag (prereleases require next)
+        required: true
+        type: choice
+        default: latest
+        options:
+          - latest
+          - next
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-rusteerio
+  cancel-in-progress: false
+
+jobs:
+  release-ref:
+    runs-on: ubuntu-24.04
+    outputs:
+      commit: ${{ steps.validate.outputs.commit }}
+      version: ${{ steps.validate.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Validate public repository, main commit and version tag
+        id: validate
+        run: node scripts/check-release-ref.mjs
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          NPM_DIST_TAG: ${{ inputs.npm_tag }}
+          REPOSITORY_VISIBILITY: ${{ github.event.repository.visibility }}
+
+  verify:
+    needs: release-ref
+    uses: ./.github/workflows/ci.yml
+    with:
+      ref: ${{ needs.release-ref.outputs.commit }}
+      release: true
+    permissions:
+      contents: read
+
+  publish:
+    needs: [release-ref, verify]
+    runs-on: ubuntu-24.04
+    environment:
+      name: npm
+      url: https://www.npmjs.com/package/rusteerio
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.release-ref.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Use an npm CLI with trusted publishing support
+        run: npm install --global npm@11 --registry=https://registry.npmjs.org/
+      - name: Check npm OIDC support
+        run: |
+          node --input-type=module -e 'import assert from "node:assert/strict"; import { execFileSync } from "node:child_process"; const [major, minor, patch] = execFileSync("npm", ["--version"], {encoding:"utf8"}).trim().split(".").map(Number); assert.ok(major > 11 || major === 11 && (minor > 5 || minor === 5 && patch >= 1), "npm 11.5.1+ is required"); assert.ok(!process.env.NODE_AUTH_TOKEN && !process.env.NPM_TOKEN, "Use npm trusted publishing instead of a long-lived token");'
+      - run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-package
+          path: release
+      - name: Verify tested artifact identity and all eight native binaries
+        run: npm run release:check -- --tarball release --commit "$SOURCE_COMMIT" --verify-manifest release/manifest.json
+        env:
+          SOURCE_COMMIT: ${{ needs.release-ref.outputs.commit }}
+      - name: Test the artifact being published
+        run: npm run test:package -- "release/rusteerio-${RELEASE_VERSION}.tgz"
+        env:
+          RELEASE_VERSION: ${{ needs.release-ref.outputs.version }}
+      - name: Publish the verified tarball with OIDC and provenance
+        run: npm publish "./release/rusteerio-${RELEASE_VERSION}.tgz" --ignore-scripts --access public --provenance --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"
+        env:
+          RELEASE_VERSION: ${{ needs.release-ref.outputs.version }}
+          NPM_DIST_TAG: ${{ inputs.npm_tag }}

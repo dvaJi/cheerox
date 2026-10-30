@@ -1,0 +1,15 @@
+{
+  "toolchain": {
+    "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1",
+    "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+  },
+  "nativeBinarySha256": {
+    "rusteerio.linux-x64-gnu.node": "a9391c29dfb69dbd858efec1370542152dad154fe024f072e9a2f3646b413d4a"
+  },
+  "libc": {
+    "buildRuntime": "glibc 2.28"
+  },
+  "containerImage": "quay.io/pypa/manylinux_2_28_x86_64@sha256:4131ddd7acb9c6c966af02fe7e71edc51e078c2d41f475966697676430bfa2ae",
+  "sourceCommit": "13d29a1463c9b46a85e8931ebd3e015d371dcfbb",
+  "sourceArchiveSha256": null
+}

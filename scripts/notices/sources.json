@@ -1,0 +1,561 @@
+{
+  "schemaVersion": 1,
+  "cache": {
+    "cheerio-MIT.txt": {
+      "sha256": "61c1e21d3a8ff20f9b69abe15104a75584688080febc22f60a4cbf3854becf4e",
+      "sources": [
+        "https://raw.githubusercontent.com/cheeriojs/cheerio/e3c7aaf9ed64fe3cb9a181e58a41c0fdd6dbfbfc/LICENSE"
+      ]
+    },
+    "htmlparser2-MIT.txt": {
+      "sha256": "204cfa747341660e4da64cd23e8c876c6b20279d247f48564993d3fc4a2eab47",
+      "sources": [
+        "https://raw.githubusercontent.com/fb55/htmlparser2/57ace50bf6eb3bfab0468deafe10d0a8a2f233aa/LICENSE"
+      ]
+    },
+    "html5ever-AUTHORS.txt": {
+      "sha256": "02930215f07fb88b2ec9503a2a1b2345fdcbd351f525c652583fb9df6bc271b9",
+      "sources": [
+        "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/AUTHORS"
+      ]
+    },
+    "html5ever-COPYRIGHT.txt": {
+      "sha256": "c6b91503fc0a9852e688b56eef715dba9a1ab4b074e86875af2471ce0163b2e5",
+      "sources": [
+        "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/COPYRIGHT"
+      ]
+    },
+    "html5ever-LICENSE-APACHE.txt": {
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "sources": [
+        "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/LICENSE-APACHE"
+      ]
+    },
+    "html5ever-LICENSE-MIT.txt": {
+      "sha256": "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3",
+      "sources": [
+        "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/LICENSE-MIT"
+      ]
+    },
+    "napi-rs-MIT.txt": {
+      "sha256": "3f1ce66533302df3a32edbfdfc0b78f0dd34659e4c1f5817162e5ea3c2297215",
+      "sources": [
+        "https://raw.githubusercontent.com/napi-rs/napi-rs/f2178312d0e3e07beecc19836b91716a229107d3/LICENSE",
+        "https://raw.githubusercontent.com/napi-rs/napi-rs/a94cef33f62e74682963dd085e283f52dcec2600/LICENSE",
+        "https://raw.githubusercontent.com/napi-rs/napi-rs/a312b7eb4e12d3e0a3e9770429ee05c333947a39/LICENSE",
+        "https://raw.githubusercontent.com/napi-rs/napi-rs/a312b7eb4e12d3e0a3e9770429ee05c333947a39/LICENSE",
+        "https://raw.githubusercontent.com/napi-rs/napi-rs/f1b8ab5e645e674df33c796ef75aa278cd1b4a31/LICENSE"
+      ]
+    },
+    "neon-MIT.txt": {
+      "sha256": "e47f19ffc3ed618c75d166781681b27c30f841f9b5b10fc488150b9128b19cac",
+      "sources": [
+        "https://raw.githubusercontent.com/neon-bindings/neon/779f733d2a98d343a125510208a96b98efa630ee/LICENSE-MIT"
+      ]
+    },
+    "runtime-01c266bced4a434da005.txt": {
+      "sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+      "sources": [
+        "https://docs.rs/crate/memchr/2.7.6/source/COPYING",
+        "https://docs.rs/crate/memchr/2.8.3/source/COPYING"
+      ]
+    },
+    "runtime-0a54e647fe54104658b5.txt": {
+      "sha256": "0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39",
+      "sources": [
+        "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE-ZLIB.md",
+        "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE-ZLIB.md"
+      ]
+    },
+    "runtime-0b74dfa0bcee5c420c6b.txt": {
+      "sha256": "0b74dfa0bcee5c420c6b7f67b4b2658f9ab8388c97b8e733975f2cecbdd668a6",
+      "sources": [
+        "https://docs.rs/crate/object/0.37.3/source/LICENSE-MIT",
+        "https://docs.rs/crate/object/0.39.1/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-0d542e0c8804e39aa7f3.txt": {
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "sources": [
+        "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE-APACHE.md",
+        "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE-APACHE.md"
+      ]
+    },
+    "runtime-0f96a83840e146e43c0e.txt": {
+      "sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f",
+      "sources": [
+        "https://docs.rs/crate/memchr/2.7.6/source/LICENSE-MIT",
+        "https://docs.rs/crate/memchr/2.8.3/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-123a331b5dbf04c30097.txt": {
+      "sha256": "123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e",
+      "sources": [
+        "https://docs.rs/crate/libc/0.2.183/source/LICENSE-MIT",
+        "https://docs.rs/crate/libc/0.2.185/source/LICENSE-MIT",
+        "https://docs.rs/crate/libc/0.2.189/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-172020dbfd5b53a226df.txt": {
+      "sha256": "172020dbfd5b53a226dfde77616190a48dcff519b0bc0e6deb91a8450782c4af",
+      "sources": [
+        "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/COPYRIGHT",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/COPYRIGHT",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/COPYRIGHT"
+      ]
+    },
+    "runtime-209fbbe0ad52d9235e37.txt": {
+      "sha256": "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b",
+      "sources": [
+        "https://docs.rs/crate/rand/0.9.2/source/LICENSE-MIT",
+        "https://docs.rs/crate/rand/0.9.5/source/LICENSE-MIT",
+        "https://docs.rs/crate/rand_core/0.9.3/source/LICENSE-MIT",
+        "https://docs.rs/crate/rand_core/0.9.5/source/LICENSE-MIT",
+        "https://docs.rs/crate/rand_xorshift/0.4.0/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-23f18e03dc49df91622f.txt": {
+      "sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+      "sources": [
+        "https://docs.rs/crate/adler2/2.0.1/source/LICENSE-MIT",
+        "https://docs.rs/crate/hermit-abi/0.5.2/source/LICENSE-MIT",
+        "https://docs.rs/crate/rustc-literal-escaper/0.0.7/source/LICENSE-MIT",
+        "https://docs.rs/crate/rustc-literal-escaper/0.0.8/source/LICENSE-MIT",
+        "https://docs.rs/crate/unwinding/0.2.10/source/LICENSE-MIT",
+        "https://docs.rs/crate/unwinding/0.2.8/source/LICENSE-MIT",
+        "https://docs.rs/crate/wasi/0.11.1+wasi-snapshot-preview1/source/LICENSE-MIT",
+        "https://docs.rs/crate/wasi/0.14.4+wasi-0.2.4/source/LICENSE-MIT",
+        "https://raw.githubusercontent.com/bytecodealliance/wasi/e55b3b02fcda2a016f5df14573ff05c5b1e313d6/LICENSE-MIT",
+        "https://docs.rs/crate/wasip2/1.0.3+wasi-0.2.9/source/LICENSE-MIT",
+        "https://docs.rs/crate/wasip2/1.0.4+wasi-0.2.12/source/LICENSE-MIT",
+        "https://docs.rs/crate/wasip3/0.6.0+wasi-0.3.0-rc-2026-03-15/source/LICENSE-MIT",
+        "https://docs.rs/crate/wasip3/0.7.0+wasi-0.3.0/source/LICENSE-MIT",
+        "https://docs.rs/crate/wit-bindgen/0.45.1/source/LICENSE-MIT",
+        "https://docs.rs/crate/wit-bindgen/0.57.1/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-268872b9816f90fd8e85.txt": {
+      "sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+      "sources": [
+        "https://docs.rs/crate/wasi/0.11.1+wasi-snapshot-preview1/source/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://docs.rs/crate/wasi/0.14.4+wasi-0.2.4/source/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://raw.githubusercontent.com/bytecodealliance/wasi/e55b3b02fcda2a016f5df14573ff05c5b1e313d6/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://docs.rs/crate/wasip2/1.0.3+wasi-0.2.9/source/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://docs.rs/crate/wasip2/1.0.4+wasi-0.2.12/source/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://docs.rs/crate/wasip3/0.6.0+wasi-0.3.0-rc-2026-03-15/source/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://docs.rs/crate/wasip3/0.7.0+wasi-0.3.0/source/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://docs.rs/crate/wit-bindgen/0.45.1/source/LICENSE-Apache-2.0_WITH_LLVM-exception",
+        "https://docs.rs/crate/wit-bindgen/0.57.1/source/LICENSE-Apache-2.0_WITH_LLVM-exception"
+      ]
+    },
+    "runtime-35242e7a83f69875e6ed.txt": {
+      "sha256": "35242e7a83f69875e6edeff02291e688c97caafe2f8902e4e19b49d3e78b4cab",
+      "sources": [
+        "https://docs.rs/crate/rand/0.9.2/source/LICENSE-APACHE",
+        "https://docs.rs/crate/rand/0.9.5/source/LICENSE-APACHE",
+        "https://docs.rs/crate/rand_xorshift/0.4.0/source/LICENSE-APACHE"
+      ]
+    },
+    "runtime-378f5840b258e2779c39.txt": {
+      "sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397",
+      "sources": [
+        "https://docs.rs/crate/cc/1.2.0/source/LICENSE-MIT",
+        "https://docs.rs/crate/cfg-if/1.0.4/source/LICENSE-MIT",
+        "https://docs.rs/crate/dlmalloc/0.2.11/source/LICENSE-MIT",
+        "https://docs.rs/crate/dlmalloc/0.2.13/source/LICENSE-MIT",
+        "https://docs.rs/crate/dlmalloc/0.2.14/source/LICENSE-MIT",
+        "https://docs.rs/crate/rustc-demangle/0.1.27/source/LICENSE-MIT",
+        "https://docs.rs/crate/rustc-demangle/0.1.28/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-4108245a1f2df9d4e94d.txt": {
+      "sha256": "4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b",
+      "sources": [
+        "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE",
+        "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE"
+      ]
+    },
+    "runtime-4455bf75a91154108304.txt": {
+      "sha256": "4455bf75a91154108304cb283e0fea9948c14f13e20d60887cf2552449dea3b1",
+      "sources": [
+        "https://docs.rs/crate/shlex/1.3.0/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-553fffcd9b1cb158bc3e.txt": {
+      "sha256": "553fffcd9b1cb158bc3e9edc35da85ca5c3b3d7d2e61c883ebcfa8a65814b583",
+      "sources": [
+        "https://docs.rs/crate/shlex/1.3.0/source/LICENSE-APACHE"
+      ]
+    },
+    "runtime-62c7a1e35f56406896d7.txt": {
+      "sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+      "sources": [
+        "https://docs.rs/crate/libc/0.2.183/source/LICENSE-APACHE",
+        "https://docs.rs/crate/libc/0.2.185/source/LICENSE-APACHE",
+        "https://docs.rs/crate/libc/0.2.189/source/LICENSE-APACHE",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-APACHE",
+        "https://docs.rs/crate/rustc-literal-escaper/0.0.7/source/LICENSE-APACHE",
+        "https://docs.rs/crate/rustc-literal-escaper/0.0.8/source/LICENSE-APACHE",
+        "https://docs.rs/crate/unwinding/0.2.10/source/LICENSE-APACHE",
+        "https://docs.rs/crate/unwinding/0.2.8/source/LICENSE-APACHE",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSE-APACHE",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSE-APACHE"
+      ]
+    },
+    "runtime-6485b8ed310d3f0340bf.txt": {
+      "sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb",
+      "sources": [
+        "https://docs.rs/crate/getopts/0.2.24/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-69fef7b0f322a6555415.txt": {
+      "sha256": "69fef7b0f322a65554156141f2bc6256ed0bb78cba7e49f0d8829d7ec4ee62cd",
+      "sources": [
+        "https://docs.rs/crate/moto-rt/0.16.0/source/LICENSE-APACHE",
+        "https://docs.rs/crate/moto-rt/0.16.4/source/LICENSE-APACHE"
+      ]
+    },
+    "runtime-6df43f6f4b5d4587f3d8.txt": {
+      "sha256": "6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51",
+      "sources": [
+        "https://docs.rs/crate/rand_core/0.9.3/source/LICENSE-APACHE",
+        "https://docs.rs/crate/rand_core/0.9.5/source/LICENSE-APACHE"
+      ]
+    },
+    "runtime-799e9ca9d179295ef372.txt": {
+      "sha256": "799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d",
+      "sources": [
+        "https://docs.rs/crate/miniz_oxide/0.8.9/source/LICENSE-MIT.md",
+        "https://docs.rs/crate/miniz_oxide/0.9.1/source/LICENSE-MIT.md"
+      ]
+    },
+    "runtime-7b63ecd5f1902af1b637.txt": {
+      "sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0",
+      "sources": [
+        "https://docs.rs/crate/gimli/0.32.3/source/LICENSE-MIT",
+        "https://docs.rs/crate/gimli/0.34.0/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-7bc7d5de2a0b793d4e1a.txt": {
+      "sha256": "7bc7d5de2a0b793d4e1adb7ffcb99387776adc1f15f055bc3b667ea449249e6a",
+      "sources": [
+        "https://raw.githubusercontent.com/vexide/vex-sdk/6c0b83d35b6fc31a7607efe456e387df45476314/LICENSE.md"
+      ]
+    },
+    "runtime-7e12e5df4bae12cb2158.txt": {
+      "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c",
+      "sources": [
+        "https://docs.rs/crate/memchr/2.7.6/source/UNLICENSE",
+        "https://docs.rs/crate/memchr/2.8.3/source/UNLICENSE"
+      ]
+    },
+    "runtime-861399f8c21c042b1105.txt": {
+      "sha256": "861399f8c21c042b110517e76dc6b63a2b334276c8cf17412fc3c8908ca8dc17",
+      "sources": [
+        "https://docs.rs/crate/adler2/2.0.1/source/LICENSE-0BSD"
+      ]
+    },
+    "runtime-8ada45cd9f843acf64e4.txt": {
+      "sha256": "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+      "sources": [
+        "https://docs.rs/crate/adler2/2.0.1/source/LICENSE-APACHE"
+      ]
+    },
+    "runtime-90eb64f0279b0d9432ac.txt": {
+      "sha256": "90eb64f0279b0d9432accfa6023ff803bc4965212383697eee27a0f426d5f8d5",
+      "sources": [
+        "https://docs.rs/crate/rand/0.9.2/source/COPYRIGHT",
+        "https://docs.rs/crate/rand/0.9.5/source/COPYRIGHT",
+        "https://docs.rs/crate/rand_core/0.9.3/source/COPYRIGHT",
+        "https://docs.rs/crate/rand_core/0.9.5/source/COPYRIGHT",
+        "https://docs.rs/crate/rand_xorshift/0.4.0/source/COPYRIGHT"
+      ]
+    },
+    "runtime-a60eea817514531668d7.txt": {
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "sources": [
+        "https://docs.rs/crate/addr2line/0.25.1/source/LICENSE-APACHE",
+        "https://docs.rs/crate/addr2line/0.27.1/source/LICENSE-APACHE",
+        "https://docs.rs/crate/cc/1.2.0/source/LICENSE-APACHE",
+        "https://docs.rs/crate/cfg-if/1.0.4/source/LICENSE-APACHE",
+        "https://docs.rs/crate/dlmalloc/0.2.11/source/LICENSE-APACHE",
+        "https://docs.rs/crate/dlmalloc/0.2.13/source/LICENSE-APACHE",
+        "https://docs.rs/crate/dlmalloc/0.2.14/source/LICENSE-APACHE",
+        "https://docs.rs/crate/getopts/0.2.24/source/LICENSE-APACHE",
+        "https://docs.rs/crate/gimli/0.32.3/source/LICENSE-APACHE",
+        "https://docs.rs/crate/gimli/0.34.0/source/LICENSE-APACHE",
+        "https://docs.rs/crate/hashbrown/0.16.1/source/LICENSE-APACHE",
+        "https://docs.rs/crate/hashbrown/0.17.1/source/LICENSE-APACHE",
+        "https://docs.rs/crate/hermit-abi/0.5.2/source/LICENSE-APACHE",
+        "https://docs.rs/crate/object/0.37.3/source/LICENSE-APACHE",
+        "https://docs.rs/crate/object/0.39.1/source/LICENSE-APACHE",
+        "https://docs.rs/crate/rustc-demangle/0.1.27/source/LICENSE-APACHE",
+        "https://docs.rs/crate/rustc-demangle/0.1.28/source/LICENSE-APACHE",
+        "https://docs.rs/crate/wasi/0.11.1+wasi-snapshot-preview1/source/LICENSE-APACHE",
+        "https://docs.rs/crate/wasi/0.14.4+wasi-0.2.4/source/LICENSE-APACHE",
+        "https://raw.githubusercontent.com/bytecodealliance/wasi/e55b3b02fcda2a016f5df14573ff05c5b1e313d6/LICENSE-APACHE",
+        "https://docs.rs/crate/wasip2/1.0.3+wasi-0.2.9/source/LICENSE-APACHE",
+        "https://docs.rs/crate/wasip2/1.0.4+wasi-0.2.12/source/LICENSE-APACHE",
+        "https://docs.rs/crate/wasip3/0.6.0+wasi-0.3.0-rc-2026-03-15/source/LICENSE-APACHE",
+        "https://docs.rs/crate/wasip3/0.7.0+wasi-0.3.0/source/LICENSE-APACHE",
+        "https://docs.rs/crate/wit-bindgen/0.45.1/source/LICENSE-APACHE",
+        "https://docs.rs/crate/wit-bindgen/0.57.1/source/LICENSE-APACHE"
+      ]
+    },
+    "runtime-a7c936ff1ed8fa340172.txt": {
+      "sha256": "a7c936ff1ed8fa340172d42a98185afee078f818e907da69f3a8e336b1623b4b",
+      "sources": [
+        "https://docs.rs/crate/moto-rt/0.16.0/source/LICENSE-MIT",
+        "https://docs.rs/crate/moto-rt/0.16.4/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-ab6eec6caf0fa5775e41.txt": {
+      "sha256": "ab6eec6caf0fa5775e411c7a8bc6a45c4ef2956b0980b157ab74fc5cd62a928b",
+      "sources": [
+        "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/library/compiler-builtins/LICENSE.txt",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/library/compiler-builtins/LICENSE.txt",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/library/compiler-builtins/LICENSE.txt"
+      ]
+    },
+    "runtime-b1181a40b2a7b25cf66f.txt": {
+      "sha256": "b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744",
+      "sources": [
+        "https://docs.rs/crate/foldhash/0.2.0/source/LICENSE"
+      ]
+    },
+    "runtime-b71bd43a069ca0641a9e.txt": {
+      "sha256": "b71bd43a069ca0641a9ecfe585ca7b3c53b5cc1608f8b68321168698e28b5ea1",
+      "sources": [
+        "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSE-MIT",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSE-MIT",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSE-MIT"
+      ]
+    },
+    "runtime-c16f8dcf1a368b83be78.txt": {
+      "sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+      "sources": [
+        "https://docs.rs/crate/windows-link/0.2.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows-sys/0.60.2/source/license-apache-2.0",
+        "https://docs.rs/crate/windows-targets/0.53.5/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_aarch64_gnullvm/0.53.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_aarch64_msvc/0.53.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_i686_gnu/0.53.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_i686_gnullvm/0.53.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_i686_msvc/0.53.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_x86_64_gnu/0.53.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_x86_64_gnullvm/0.53.1/source/license-apache-2.0",
+        "https://docs.rs/crate/windows_x86_64_msvc/0.53.1/source/license-apache-2.0"
+      ]
+    },
+    "runtime-c2cfccb812fe482101a8.txt": {
+      "sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "sources": [
+        "https://docs.rs/crate/windows-link/0.2.1/source/license-mit",
+        "https://docs.rs/crate/windows-sys/0.60.2/source/license-mit",
+        "https://docs.rs/crate/windows-targets/0.53.5/source/license-mit",
+        "https://docs.rs/crate/windows_aarch64_gnullvm/0.53.1/source/license-mit",
+        "https://docs.rs/crate/windows_aarch64_msvc/0.53.1/source/license-mit",
+        "https://docs.rs/crate/windows_i686_gnu/0.53.1/source/license-mit",
+        "https://docs.rs/crate/windows_i686_gnullvm/0.53.1/source/license-mit",
+        "https://docs.rs/crate/windows_i686_msvc/0.53.1/source/license-mit",
+        "https://docs.rs/crate/windows_x86_64_gnu/0.53.1/source/license-mit",
+        "https://docs.rs/crate/windows_x86_64_gnullvm/0.53.1/source/license-mit",
+        "https://docs.rs/crate/windows_x86_64_msvc/0.53.1/source/license-mit"
+      ]
+    },
+    "runtime-e99d88d232bf57d70f0f.txt": {
+      "sha256": "e99d88d232bf57d70f0fb87f6b496d44b6653f99f8a63d250a54c61ea4bcde40",
+      "sources": [
+        "https://docs.rs/crate/addr2line/0.25.1/source/LICENSE-MIT",
+        "https://docs.rs/crate/addr2line/0.27.1/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-f32fb3b417a194167cfa.txt": {
+      "sha256": "f32fb3b417a194167cfad068223fc975ba96c5960513a10f66a3c28720aec1df",
+      "sources": [
+        "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSES/BSD-2-Clause.txt",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSES/BSD-2-Clause.txt",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSES/BSD-2-Clause.txt"
+      ]
+    },
+    "runtime-f5062c9a188d81dfe66b.txt": {
+      "sha256": "f5062c9a188d81dfe66b56db4182dcf9e4b17c0d9b0d311a8e20b3a1b075c443",
+      "sources": [
+        "https://raw.githubusercontent.com/rust-lang/rust/1.96.1/LICENSES/Unicode-3.0.txt",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.97.1/LICENSES/Unicode-3.0.txt",
+        "https://raw.githubusercontent.com/rust-lang/rust/1.99.0/LICENSES/Unicode-3.0.txt"
+      ]
+    },
+    "runtime-f9070a832833fa7488fd.txt": {
+      "sha256": "f9070a832833fa7488fde8c446d5b192d749e048dff0dc2c17086eb5111ccfba",
+      "sources": [
+        "https://raw.githubusercontent.com/r-efi/r-efi-alloc/2341569232a4f4f8196421c71cf94914352dc72b/README.md",
+        "https://raw.githubusercontent.com/r-efi/r-efi/97b55bed1c2c91dcbf787674849f05337ff80b33/README.md"
+      ]
+    },
+    "runtime-fab3dd6bdab226f1c086.txt": {
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85",
+      "sources": [
+        "https://raw.githubusercontent.com/fortanix/rust-sgx/adcc6cdb981bcf2101437edbd3ef6144246621d3/LICENSE"
+      ]
+    },
+    "runtime-fba3318d0c600380177e.txt": {
+      "sha256": "fba3318d0c600380177edf7ba4778ff6588faa8d106c679ac5dfee620011239c",
+      "sources": [
+        "https://docs.rs/crate/r-efi-alloc/2.1.0/source/AUTHORS"
+      ]
+    },
+    "runtime-ff8f68cb076caf8cefe7.txt": {
+      "sha256": "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2",
+      "sources": [
+        "https://docs.rs/crate/hashbrown/0.16.1/source/LICENSE-MIT",
+        "https://docs.rs/crate/hashbrown/0.17.1/source/LICENSE-MIT"
+      ]
+    },
+    "runtime-ff92bed461f50338dd70.txt": {
+      "sha256": "ff92bed461f50338dd703a9ba9aee496a425957873df1d91192776e4bdf5dda7",
+      "sources": [
+        "https://docs.rs/crate/r-efi/5.3.0/source/AUTHORS"
+      ]
+    },
+    "xray-MIT.txt": {
+      "sha256": "b77c4d943c496d18fcab9c638e07497caf809b4c72f153cf087a3a29fd67b342",
+      "sources": [
+        "https://raw.githubusercontent.com/atom/xray/cb6c5809f18c733f55b89ce202678c379a4cfc7b/LICENSE"
+      ]
+    }
+  },
+  "packages": {
+    "fxhash@0.2.1": {
+      "reason": "The crate publishes its dual-license copyright header but no standalone license files. The Apache-2.0 alternative is reproduced here.",
+      "notices": [
+        {
+          "file": "lib.rs",
+          "startLine": 1,
+          "endLine": 9,
+          "name": "Rust copyright and licensing header"
+        },
+        {
+          "package": "bitflags@2.13.2",
+          "file": "LICENSE-APACHE",
+          "name": "Apache-2.0 license text"
+        }
+      ]
+    },
+    "mac@0.1.1": {
+      "reason": "The crate README declares MIT/Apache-2.0 and identifies its author, but no standalone license files are published. The Apache-2.0 alternative is reproduced here.",
+      "notices": [
+        {
+          "file": "README.md",
+          "name": "Published README licensing and author notice"
+        },
+        {
+          "package": "bitflags@2.13.2",
+          "file": "LICENSE-APACHE",
+          "name": "Apache-2.0 license text"
+        }
+      ]
+    },
+    "match_token@0.35.0": {
+      "reason": "The published crate omits its repository-level license files. These notices come from the exact .cargo_vcs_info.json commit.",
+      "notices": [
+        {
+          "cache": "html5ever-AUTHORS.txt",
+          "source": "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/AUTHORS",
+          "name": "AUTHORS"
+        },
+        {
+          "cache": "html5ever-COPYRIGHT.txt",
+          "source": "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/COPYRIGHT",
+          "name": "COPYRIGHT"
+        },
+        {
+          "cache": "html5ever-LICENSE-MIT.txt",
+          "source": "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/LICENSE-MIT",
+          "name": "LICENSE-MIT"
+        },
+        {
+          "cache": "html5ever-LICENSE-APACHE.txt",
+          "source": "https://raw.githubusercontent.com/servo/html5ever/6db7bbf1c4dfaecd28731950d427e40c8b911bef/LICENSE-APACHE",
+          "name": "LICENSE-APACHE"
+        }
+      ]
+    },
+    "napi-build@2.6.0": {
+      "reason": "The published crate omits its repository-level license files. These notices come from the exact .cargo_vcs_info.json commit.",
+      "notices": [
+        {
+          "cache": "napi-rs-MIT.txt",
+          "source": "https://raw.githubusercontent.com/napi-rs/napi-rs/a94cef33f62e74682963dd085e283f52dcec2600/LICENSE",
+          "name": "LICENSE"
+        }
+      ]
+    },
+    "napi-derive-backend@1.0.75": {
+      "reason": "The published crate omits its repository-level license files. These notices come from the exact .cargo_vcs_info.json commit.",
+      "notices": [
+        {
+          "cache": "napi-rs-MIT.txt",
+          "source": "https://raw.githubusercontent.com/napi-rs/napi-rs/a312b7eb4e12d3e0a3e9770429ee05c333947a39/LICENSE",
+          "name": "LICENSE"
+        }
+      ]
+    },
+    "napi-derive@2.16.13": {
+      "reason": "The published crate omits its repository-level license files. These notices come from the exact .cargo_vcs_info.json commit.",
+      "notices": [
+        {
+          "cache": "napi-rs-MIT.txt",
+          "source": "https://raw.githubusercontent.com/napi-rs/napi-rs/a312b7eb4e12d3e0a3e9770429ee05c333947a39/LICENSE",
+          "name": "LICENSE"
+        }
+      ]
+    },
+    "napi-sys@2.4.0": {
+      "reason": "The published crate omits its repository-level license files. These notices come from the exact .cargo_vcs_info.json commit. The crate README also credits neon-bindings/neon; its original MIT notice is retained.",
+      "notices": [
+        {
+          "cache": "napi-rs-MIT.txt",
+          "source": "https://raw.githubusercontent.com/napi-rs/napi-rs/f1b8ab5e645e674df33c796ef75aa278cd1b4a31/LICENSE",
+          "name": "LICENSE"
+        },
+        {
+          "cache": "neon-MIT.txt",
+          "source": "https://raw.githubusercontent.com/neon-bindings/neon/779f733d2a98d343a125510208a96b98efa630ee/LICENSE-MIT",
+          "name": "LICENSE-MIT (credited upstream neon-bindings/neon)"
+        }
+      ]
+    },
+    "napi@2.16.17": {
+      "reason": "The published crate omits its repository-level license files. These notices come from the exact .cargo_vcs_info.json commit. The crate README also credits atom/xray; its original MIT notice is retained.",
+      "notices": [
+        {
+          "cache": "napi-rs-MIT.txt",
+          "source": "https://raw.githubusercontent.com/napi-rs/napi-rs/f2178312d0e3e07beecc19836b91716a229107d3/LICENSE",
+          "name": "LICENSE"
+        },
+        {
+          "cache": "xray-MIT.txt",
+          "source": "https://raw.githubusercontent.com/atom/xray/cb6c5809f18c733f55b89ce202678c379a4cfc7b/LICENSE",
+          "name": "LICENSE (credited upstream atom/xray)"
+        }
+      ]
+    },
+    "selectors@0.31.0": {
+      "reason": "The crate carries MPL-2.0 source headers but omits a standalone license file. The complete MPL-2.0 text is reproduced from the locked cssparser crate.",
+      "notices": [
+        {
+          "file": "lib.rs",
+          "startLine": 1,
+          "endLine": 3,
+          "name": "MPL-2.0 source notice"
+        },
+        {
+          "package": "cssparser@0.35.0",
+          "file": "LICENSE",
+          "name": "MPL-2.0 license text"
+        }
+      ]
+    }
+  }
+}

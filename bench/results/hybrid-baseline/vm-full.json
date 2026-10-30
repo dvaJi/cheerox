@@ -1,0 +1,215 @@
+{
+  "generatedAt": "2026-10-12T23:37:01.452Z",
+  "metadata": {
+    "node": "v24.18.1",
+    "platform": "linux",
+    "architecture": "x64",
+    "cpu": "AMD Ryzen 9 9950X 16-Core Processor",
+    "logicalCpus": 8,
+    "availableCpus": 8,
+    "totalMemoryBytes": 16768798720,
+    "gcExposed": true,
+    "quick": false,
+    "threads": 8,
+    "batchSize": 32,
+    "nativeStatus": {
+      "available": true
+    }
+  },
+  "workloads": [
+    {
+      "size": "small",
+      "articleCount": 20,
+      "documentBytes": 3467,
+      "sync": [
+        {
+          "name": "cheerio.load + select + text + attr",
+          "rounds": 9,
+          "medianMs": 1.4897689999999955,
+          "p95Ms": 1.5330000000000013,
+          "minMs": 1.0988290000000234,
+          "maxMs": 1.5330000000000013
+        },
+        {
+          "name": "rusteerio.load + select + text + attr",
+          "rounds": 9,
+          "medianMs": 0.1829309999999964,
+          "p95Ms": 0.32520600000000854,
+          "minMs": 0.15477999999998815,
+          "maxMs": 0.32520600000000854,
+          "speedupVsCheerio": 8.143884852758825
+        }
+      ],
+      "batch": [
+        {
+          "name": "cheerio serial extraction",
+          "rounds": 9,
+          "medianMs": 14.719538,
+          "p95Ms": 17.447896999999983,
+          "minMs": 9.533964999999995,
+          "maxMs": 17.447896999999983,
+          "documentsPerSecond": 2173.981275771019,
+          "speedupVsCheerio": 1
+        },
+        {
+          "name": "rusteerio.extractAll threads=1",
+          "rounds": 9,
+          "medianMs": 2.6714130000000296,
+          "p95Ms": 3.869027000000017,
+          "minMs": 2.5640129999999886,
+          "maxMs": 3.869027000000017,
+          "documentsPerSecond": 11978.679447917504,
+          "speedupVsCheerio": 5.510019603857523
+        },
+        {
+          "name": "rusteerio.extractAll threads=8",
+          "rounds": 9,
+          "medianMs": 1.0320559999999546,
+          "p95Ms": 1.0711680000000001,
+          "minMs": 0.9118510000000128,
+          "maxMs": 1.0711680000000001,
+          "documentsPerSecond": 31006.069438093873,
+          "speedupVsCheerio": 14.262344291395669
+        }
+      ]
+    },
+    {
+      "size": "medium",
+      "articleCount": 500,
+      "documentBytes": 86987,
+      "sync": [
+        {
+          "name": "cheerio.load + select + text + attr",
+          "rounds": 9,
+          "medianMs": 11.382671999999957,
+          "p95Ms": 11.888715999999988,
+          "minMs": 10.460561000000041,
+          "maxMs": 11.888715999999988
+        },
+        {
+          "name": "rusteerio.load + select + text + attr",
+          "rounds": 9,
+          "medianMs": 2.1280699999999797,
+          "p95Ms": 2.1676630000000614,
+          "minMs": 2.0661340000000337,
+          "maxMs": 2.1676630000000614,
+          "speedupVsCheerio": 5.348824051840431
+        }
+      ],
+      "batch": [
+        {
+          "name": "cheerio serial extraction",
+          "rounds": 9,
+          "medianMs": 189.76828799999998,
+          "p95Ms": 199.0303590000001,
+          "minMs": 182.7940569999996,
+          "maxMs": 199.0303590000001,
+          "documentsPerSecond": 168.6266991036985,
+          "speedupVsCheerio": 1
+        },
+        {
+          "name": "rusteerio.extractAll threads=1",
+          "rounds": 9,
+          "medianMs": 55.02731499999982,
+          "p95Ms": 55.66157999999996,
+          "minMs": 54.42688500000031,
+          "maxMs": 55.66157999999996,
+          "documentsPerSecond": 581.5293731849374,
+          "speedupVsCheerio": 3.4486197990943337
+        },
+        {
+          "name": "rusteerio.extractAll threads=8",
+          "rounds": 9,
+          "medianMs": 12.44951600000013,
+          "p95Ms": 14.57227899999998,
+          "minMs": 10.973071000000346,
+          "maxMs": 14.57227899999998,
+          "documentsPerSecond": 2570.3810493516103,
+          "speedupVsCheerio": 15.24302535134683
+        }
+      ]
+    },
+    {
+      "size": "large",
+      "articleCount": 5000,
+      "documentBytes": 888987,
+      "sync": [
+        {
+          "name": "cheerio.load + select + text + attr",
+          "rounds": 9,
+          "medianMs": 64.35080100000005,
+          "p95Ms": 68.96447499999977,
+          "minMs": 60.488000000000284,
+          "maxMs": 68.96447499999977
+        },
+        {
+          "name": "rusteerio.load + select + text + attr",
+          "rounds": 9,
+          "medianMs": 19.47491600000012,
+          "p95Ms": 19.920889999999417,
+          "minMs": 19.317361999999775,
+          "maxMs": 19.920889999999417,
+          "speedupVsCheerio": 3.304291582053532
+        }
+      ],
+      "batch": [
+        {
+          "name": "cheerio serial extraction",
+          "rounds": 9,
+          "medianMs": 3954.8444500000005,
+          "p95Ms": 4317.066916,
+          "minMs": 3888.426961000001,
+          "maxMs": 4317.066916,
+          "documentsPerSecond": 8.091342252411469,
+          "speedupVsCheerio": 1
+        },
+        {
+          "name": "rusteerio.extractAll threads=1",
+          "rounds": 9,
+          "medianMs": 592.9080979999999,
+          "p95Ms": 642.1122860000032,
+          "minMs": 576.6035390000034,
+          "maxMs": 642.1122860000032,
+          "documentsPerSecond": 53.97126486877568,
+          "speedupVsCheerio": 6.670248666429922
+        },
+        {
+          "name": "rusteerio.extractAll threads=8",
+          "rounds": 9,
+          "medianMs": 119.34781600000133,
+          "p95Ms": 126.16662799999904,
+          "minMs": 113.6830639999971,
+          "maxMs": 126.16662799999904,
+          "documentsPerSecond": 268.12388422758943,
+          "speedupVsCheerio": 33.137132982810144
+        }
+      ]
+    }
+  ],
+  "eventLoop": [
+    {
+      "name": "cheerio serial extraction",
+      "elapsedMs": 4038.246982000004,
+      "timerTicksDuringWork": 0,
+      "maxTimerLagMs": 4033.3962630000024,
+      "eventLoopP99Ms": 4043.309055,
+      "eventLoopMaxMs": 4043.309055
+    },
+    {
+      "name": "rusteerio.extractAll threads=1",
+      "elapsedMs": 594.9437220000036,
+      "timerTicksDuringWork": 112,
+      "maxTimerLagMs": 14.640870000002906,
+      "eventLoopP99Ms": 10.502143,
+      "eventLoopMaxMs": 19.644415
+    },
+    {
+      "name": "rusteerio.extractAll threads=8",
+      "elapsedMs": 131.78123700000287,
+      "timerTicksDuringWork": 22,
+      "maxTimerLagMs": 5.650469000000157,
+      "eventLoopP99Ms": 10.739711,
+      "eventLoopMaxMs": 10.739711
+    }
+  ]
+}

@@ -1,0 +1,99 @@
+{
+ "rusteerio": [
+  {
+   "page": 38,
+   "field": "links",
+   "got": "#main-content\u0000/plus/\u0000/\u0000/plus/\u0000/f1/\u0000/f1/news/\u0000/f1/schedule/\u0000/f1/standings/\u0000/f1/results/\u0000/f1/galleries/\u0000/f1/videos/\u0000https:",
+   "want": "#main-content\u0000/plus/\u0000/\u0000/plus/\u0000/f1/\u0000/f1/news/\u0000/f1/schedule/\u0000/f1/standings/\u0000/f1/results/\u0000/f1/galleries/\u0000/f1/videos/\u0000https:"
+  },
+  {
+   "page": 38,
+   "field": "headings",
+   "got": "Sign up for free\u0000Autosport Plus\u0000Circuito de Almeria\u0000\u0000Sign up for free\u0000Autosport Plus\u0000Theme\u0000Quick links:\u0000Popular series\u0000A",
+   "want": "Sign up for free\u0000Autosport Plus\u0000Circuito de Almeria\u0000\u0000Sign up for free\u0000Autosport Plus\u0000Filters\u0000Comments\u0000\u0000Advertisement"
+  },
+  {
+   "page": 38,
+   "field": "imgs",
+   "got": "39",
+   "want": "3"
+  },
+  {
+   "page": 67,
+   "field": "imgs",
+   "got": "12",
+   "want": "9"
+  },
+  {
+   "page": 84,
+   "field": "links",
+   "got": "/\u0000#\u0000/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.betexa.sk/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.bet",
+   "want": "/\u0000#\u0000/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.betexa.sk/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.bet"
+  }
+ ],
+ "cheerio": [
+  {
+   "page": 38,
+   "field": "links",
+   "got": "#main-content\u0000/plus/\u0000/\u0000/plus/\u0000/f1/\u0000/f1/news/\u0000/f1/schedule/\u0000/f1/standings/\u0000/f1/results/\u0000/f1/galleries/\u0000/f1/videos/\u0000https:",
+   "want": "#main-content\u0000/plus/\u0000/\u0000/plus/\u0000/f1/\u0000/f1/news/\u0000/f1/schedule/\u0000/f1/standings/\u0000/f1/results/\u0000/f1/galleries/\u0000/f1/videos/\u0000https:"
+  },
+  {
+   "page": 38,
+   "field": "headings",
+   "got": "Sign up for free\u0000Autosport Plus\u0000Circuito de Almeria\u0000\u0000Sign up for free\u0000Autosport Plus\u0000Theme\u0000Quick links:\u0000Popular series\u0000A",
+   "want": "Sign up for free\u0000Autosport Plus\u0000Circuito de Almeria\u0000\u0000Sign up for free\u0000Autosport Plus\u0000Filters\u0000Comments\u0000\u0000Advertisement"
+  },
+  {
+   "page": 38,
+   "field": "imgs",
+   "got": "39",
+   "want": "3"
+  },
+  {
+   "page": 67,
+   "field": "imgs",
+   "got": "12",
+   "want": "9"
+  },
+  {
+   "page": 84,
+   "field": "links",
+   "got": "/\u0000#\u0000/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.betexa.sk/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.bet",
+   "want": "/\u0000#\u0000/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.betexa.sk/modelarske-doplnky-3853/m-marvy-uchida\u0000https://www.bet"
+  }
+ ],
+ "jsdom": [
+  {
+   "page": 1,
+   "field": "imgs",
+   "got": "6",
+   "want": "5"
+  },
+  {
+   "page": 5,
+   "field": "imgs",
+   "got": "14",
+   "want": "12"
+  },
+  {
+   "page": 7,
+   "field": "imgs",
+   "got": "83",
+   "want": "82"
+  },
+  {
+   "page": 10,
+   "field": "imgs",
+   "got": "3",
+   "want": "2"
+  },
+  {
+   "page": 13,
+   "field": "headings",
+   "got": "DOWNLOAD\u0000CONTATO\u0000AFILIE-SE\u0000CONSERVADORISMO CRESCE NO BRASIL DESDE 2010\u0000\u0000Temas como aborto e agenda LGBT s\u00e3o rejeitados p",
+   "want": "DOWNLOAD\u0000CONTATO\u0000AFILIE-SE\u0000CONSERVADORISMO CRESCE NO BRASIL DESDE 2010\u0000<img fetchpriority=\"high\" decoding=\"async\" class="
+  }
+ ],
+ "parse5": []
+}

@@ -1,0 +1,6 @@
+{"lib": "cheerio", "op": "parse", "repeats": 5, "pages": 3000, "timesMs": [26421.2, 25896.4, 25935.4, 25269.1, 25045.6], "medianMs": 25896.4, "msPerPage": 8.6321, "mbPerSec": 19.7, "vm": "bx_ww84s7pw"}
+{"lib": "cheerio", "op": "extract", "repeats": 5, "pages": 3000, "timesMs": [28865.7, 28170.2, 28296.2, 27354.4, 27494.1], "medianMs": 28170.2, "msPerPage": 9.3901, "mbPerSec": 18.11, "vm": "bx_ww84s7pw"}
+{"lib": "cheerio", "op": "serialize", "repeats": 5, "pages": 3000, "timesMs": [27184.8, 27138.9, 28213.8, 25451.6, 24361.3], "medianMs": 27138.9, "msPerPage": 9.0463, "mbPerSec": 18.8, "vm": "bx_ww84s7pw"}
+{"lib": "parse5", "op": "parse", "repeats": 5, "pages": 3000, "timesMs": [11152.4, 10826.1, 11291.1, 10900.9, 10792.7], "medianMs": 10900.9, "msPerPage": 3.6336, "mbPerSec": 46.8, "vm": "bx_ww84s7pw"}
+{"lib": "parse5", "op": "extract", "repeats": 5, "pages": 3000, "timesMs": [10212.2, 10003.1, 9714.4, 9264.3, 9056.5], "medianMs": 9714.4, "msPerPage": 3.2381, "mbPerSec": 52.52, "vm": "bx_ww84s7pw"}
+{"lib": "parse5", "op": "serialize", "repeats": 5, "pages": 3000, "timesMs": [12318.5, 12113.8, 12093.5, 11784.7, 11579.7], "medianMs": 12093.5, "msPerPage": 4.0312, "mbPerSec": 42.19, "vm": "bx_ww84s7pw"}

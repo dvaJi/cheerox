@@ -1,0 +1,16 @@
+name: Feature request
+description: Suggest an API, compatibility or performance improvement.
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would this help you do?
+      description: Describe the workload or use case and the current limitation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Include an API example or expected output when useful.

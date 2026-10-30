@@ -1,0 +1,130 @@
+{
+  "validatedAt": "2026-10-13T00:11:06.770Z",
+  "environment": "VM",
+  "architecture": "full Rust engine with a TypeScript adapter",
+  "npmRuntimeDependencies": 0,
+  "rust": {
+    "testsPassed": 25,
+    "testsFailed": 0,
+    "linuxToolchain": "1.97.1",
+    "releaseBuilds": [
+      "darwin-arm64",
+      "linux-x64-gnu"
+    ],
+    "formatCheck": "passed",
+    "clippyAllTargetsWarningsDenied": "passed"
+  },
+  "typescript": {
+    "sourceCheck": "passed",
+    "selfContainedDeclarations": "passed",
+    "strictCheerioApiCompatibility": "passed",
+    "preciseCallbackAndExtractionInference": "passed"
+  },
+  "nodeVersions": [
+    {
+      "version": "20.19.0",
+      "platform": "linux-x64-gnu",
+      "runtimeTestsPassed": 118,
+      "upstreamTestsPassed": 739,
+      "failed": 0,
+      "consumerTypecheck": "passed",
+      "packedTarball": "passed"
+    },
+    {
+      "version": "22.23.2",
+      "platform": "linux-x64-gnu",
+      "runtimeTestsPassed": 118,
+      "upstreamTestsPassed": 739,
+      "failed": 0,
+      "consumerTypecheck": "passed",
+      "packedTarball": "passed"
+    },
+    {
+      "version": "24.18.1",
+      "platform": "linux-x64-gnu",
+      "runtimeTestsPassed": 118,
+      "upstreamTestsPassed": 739,
+      "failed": 0,
+      "consumerTypecheck": "passed",
+      "packedTarball": "passed"
+    },
+    {
+      "version": "22.22.3",
+      "platform": "darwin-arm64",
+      "runtimeTestsPassed": 118,
+      "upstreamTestsPassed": 739,
+      "failed": 0,
+      "consumerTypecheck": "passed",
+      "packedTarball": "passed"
+    }
+  ],
+  "packaging": {
+    "esm": "passed",
+    "commonJs": "passed",
+    "slimAndUtils": "passed",
+    "nativeLoading": "passed",
+    "parallelExtraction": "passed",
+    "zeroTransitiveNpmDependencies": "passed",
+    "localTarballPlatforms": [
+      "darwin-arm64",
+      "linux-x64-gnu"
+    ],
+    "otherReleaseTargets": "configured in CI; not executed in this session"
+  },
+  "benchmarks": {
+    "rounds": 9,
+    "outputEquality": "passed",
+    "extraction": {
+      "report": "vm-full.json"
+    },
+    "mutableEngine": {
+      "report": "vm-engine.json"
+    },
+    "stress": {
+      "report": "vm-stress.json",
+      "processedDocuments": 1280,
+      "processedBytes": 610215480
+    }
+  },
+  "sourceAgreement": "All 25 implementation/build files match the final VM source. The final selection formatting change compiles to identical runtime JavaScript as the Node-version tested source.",
+  "sourceSha256": {
+    "Cargo.lock": "0d04ee21c4d9aa64ff4c02c519cb2edbdc26bcba67200f5ca182d76c553eb90d",
+    "Cargo.toml": "47265148e6a168e16caa67bc7a0c30b1dec076d096edbccd8fc659a71a171696",
+    "build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
+    "native/src/arena.rs": "45a6c1e602df2d0b721a9c4295634c2a99fbf202dfb9ce5ac30b71312590cc75",
+    "native/src/attributes.rs": "88735db1490bca158a026807621b866732df38661b870598bd901561eca94425",
+    "native/src/lib.rs": "054e0e72eecbc809f31e79eacafe3b9a2771e40b9e500b3663862bf061575f70",
+    "native/src/location.rs": "e8d5625022ae7ec6e28f260ed56d1c7ebd6c755c08ebc8779baf777a3a28c3ca",
+    "native/src/selector.rs": "971990181524ac404b3d043259fe764175bb9098b44d23590a82652793eb8915",
+    "native/src/sink.rs": "cbbea8f0246fbe927a5ca71a85788d6076ddaffbd1e39379036ea83f54247e4b",
+    "package-lock.json": "a1c57629bea340947534ab11923a5f483548e1ea7a66b752f6f6450bd1071ac4",
+    "package.json": "5fc99d982ebb6a32d979c6fdaaf709fe5de12367a54801f95c30120911bbbae1",
+    "scripts/test-package.mjs": "1d594c1c65624360bd2c310d6c0a094ce62c4452172b2ff2613429bfd082eeb9",
+    "src/attributes.ts": "55f5f7b35fcca3c82ec1bd8c9b105ef437cd9e6fe644f63c622a04c1d6bbb96d",
+    "src/extract.ts": "3bc37e9baf3141ef126cff8296ff40ea0853368640ab9f74c3f08e3359d171b7",
+    "src/index.ts": "160f13319e9948150a9e772639d8a351dd4067c17c4d28bd3d804e15fb71411f",
+    "src/io.ts": "ce0b2341d68a52761864143cf1f39445eeb770512c4926bdfcbebc853e1226d9",
+    "src/native.ts": "6d1f6cadb6ddd9fa920b0862ad6986d3dc106e77d458c16ec95818aa4fc79560",
+    "src/nodes.ts": "20ca293fce4036a6a89a137384409bc872c6663defb05db3d777fb69b10c48cf",
+    "src/router.ts": "9d2d48fd0d43dfc6f3634f88b93ef743e6a3244bec75eddbd93ac3c706742de5",
+    "src/selection.ts": "148a3d2718d0d5affbf5d706208b724b933bdd8f3f32ebf83c49efc97bbc6977",
+    "src/slim.ts": "019d32f596a12bfe582ca023a1767bab1158631229fdae1c6ee162208a241db3",
+    "src/types.ts": "0b4a800f16fc6367827641cb9f957071ece984cc75446f47d97947310dfb31ae",
+    "src/utils.ts": "6d943090fff62abc93b373b3875c2c4d288c13f3bcc2d44189cb80cfbdcf83a3",
+    "tsconfig.json": "64ec16aa70c6a5723112a9e69bbf0c20bdad369337e813e88c04ab2e85e5633c",
+    "tsup.config.ts": "4a77b1e2da6b7d5596cf6ea8a30442a2ba13b249be9f6df305cbedbb894800ff"
+  },
+  "nativeBinarySha256": {
+    "darwin-arm64": "f094cad14d21afce16cf8a0bf5673f61c4e97d9e70040fbe7522facab71f8003",
+    "linux-x64-gnu": "adbda19edfe465534884d0d0fd38fa2698cab0499dcffe44a7fa930862cb7d64"
+  },
+  "tarball": {
+    "filename": "rusteerio-0.1.0.tgz",
+    "sha256": "d864817e430e9cdaa5aa173ec054207d1c9e48090a85ad4bd69ca76c63516f8a",
+    "bytes": 2417034
+  },
+  "vmCleanup": {
+    "stopRequestedAt": "2026-10-13T00:11:58.714Z",
+    "result": "VM removed after stopping; subsequent status and inventory checks confirmed removal."
+  }
+}

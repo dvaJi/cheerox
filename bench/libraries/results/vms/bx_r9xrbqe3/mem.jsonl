@@ -1,0 +1,2 @@
+{"lib": "rusteerio", "docs": 500, "htmlMB": 76.82, "parseMs": 672, "retainedRssMB": 604, "retainedHeapMB": 10.4, "retainedExternalMB": 2.2, "rssPerHtmlMB": 7.86, "peakRssMB": 909.2, "vm": "bx_r9xrbqe3"}
+{"lib": "parse5", "docs": 500, "htmlMB": 76.82, "parseMs": 2644, "retainedRssMB": 1743.1, "retainedHeapMB": 1746.7, "retainedExternalMB": 0, "rssPerHtmlMB": 22.69, "peakRssMB": 2045.6, "vm": "bx_r9xrbqe3"}

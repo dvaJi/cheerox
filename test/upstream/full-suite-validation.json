@@ -1,0 +1,213 @@
+{
+  "validatedAt": "2026-10-13T00:32:16.473220+00:00",
+  "upstream": {
+    "repository": "https://github.com/cheeriojs/cheerio",
+    "version": "1.2.0",
+    "commit": "e3c7aaf9ed64fe3cb9a181e58a41c0fdd6dbfbfc",
+    "completeInventory": true,
+    "specFiles": 14,
+    "assertionsAndFixtures": "unchanged; only implementation import module specifiers differ"
+  },
+  "implementationUnderTest": {
+    "runtime": "dist/index.mjs",
+    "utilities": "dist/utils.mjs",
+    "parsers": "src/parse.ts, also used by production Cheerio._parse",
+    "parserEngine": "Rust HTML5/HTML/XML; no Cheerio or JavaScript parser fallback"
+  },
+  "environment": {
+    "node": "v22.22.3",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "results": {
+    "testFiles": 14,
+    "testsPassed": 777,
+    "testsFailed": 0,
+    "testsSkipped": 0,
+    "testsPending": 0,
+    "durationMs": 793.455322265625
+  },
+  "additionalChecks": {
+    "runtimeTestsPassed": 121,
+    "runtimeTestsFailed": 0,
+    "sourceTypecheck": "passed",
+    "consumerTypes": "passed",
+    "npmTarball": "passed",
+    "rustTests": {
+      "passed": 25,
+      "sourceAndAddonUnchangedFromPriorValidation": true
+    }
+  },
+  "command": "npm run test:upstream",
+  "hashNormalization": "UTF-8 text with CRLF normalized to LF",
+  "files": [
+    {
+      "path": "__tests__/deprecated.spec.ts",
+      "upstreamSha256": "b859cbf252bda22c834d49fe821934f82bab323b60cfeb9ee8c6a8364304330c",
+      "vendoredSha256": "b859cbf252bda22c834d49fe821934f82bab323b60cfeb9ee8c6a8364304330c",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "__tests__/xml.spec.ts",
+      "upstreamSha256": "b99ed48c599618594a3d7b72e7566cffa839e77d257618b3aba54171aade857a",
+      "vendoredSha256": "ceffbf557cad74303fdbfb3d63f4b8ecaaa0018250f3c09d851f2c456a9dfb55",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "api/attributes.spec.ts",
+      "upstreamSha256": "98f516ed9c3e9dd5b2bd8423356932bbc6433f583b1576f0cd8b2a1da1c337d4",
+      "vendoredSha256": "8e70d1ed570d3ad9a552d78d923d5bd2f9afd650b47cad51a9516a34c41eccf0",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "api/css.spec.ts",
+      "upstreamSha256": "dfb436030684145f422f039a4726d5a891d8dcd8b50f63de9b4885cef23fe00b",
+      "vendoredSha256": "5a764b4666d1442de7821d4d2486795e3340223f36b503727a94e6bd2b272ab8",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "api/extract.spec.ts",
+      "upstreamSha256": "8601fe077e064968443da77efc2e151e8fc367cba69176b02f29a84dddd52a40",
+      "vendoredSha256": "3f29d3892dd0d2302a43627ea6ed046157ec7ff6ce7d5806390b00cb100d70d7",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "api/forms.spec.ts",
+      "upstreamSha256": "c0550df9d4a572d4483db76a870888ee41f0d9735fa89a680d2c8f41a4ebd6e0",
+      "vendoredSha256": "ce9baa505a389b1e580d93b47bd5e93c30148f566bcd11471523486e326c48d2",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "api/manipulation.spec.ts",
+      "upstreamSha256": "61cba75e9aa917ba69dcd936e8e30676833fa728d27708c3bb3a87338517a898",
+      "vendoredSha256": "021ef607809f94a0cbe0bf9cf6297d8337765f170bbd15954ffbe1a90cf590fc",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "api/traversing.spec.ts",
+      "upstreamSha256": "5704209c15d71a4174e83e7610c0e902bdd7de6f83ea17a1daa282a2f3e5bf9a",
+      "vendoredSha256": "66196d19354a74b3e44820baefda00be6da2eed10bd98d80c56ff46a2ccd899f",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "cheerio.spec.ts",
+      "upstreamSha256": "38702824846792fa7c7575dd71939705afab4031072d5b927bd835b434345fb5",
+      "vendoredSha256": "f06baf144ec154d9633448f70cd5fdaf1198e97b1737d5215d6ad709753f3e59",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "index.spec.ts",
+      "upstreamSha256": "3fc98aafe373df9c5f5114fc99290cbcc024b82fa5a967d0cd7f69a5553403cf",
+      "vendoredSha256": "42de62bc7dbdbe377d43602c8ced6c67831e294b6f21df27d5a351dd246663ca",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "load.spec.ts",
+      "upstreamSha256": "f21b52759ff8cc11c0bcbfbd805b3c10c661a6130c90a5eb04a6a1362715ffc6",
+      "vendoredSha256": "8c1dd23ee6678335ad45d36f80fc6698c559e40059df8a4abd141dfb2995b85a",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "parse.spec.ts",
+      "upstreamSha256": "40e29b418c86b7431cd69af93aace8e5ea7b14b70b0405cb10754d038f70c061",
+      "vendoredSha256": "dffff3408344a363c663f8db9d69df0390b0cd74873a4f3a90afe9183b7f7e45",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "static.spec.ts",
+      "upstreamSha256": "126ddab8122e72027229041c8f048ecdf07627a7768236b66b888bbaa8e61c65",
+      "vendoredSha256": "93f26450753d88d479c09dcab6a5151e4999e20bb3721a41d39890b8f4e3b5c9",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "utils.spec.ts",
+      "upstreamSha256": "6a4c80522e5b8fcbbb926672709230f6ecd303cc3208fa11f27e4776c6a75961",
+      "vendoredSha256": "62303aba7acf8e3d248ccb8f2f19ceb707a28fd09d753dde2f4e03f86158805f",
+      "importOnlyDifferences": true
+    },
+    {
+      "path": "__fixtures__/fixtures.ts",
+      "upstreamSha256": "120597440df692e2f9565f4cef2d0fcbb1820514bed6818c0607891fa96d0f6c",
+      "vendoredSha256": "88230e64d24a8258b4f0dd993d51219dfdf8a1a042eb7e434d0213351e5e1147",
+      "importOnlyDifferences": true
+    }
+  ],
+  "perFile": [
+    {
+      "path": "cheerio.spec.ts",
+      "testsPassed": 49,
+      "status": "passed"
+    },
+    {
+      "path": "index.spec.ts",
+      "testsPassed": 13,
+      "status": "passed"
+    },
+    {
+      "path": "load.spec.ts",
+      "testsPassed": 4,
+      "status": "passed"
+    },
+    {
+      "path": "parse.spec.ts",
+      "testsPassed": 35,
+      "status": "passed"
+    },
+    {
+      "path": "static.spec.ts",
+      "testsPassed": 39,
+      "status": "passed"
+    },
+    {
+      "path": "utils.spec.ts",
+      "testsPassed": 3,
+      "status": "passed"
+    },
+    {
+      "path": "__tests__/deprecated.spec.ts",
+      "testsPassed": 20,
+      "status": "passed"
+    },
+    {
+      "path": "__tests__/xml.spec.ts",
+      "testsPassed": 7,
+      "status": "passed"
+    },
+    {
+      "path": "api/attributes.spec.ts",
+      "testsPassed": 127,
+      "status": "passed"
+    },
+    {
+      "path": "api/css.spec.ts",
+      "testsPassed": 16,
+      "status": "passed"
+    },
+    {
+      "path": "api/extract.spec.ts",
+      "testsPassed": 13,
+      "status": "passed"
+    },
+    {
+      "path": "api/forms.spec.ts",
+      "testsPassed": 16,
+      "status": "passed"
+    },
+    {
+      "path": "api/manipulation.spec.ts",
+      "testsPassed": 197,
+      "status": "passed"
+    },
+    {
+      "path": "api/traversing.spec.ts",
+      "testsPassed": 238,
+      "status": "passed"
+    }
+  ],
+  "implementationSha256": {
+    "src/parse.ts": "d1ae2f7d2fdb7b118b4b705304e327d2851f8ca5e040b75b446210a8f8bb8a58",
+    "src/selection.ts": "7281ca4bbb3b8df9a90ff61fcbca25093993a47b03e6becfa510af09cdf4dab9"
+  },
+  "nativeAddonSha256": "f094cad14d21afce16cf8a0bf5673f61c4e97d9e70040fbe7522facab71f8003",
+  "integrityGuard": "passed; exact upstream inventory and vendored source checksums"
+}

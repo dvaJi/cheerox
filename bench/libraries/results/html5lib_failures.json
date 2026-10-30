@@ -1,0 +1,370 @@
+{
+ "rusteerio": [
+  {
+   "file": "html5test-com.dat",
+   "data": "<?import namespace=\"foo\" implementation=\"#bar\">",
+   "got": "| <!-- ?import namespace=\"foo\" implementation=\"#bar\" -->\n| <html>\n|   <head>\n|   <body>",
+   "want": "| <?import namespace=\"foo\" implementation=\"#bar\"?>\n| <html>\n|   <head>\n|   <body>"
+  },
+  {
+   "file": "menuitem-element.dat",
+   "data": "<!DOCTYPE html><select><menuitem></select>",
+   "got": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>",
+   "want": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <menuitem>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something><span>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->\n|     <span>",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>\n|     <span>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something else is good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something else is good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something else is good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?one><?two>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?one -->\n|     <!-- ?two -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?one ?>\n|     <?two ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?a$><?b$><?good?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <!-- ?good? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <?good ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey   there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey   there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey?there>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey?there -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey ?there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey\tthere=1?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey\tthere=1? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there=1?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey\nthere=1?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey\nthere=1? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there=1?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey\rthere=1?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey\nthere=1? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there=1?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey\fthere=1?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey\fthere=1? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there=1?>"
+  }
+ ],
+ "cheerio": [
+  {
+   "file": "html5test-com.dat",
+   "data": "<?import namespace=\"foo\" implementation=\"#bar\">",
+   "got": "| <!-- ?import namespace=\"foo\" implementation=\"#bar\" -->\n| <html>\n|   <head>\n|   <body>",
+   "want": "| <?import namespace=\"foo\" implementation=\"#bar\"?>\n| <html>\n|   <head>\n|   <body>"
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<svg><title><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg title>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg title>\n|         \"x\""
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<svg><foreignobject><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg foreignObject>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg foreignObject>\n|         \"x\""
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<math><mtext><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mtext>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mtext>\n|         \"x\""
+  },
+  {
+   "file": "menuitem-element.dat",
+   "data": "<!DOCTYPE html><select><menuitem></select>",
+   "got": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>",
+   "want": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <menuitem>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something><span>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->\n|     <span>",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>\n|     <span>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something else is good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something else is good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something else is good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?one><?two>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?one -->\n|     <!-- ?two -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?one ?>\n|     <?two ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?a$><?b$><?good?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <!-- ?good? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <?good ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey   there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey   there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey?there>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey?there -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey ?there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey\tthere=1?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey\tthere=1? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there=1?>"
+  }
+ ],
+ "jsdom": [
+  {
+   "file": "html5test-com.dat",
+   "data": "<?import namespace=\"foo\" implementation=\"#bar\">",
+   "got": "| <!-- ?import namespace=\"foo\" implementation=\"#bar\" -->\n| <html>\n|   <head>\n|   <body>",
+   "want": "| <?import namespace=\"foo\" implementation=\"#bar\"?>\n| <html>\n|   <head>\n|   <body>"
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<svg><title><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg title>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg title>\n|         \"x\""
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<svg><foreignobject><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg foreignObject>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg foreignObject>\n|         \"x\""
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<math><mtext><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mtext>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mtext>\n|         \"x\""
+  },
+  {
+   "file": "menuitem-element.dat",
+   "data": "<!DOCTYPE html><select><menuitem></select>",
+   "got": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>",
+   "want": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <menuitem>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something><span>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->\n|     <span>",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>\n|     <span>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something else is good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something else is good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something else is good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?one><?two>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?one -->\n|     <!-- ?two -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?one ?>\n|     <?two ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?a$><?b$><?good?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <!-- ?good? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <?good ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey   there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey   there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey?there>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey?there -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey ?there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey\tthere=1?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey\tthere=1? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there=1?>"
+  }
+ ],
+ "parse5": [
+  {
+   "file": "html5test-com.dat",
+   "data": "<?import namespace=\"foo\" implementation=\"#bar\">",
+   "got": "| <!-- ?import namespace=\"foo\" implementation=\"#bar\" -->\n| <html>\n|   <head>\n|   <body>",
+   "want": "| <?import namespace=\"foo\" implementation=\"#bar\"?>\n| <html>\n|   <head>\n|   <body>"
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<svg><title><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg title>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg title>\n|         \"x\""
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<svg><foreignobject><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg foreignObject>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <svg svg>\n|       <svg foreignObject>\n|         \"x\""
+  },
+  {
+   "file": "html5test-com.dat",
+   "data": "<math><mtext><![CDATA[x]]>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mtext>\n|         <!-- [CDATA[x]] -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <math math>\n|       <math mtext>\n|         \"x\""
+  },
+  {
+   "file": "menuitem-element.dat",
+   "data": "<!DOCTYPE html><select><menuitem></select>",
+   "got": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>",
+   "want": "| <!DOCTYPE html>\n| <html>\n|   <head>\n|   <body>\n|     <select>\n|       <menuitem>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something><span>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something -->\n|     <span>",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something ?>\n|     <span>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?something else is good>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?something else is good -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?something else is good?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?one><?two>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?one -->\n|     <!-- ?two -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?one ?>\n|     <?two ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?a$><?b$><?good?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <!-- ?good? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?a$ -->\n|     <!-- ?b$ -->\n|     <?good ?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey   there?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey   there? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey?there>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey?there -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey ?there?>"
+  },
+  {
+   "file": "processing-instructions.dat",
+   "data": "<body><?hey\tthere=1?>",
+   "got": "| <html>\n|   <head>\n|   <body>\n|     <!-- ?hey\tthere=1? -->",
+   "want": "| <html>\n|   <head>\n|   <body>\n|     <?hey there=1?>"
+  }
+ ]
+}

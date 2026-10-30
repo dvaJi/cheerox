@@ -1,0 +1,44 @@
+[package]
+name = "cheerox"
+version = "0.22.0"
+edition = "2021"
+description = "Rust HTML5 parser and CSS selector engine for the cheerox Node.js package"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "native/src/lib.rs"
+
+[dependencies]
+ego-tree = "0.10"
+html5ever = "0.35"
+html5gum = "0.8.4"
+url = "2"
+napi = { version = "2", default-features = false, features = ["napi8", "async"] }
+napi-derive = "2"
+memchr = "2"
+rayon = "1.10"
+scraper = { version = "0.24", default-features = false, features = ["atomic", "deterministic"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+
+# Parsing and tree writes allocate many small objects, which glibc's and musl's
+# allocators serve slowly. The addon is loaded with dlopen, so mimalloc uses the
+# dynamic TLS model; other platforms keep their allocator, since macOS mimalloc
+# stores its thread heap in a fixed TLS slot that a second copy would share.
+[target.'cfg(target_os = "linux")'.dependencies]
+mimalloc = { version = "0.1", default-features = false, features = ["local_dynamic_tls"] }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+
+# Observer hooks retain the upstream HTML5 algorithm while exposing the actual
+# open-element stack to user-supplied parse5-compatible tree adapters.
+[patch.crates-io]
+html5ever = { path = "native/vendor/html5ever-0.35.0" }
+markup5ever = { path = "native/vendor/markup5ever-0.35.0" }
+html5gum = { path = "native/vendor/html5gum-0.8.4" }

@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-10-12T23:38:05.197Z",
+  "node": "v24.18.1",
+  "threads": 8,
+  "batchCount": 20,
+  "documentCount": 64,
+  "articleCount": 2000,
+  "processedDocuments": 1280,
+  "processedBytes": 610215480,
+  "elapsedMs": 1731.845573,
+  "documentsPerSecond": 739.095921689318,
+  "megabytesPerSecond": 352.3498223591325,
+  "timerTicks": 237,
+  "maxTimerLagMs": 36.611327999999986,
+  "peakObservedRssBytes": 436895744,
+  "endRssBytes": 437833728
+}

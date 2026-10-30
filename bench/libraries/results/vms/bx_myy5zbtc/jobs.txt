@@ -1,0 +1,5 @@
+scalingpool rusteerio 16
+scalingpool rusteerio 8
+scalingpool rusteerio 4
+scalingpool rusteerio 2
+scalingpool rusteerio 1

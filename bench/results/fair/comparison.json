@@ -1,0 +1,1710 @@
+{
+  "generatedAt": "2026-10-13T05:43:23.358Z",
+  "metadata": {
+    "node": "v24.18.1",
+    "cpu": "AMD Ryzen 9 9950X 16-Core Processor",
+    "availableCpus": 8,
+    "rounds": 9,
+    "affinityEnforced": true,
+    "priorRevision": "13d29a1463c9b46a85e8931ebd3e015d371dcfbb",
+    "currentRevision": "2bb7cb960d88c998315256725fef759eee246fb8",
+    "priorSourceSha256": {
+      "Cargo.lock": "0d04ee21c4d9aa64ff4c02c519cb2edbdc26bcba67200f5ca182d76c553eb90d",
+      "Cargo.toml": "47265148e6a168e16caa67bc7a0c30b1dec076d096edbccd8fc659a71a171696",
+      "bench/fair.mjs": "a50eb1cfa1053685da326d90129b50b38ffbe8112e0536bd95e00ceb6930c894",
+      "bench/suite/._case.mjs": "efe1874c89e88829cdba8e60398213046190ef90dd6f74107cdc36c606d217a9",
+      "bench/suite/._cheerio-worker.mjs": "efe1874c89e88829cdba8e60398213046190ef90dd6f74107cdc36c606d217a9",
+      "bench/suite/._fixtures.mjs": "efe1874c89e88829cdba8e60398213046190ef90dd6f74107cdc36c606d217a9",
+      "bench/suite/._worker-pool.mjs": "efe1874c89e88829cdba8e60398213046190ef90dd6f74107cdc36c606d217a9",
+      "bench/suite/._worker-pool.test.mjs": "efe1874c89e88829cdba8e60398213046190ef90dd6f74107cdc36c606d217a9",
+      "bench/suite/case.mjs": "43bba58b67211e2e1992527c7056ff0fa0749506d8aaff16e88ed7c21d37133f",
+      "bench/suite/cheerio-worker.mjs": "d3a532a959b05032ad7510ad190bc0f6bca83bc9bb24f1779ad702e13b1a0a95",
+      "bench/suite/fixtures.mjs": "91dad93f8a6a2fa969c82bdedc3bfc0185fd4d20d447254b01baec6ae3af3cc4",
+      "bench/suite/worker-pool.mjs": "a39997ebcfbae92551a26cccef7a4ae6afeb10856c439bfd0f580feb6550b398",
+      "bench/suite/worker-pool.test.mjs": "5fd939f401374acb5558db7724c8882a5617c144e375bf612ad85a31e6b437a0",
+      "build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
+      "native/src/arena.rs": "45a6c1e602df2d0b721a9c4295634c2a99fbf202dfb9ce5ac30b71312590cc75",
+      "native/src/attributes.rs": "88735db1490bca158a026807621b866732df38661b870598bd901561eca94425",
+      "native/src/lib.rs": "054e0e72eecbc809f31e79eacafe3b9a2771e40b9e500b3663862bf061575f70",
+      "native/src/location.rs": "e8d5625022ae7ec6e28f260ed56d1c7ebd6c755c08ebc8779baf777a3a28c3ca",
+      "native/src/selector.rs": "971990181524ac404b3d043259fe764175bb9098b44d23590a82652793eb8915",
+      "native/src/sink.rs": "cbbea8f0246fbe927a5ca71a85788d6076ddaffbd1e39379036ea83f54247e4b",
+      "package-lock.json": "a1c57629bea340947534ab11923a5f483548e1ea7a66b752f6f6450bd1071ac4",
+      "package.json": "1217ac3bab7295a60a60a5d3284e4baacf3e4a9e481367f108d051b8d0b8cb47",
+      "src/attributes.ts": "55f5f7b35fcca3c82ec1bd8c9b105ef437cd9e6fe644f63c622a04c1d6bbb96d",
+      "src/extract.ts": "3bc37e9baf3141ef126cff8296ff40ea0853368640ab9f74c3f08e3359d171b7",
+      "src/index.ts": "160f13319e9948150a9e772639d8a351dd4067c17c4d28bd3d804e15fb71411f",
+      "src/io.ts": "ce0b2341d68a52761864143cf1f39445eeb770512c4926bdfcbebc853e1226d9",
+      "src/native.ts": "6d1f6cadb6ddd9fa920b0862ad6986d3dc106e77d458c16ec95818aa4fc79560",
+      "src/nodes.ts": "20ca293fce4036a6a89a137384409bc872c6663defb05db3d777fb69b10c48cf",
+      "src/parse.ts": "d1ae2f7d2fdb7b118b4b705304e327d2851f8ca5e040b75b446210a8f8bb8a58",
+      "src/router.ts": "9d2d48fd0d43dfc6f3634f88b93ef743e6a3244bec75eddbd93ac3c706742de5",
+      "src/selection.ts": "7281ca4bbb3b8df9a90ff61fcbca25093993a47b03e6becfa510af09cdf4dab9",
+      "src/slim.ts": "019d32f596a12bfe582ca023a1767bab1158631229fdae1c6ee162208a241db3",
+      "src/types.ts": "0b4a800f16fc6367827641cb9f957071ece984cc75446f47d97947310dfb31ae",
+      "src/utils.ts": "6d943090fff62abc93b373b3875c2c4d288c13f3bcc2d44189cb80cfbdcf83a3",
+      "tsup.config.ts": "4a77b1e2da6b7d5596cf6ea8a30442a2ba13b249be9f6df305cbedbb894800ff"
+    },
+    "currentSourceSha256": {
+      "Cargo.lock": "40e06a68078b531dc581ee78ebed58095cc69a2c632e02c05a31bbd5f347571a",
+      "Cargo.toml": "9ac362b7c07e53cba15b575c4de1ab8269d694ccc746e149f66eac9752adda42",
+      "bench/fair.mjs": "a50eb1cfa1053685da326d90129b50b38ffbe8112e0536bd95e00ceb6930c894",
+      "bench/suite/case.mjs": "43bba58b67211e2e1992527c7056ff0fa0749506d8aaff16e88ed7c21d37133f",
+      "bench/suite/cheerio-worker.mjs": "d3a532a959b05032ad7510ad190bc0f6bca83bc9bb24f1779ad702e13b1a0a95",
+      "bench/suite/fixtures.mjs": "91dad93f8a6a2fa969c82bdedc3bfc0185fd4d20d447254b01baec6ae3af3cc4",
+      "bench/suite/worker-pool.mjs": "a39997ebcfbae92551a26cccef7a4ae6afeb10856c439bfd0f580feb6550b398",
+      "bench/suite/worker-pool.test.mjs": "5fd939f401374acb5558db7724c8882a5617c144e375bf612ad85a31e6b437a0",
+      "build.rs": "fcbd1ff3f627a7553fa1704dc6f558998daff8bc256015c37aace62cc49ce584",
+      "native/src/arena.rs": "225493a12d0e7d1513a54d5bdf42e05e7865820cac15a4830ae156156582d3b6",
+      "native/src/attributes.rs": "41457e26a8c7dfbfbd26d3b58e20ea643f9d3a59a4123d864ce7736b0964ae88",
+      "native/src/codec.rs": "f5fb4ce0a7a8ec212ee09342b338d161f48adefe18cf14edaeda4a8c3412b041",
+      "native/src/diagnostics.rs": "4bbbe7b10d55b0bda6be8b0604537ba5b5f16a6ace7ee862c1612adc66b002f6",
+      "native/src/extraction.rs": "380c7c56fdaceb24d24e96a0093f507bcae050267c013f2b6be364d0b82c306a",
+      "native/src/gc.rs": "2e157457341c1268f190665b35551564c07be2619ea2dfaf427ef449b24f847e",
+      "native/src/hook_sink.rs": "e409bc5d093dacb03d1ceb3204cdc00e8cee6e89e527e9b88be91b66d88465af",
+      "native/src/hook_stream.rs": "817df9f5744ad57f51ab3b77f5fa637a03c2391640e5da1ca16e3a8976ff3c8c",
+      "native/src/lib.rs": "98eaaab6f3a2729c288911b06f00d527b0639dffa6d574e834821da9f833977a",
+      "native/src/location.rs": "30cf40ec9ca393ee0e3d65bde9be5bade19bb4331f89fd8333f3798a3b1faf5b",
+      "native/src/runtime.rs": "601025c3ced1ae27f99258aa7dae9acedf830959628337f22d97c3dee29981cd",
+      "native/src/selector.rs": "a314c9b3b8d0a26451e556433e10959229f545b6b096dc8c228754d7fba8a4fc",
+      "native/src/sink.rs": "156cce09e58d76ad73bd620342a5988594216177e366e9a63014d03b6c30b71b",
+      "native/src/stream.rs": "c8df8921578166369a082cbb7238b63b8183cfa94ddbaf1176278d55b9359c20",
+      "native/src/tokenizer.rs": "cbb00c922fb275aa966bc80d893608276046f10023cf606b61f7b9d113a454a3",
+      "native/src/tracker.rs": "1c6d7566049d10dfe11747998cfb73f6595171e578f975fceabf480b8a02d4b0",
+      "native/vendor/html5ever-0.35.0/Cargo.lock": "3f237a823015529eb2553618a570bf389f2b5e62f8e18be17666a1a9aca05989",
+      "native/vendor/html5ever-0.35.0/Cargo.toml": "3d2e7ea913aa8404b53b4170657ebeda5955639a2638aca35b5dbba71d4e7689",
+      "native/vendor/html5ever-0.35.0/benches/html5ever.rs": "848ca1aac420dd2dd9a7ca19e3fc9ec7737b47e5ea328e5021688eba5270066a",
+      "native/vendor/html5ever-0.35.0/examples/arena.rs": "f3f8ad83b3e7a96fc826d0b95c161cdeb8aa12c86f9655310fabb04ca59ec3c5",
+      "native/vendor/html5ever-0.35.0/examples/noop-tokenize.rs": "79c1d34c8c941e3e6b6a1953455d0502fdc56195a7d932cdd7665a0011a9da9a",
+      "native/vendor/html5ever-0.35.0/examples/noop-tree-builder.rs": "bf8ea674566cbb09d6c9871519e712e54fee7fd4eb889a7970b23d575591b516",
+      "native/vendor/html5ever-0.35.0/examples/print-tree-actions.rs": "d04287c1a129fe7c18ff621cfe1a69c5411fa905733f895af420d948e80ec65d",
+      "native/vendor/html5ever-0.35.0/examples/tokenize.rs": "fbf13646df42d4536691c62422b073e80b3f5cacfbc47294130c265134e21337",
+      "native/vendor/html5ever-0.35.0/src/driver.rs": "efc2cfdfe6920fb9d4db71cc830bfbcebea53761f95562870601f3ec5ef83295",
+      "native/vendor/html5ever-0.35.0/src/lib.rs": "8c0886497cd04c1e03d27454b7e61c74f5daf301865d1d21a2a1231b09206ca9",
+      "native/vendor/html5ever-0.35.0/src/macros.rs": "9d964d34792195764fc7d53c7bfdec3ba468ee7708ab4dd0891a37c211f96977",
+      "native/vendor/html5ever-0.35.0/src/serialize/mod.rs": "4590741ad63e40e624582ce68ebcb8e9b27cf11c3d943e68a974c5b481a205ca",
+      "native/vendor/html5ever-0.35.0/src/tokenizer/char_ref/mod.rs": "66bd5f7e8083a3e632561395a6d63fa647658c1ff34e0e1c990029d473ad9213",
+      "native/vendor/html5ever-0.35.0/src/tokenizer/interface.rs": "3c96dd965b492de373347c6a4d1ee2df58c319823ac6c2cfed3f20c9030f341e",
+      "native/vendor/html5ever-0.35.0/src/tokenizer/mod.rs": "59e7a460c14f4ad93e8f6dbfcd3051bf23a81fdba61424e6686e74dff07e172c",
+      "native/vendor/html5ever-0.35.0/src/tokenizer/states.rs": "09a8d3c36072e8dc584fd0d520c2e250d8d7b1b10b3c8c90c388346f0795d78a",
+      "native/vendor/html5ever-0.35.0/src/tree_builder/data.rs": "256c72e7d368b0be3d1f473c7b36907b6f6b602aff7d1441b9be109fea3375b1",
+      "native/vendor/html5ever-0.35.0/src/tree_builder/mod.rs": "5aa68c3c575d74db9eae8e68efb4c51b3dde382d812f00f8c05d7c065576f2c4",
+      "native/vendor/html5ever-0.35.0/src/tree_builder/rules.rs": "0cade1be34f83dac89a92ccb7c885beda0c229f918e7db28494b35dda8f28861",
+      "native/vendor/html5ever-0.35.0/src/tree_builder/tag_sets.rs": "3b70c6f8d86d06b0cb126d5a11541064766af324498752ca134909683d50ff30",
+      "native/vendor/html5ever-0.35.0/src/tree_builder/types.rs": "dfef44b2ede374be5225d36a397524e3916dbf42232a6ded80299dd55bb91f80",
+      "native/vendor/html5ever-0.35.0/src/util/str.rs": "48ca91feaa5e352cafb1743f996f57e6209c34851da6400488fb2fede2593161",
+      "native/vendor/html5gum-0.8.4/Cargo.lock": "9e931aff8d6e804933e82979afeadc890bd9d445cab9cddc0aeee6eaabc4b489",
+      "native/vendor/html5gum-0.8.4/Cargo.toml": "2df7df1af4d0ee64680b290f076f2dfebd79d4894578e314cb10d10d4322285b",
+      "native/vendor/html5gum-0.8.4/benches/files.rs": "239539fc479593907b3ece97ae8af2a185a6ffbf557bdfabd77d5490f40c20a9",
+      "native/vendor/html5gum-0.8.4/benches/patterns.rs": "a219b773310ee5b98eece51a6d8ee64f309a4f8c8499ac938f1df2348c39f2ab",
+      "native/vendor/html5gum-0.8.4/src/arrayvec.rs": "f94c668f83ae97272dfd1e7c6d93054487158721d1dfe859ca5163a062e72404",
+      "native/vendor/html5gum-0.8.4/src/char_validator.rs": "8bcdcd11d92eac8e78dc0e439eb4871a5cb93e78cf1af8ebdb323cc10617637f",
+      "native/vendor/html5gum-0.8.4/src/emitters/callback.rs": "9fb4899a63985c4efedbfc826e71b7212a796becc9defef4b082009a6fa5eff2",
+      "native/vendor/html5gum-0.8.4/src/emitters/default.rs": "a1ccc91aad7d591f9a30278605f1501ad2c3a3c79107b4d99e2bb6336722a680",
+      "native/vendor/html5gum-0.8.4/src/emitters/emitter.rs": "fb4f261188c87212bc781a9f9c986d85427731172a2a44840abfc61c0b4a725c",
+      "native/vendor/html5gum-0.8.4/src/emitters/html5ever.rs": "5d28457307efa73935a5aa6dbf244731f8534b371e7807e0ac6f18ae233e890e",
+      "native/vendor/html5gum-0.8.4/src/emitters/mod.rs": "27a2c02b9eb0625866ed5f758449625b0e542788c18605d2d555455309bd3cb9",
+      "native/vendor/html5gum-0.8.4/src/entities.rs": "3764d9e60b6c9afab71a436522a2e66cba8b40f9e6ca1487c69a516912a2e1ec",
+      "native/vendor/html5gum-0.8.4/src/error.rs": "579bb6319da35558309db2b595bd2fb872e8f26e211115a8fecaa1e24bfa1fd9",
+      "native/vendor/html5gum-0.8.4/src/htmlstring.rs": "334f8c18014c0a31b7e3b4674df509c9fa5b9530c0a98b4ecd48e4abd0fecbe5",
+      "native/vendor/html5gum-0.8.4/src/lib.rs": "43becc67ddafe87aecdb748578106969fa0141ba76637037d2c36afa74a3e250",
+      "native/vendor/html5gum-0.8.4/src/machine.rs": "41cb38fcc71ca287eecbf27ff1aa3fc5825e6b8aed3999aae0cc85cd0b182f6d",
+      "native/vendor/html5gum-0.8.4/src/machine_helper.rs": "9d3474d4c1acff87d794fd235c8546fea6505d04794a360c0cc7d06dea88afa3",
+      "native/vendor/html5gum-0.8.4/src/read_helper.rs": "0f55c6ac9a2a57773e3f20806fe6006d6e99cb140e8e0440e18d7e59e2b090c7",
+      "native/vendor/html5gum-0.8.4/src/reader.rs": "b07e442db69bf22caca63c199c12c10743b5684119b94462014b5bfd9d17df98",
+      "native/vendor/html5gum-0.8.4/src/span.rs": "2076ff7f853bb45518cfaca79fb336b2c05ead1ebcb04eca77c10ad140606cbe",
+      "native/vendor/html5gum-0.8.4/src/state.rs": "230729d2a770bb975379d6ae2a9d33132825f69f649ce7c176446ee60e8ca7b6",
+      "native/vendor/html5gum-0.8.4/src/testutils.rs": "06fb86a8c17eb28e43f38ef1d3ab2dbd053742a2fa294704652c05d23c189ccb",
+      "native/vendor/html5gum-0.8.4/src/tokenizer.rs": "dad9baf2614a962952651674563f4856472299ac3da37ac5e9bf184aba80e881",
+      "native/vendor/html5gum-0.8.4/src/utils.rs": "39aac8e9fda9d312bb0b99cb9fadfc72879a6f194c115a0a0e1ae7589ce63e46",
+      "native/vendor/markup5ever-0.35.0/Cargo.toml": "60ecaea0105ca59bd9a57ad69b5f854bd2cb5b2216659f2e76b1e6586fe46bf1",
+      "native/vendor/markup5ever-0.35.0/interface/mod.rs": "015a3765a6ebcd7812a647e4f8c6b03df4b6a1b347e7be2003e2f81189245a64",
+      "native/vendor/markup5ever-0.35.0/interface/tree_builder.rs": "f250da8d6952b1962aa6fc9954ce3e43ecb080ddcfc36e4e0d987bbddda9f76c",
+      "native/vendor/markup5ever-0.35.0/lib.rs": "139b8ba0352399434bba3837b009d64fd4664c7fcd37ed79883c7ebffc55aa74",
+      "native/vendor/markup5ever-0.35.0/serialize.rs": "871f613fdc4e9e8508cf12bf74087d4c39a5e19c5701324961e7e13491c0b7ac",
+      "native/vendor/markup5ever-0.35.0/util/buffer_queue.rs": "5d0bcdd8b2d0e4aa7c7c881c44ae66258e384a00f3faeadfc4dc7086a1a63f97",
+      "native/vendor/markup5ever-0.35.0/util/smallcharset.rs": "97ee1244744875deba3664c4c6eb638ddd69c68c4699899dbac4df26c3efcac8",
+      "package-lock.json": "bc05db154bba0d449ae89c40d91bf41ac2e3608722577c1d9d5cf2318bdebf3f",
+      "package.json": "ffe57f8e56edbd8a524ab16e935ac49f068eeb36c14ca7e26dddfeb1a54bd6ea",
+      "src/attributes.ts": "a0c47fbfd12a86b845bc12f463e7948ea79a4610befa72332f9a18420356fdca",
+      "src/codec.ts": "b590feb946871a166cd446a3eea5bcf48fe75d90a0dee19a80e263575df66992",
+      "src/dom.ts": "a3020db73a6b5adf5cd7e49cc357f13812619ec0fdf75a700051e2689204792d",
+      "src/extract-plan.ts": "d1537c86a7150bfc6bc83277c35be973eafe42c31838ecbc8d24255b033572dd",
+      "src/extract.ts": "d2c76b31dcb9d973ca970d0e1e62b5c26077359ba07f4facdfaedf06b8728f1c",
+      "src/hooks.ts": "373dc19e5bd4097ce9b2adbcb571730936ee3474044f12390243ed4f0d7834e1",
+      "src/index.ts": "ce7282b3508d2c117c8410f09f69e064d7ee3ff51d6babbd5569df7e84f28a16",
+      "src/io.ts": "5c54ba0823fb6acb6100de482b7f89b17ffbd8346b5fc0a2f8cf152c27b69f9d",
+      "src/native.ts": "0eb1180f264e46f49f384001bbbf8357e888042bcb8f273bc58f3d1665d5d58c",
+      "src/nodes.ts": "278691272243aa04927fbe52be99c071b5eba57e6fb5ff3adca8e7347d07181e",
+      "src/parse.ts": "3b77be75521582183d72ec6e8d6c451e264f98cb20f739c5f34e8b0e37af4bb0",
+      "src/parser-types.ts": "69f48171671a8e5289aeebca2b147befa1b3a320f487da36d573e6cf4cd3c785",
+      "src/router.ts": "de2c4ebc04cefd618b3997aaeebd37bc10f12e6d054e5d4095af8a70328b18a0",
+      "src/selection.ts": "53ee5ca5d085e61cd768f1bbc5ffbdf84d094acda5dd214ee4b9873bfd5f062a",
+      "src/slim.ts": "f233c8e3309d56349ada890ef9a4fffb844decce66ff4490bcad89e3aeacc5e6",
+      "src/transport.ts": "d3f48b669162cbbc09bc06f29a6ad419ca9b04da56cad93167f0b98744c0afe5",
+      "src/types.ts": "4a34cc968ae982f83a77c679065b178f0fc8082d9361a1f6d40eddabbb60a746",
+      "src/utils.ts": "6d943090fff62abc93b373b3875c2c4d288c13f3bcc2d44189cb80cfbdcf83a3",
+      "src/workers.ts": "c5ee4db2e400adfecdf1d6b00e44c0c014455a4cfd6ef0394fa660de538caa35",
+      "tsup.config.ts": "4a77b1e2da6b7d5596cf6ea8a30442a2ba13b249be9f6df305cbedbb894800ff"
+    },
+    "priorNativeBinarySha256": {
+      "rusteerio.linux-x64-gnu.node": "a9391c29dfb69dbd858efec1370542152dad154fe024f072e9a2f3646b413d4a"
+    },
+    "currentNativeBinarySha256": {
+      "rusteerio.linux-x64-gnu.node": "ae1abae03b1f72e79a512676aff2ea0960177a914435ef28257e338bc6ec5998"
+    },
+    "currentToolchain": {
+      "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)\nbinary: rustc\ncommit-hash: b940084d7eb6a299eb4bfeb8e34901bc051e7ac4\ncommit-date: 2026-09-28\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.0\nLLVM version: 23.1.1",
+      "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)"
+    },
+    "buildImage": "quay.io/pypa/manylinux_2_28_x86_64@sha256:4131ddd7acb9c6c966af02fe7e71edc51e078c2d41f475966697676430bfa2ae",
+    "coldMetric": "Engine import/pool initialization plus first batch; child Node startup and fixture preparation excluded.",
+    "memoryCaveat": "Absolute process RSS includes engine/worker initialization and matched input; sampled peaks can miss spikes. Retention growth is final checkpoint RSS minus first checkpoint RSS."
+  },
+  "caseCount": 45,
+  "rustWins": 39,
+  "rustLosses": [
+    "pool/nestedCallback/medium//1",
+    "pool/nestedCallback/medium//2",
+    "pool/nestedCallback/medium//4",
+    "pool/nestedCallback/medium//8",
+    "stream/decodeStream/large/xml/8",
+    "retention/boundedLiveDom///1"
+  ],
+  "cases": [
+    {
+      "id": "sync/query/tiny//1",
+      "kind": "sync",
+      "mode": "query",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 4.67823199999998,
+          "currentMedianMs": 4.378672999999992,
+          "improvementVsPrevious": 1.0684131927641065,
+          "medianBaselineRssBytes": 84926464,
+          "medianEndRssBytes": 85274624,
+          "medianSampledPeakRssBytes": 85274624,
+          "medianProcessLifetimePeakRssBytes": 86106112,
+          "medianMaxTimerLagMs": 0.07971499999996468,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 0.49143899999999974,
+          "currentMedianMs": 0.551983000000007,
+          "improvementVsPrevious": 0.8903154626138731,
+          "medianBaselineRssBytes": 69038080,
+          "medianEndRssBytes": 69038080,
+          "medianSampledPeakRssBytes": 69038080,
+          "medianProcessLifetimePeakRssBytes": 69038080,
+          "medianMaxTimerLagMs": 0,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 7.9326229249812705,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/mutations/tiny//1",
+      "kind": "sync",
+      "mode": "mutations",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 5.815498999999988,
+          "currentMedianMs": 4.710943999999984,
+          "improvementVsPrevious": 1.23446574614345,
+          "medianBaselineRssBytes": 86233088,
+          "medianEndRssBytes": 86364160,
+          "medianSampledPeakRssBytes": 86364160,
+          "medianProcessLifetimePeakRssBytes": 86364160,
+          "medianMaxTimerLagMs": 0.09796000000000049,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 0.9563590000000062,
+          "currentMedianMs": 0.9965039999999874,
+          "improvementVsPrevious": 0.9597141607058459,
+          "medianBaselineRssBytes": 69435392,
+          "medianEndRssBytes": 69566464,
+          "medianSampledPeakRssBytes": 69566464,
+          "medianProcessLifetimePeakRssBytes": 69566464,
+          "medianMaxTimerLagMs": 0,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 4.7274712394531715,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/xml/tiny//1",
+      "kind": "sync",
+      "mode": "xml",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 1.035667999999987,
+          "currentMedianMs": 1.065904000000046,
+          "improvementVsPrevious": 0.9716334679295155,
+          "medianBaselineRssBytes": 84180992,
+          "medianEndRssBytes": 85061632,
+          "medianSampledPeakRssBytes": 85061632,
+          "medianProcessLifetimePeakRssBytes": 85479424,
+          "medianMaxTimerLagMs": 0.09536399999996092,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 0.45320700000000613,
+          "currentMedianMs": 0.5972370000000069,
+          "improvementVsPrevious": 0.7588394556934699,
+          "medianBaselineRssBytes": 69033984,
+          "medianEndRssBytes": 69033984,
+          "medianSampledPeakRssBytes": 69165056,
+          "medianProcessLifetimePeakRssBytes": 69033984,
+          "medianMaxTimerLagMs": 0,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 1.7847253267966212,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/crossDocument/tiny//1",
+      "kind": "sync",
+      "mode": "crossDocument",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 4.62894,
+          "currentMedianMs": 4.509277999999995,
+          "improvementVsPrevious": 1.026536842483432,
+          "medianBaselineRssBytes": 86896640,
+          "medianEndRssBytes": 86978560,
+          "medianSampledPeakRssBytes": 86978560,
+          "medianProcessLifetimePeakRssBytes": 87572480,
+          "medianMaxTimerLagMs": 0.09811900000002538,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 0.874446000000006,
+          "currentMedianMs": 0.9517809999999827,
+          "improvementVsPrevious": 0.9187470647134393,
+          "medianBaselineRssBytes": 69431296,
+          "medianEndRssBytes": 69431296,
+          "medianSampledPeakRssBytes": 69431296,
+          "medianProcessLifetimePeakRssBytes": 69431296,
+          "medianMaxTimerLagMs": 0.07636899999999969,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 4.737726430765141,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/query/medium//1",
+      "kind": "sync",
+      "mode": "query",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 35.72500100000002,
+          "currentMedianMs": 35.25398499999994,
+          "improvementVsPrevious": 1.0133606456121225,
+          "medianBaselineRssBytes": 101097472,
+          "medianEndRssBytes": 101335040,
+          "medianSampledPeakRssBytes": 101466112,
+          "medianProcessLifetimePeakRssBytes": 103325696,
+          "medianMaxTimerLagMs": 30.363380000000006,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 3.212108999999998,
+          "currentMedianMs": 4.08211799999998,
+          "improvementVsPrevious": 0.7868731379151739,
+          "medianBaselineRssBytes": 74055680,
+          "medianEndRssBytes": 74317824,
+          "medianSampledPeakRssBytes": 74317824,
+          "medianProcessLifetimePeakRssBytes": 74317824,
+          "medianMaxTimerLagMs": 0.09579399999998373,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 8.636199394530024,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/mutations/medium//1",
+      "kind": "sync",
+      "mode": "mutations",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 43.02797399999997,
+          "currentMedianMs": 39.10126500000001,
+          "improvementVsPrevious": 1.1004240911387384,
+          "medianBaselineRssBytes": 126124032,
+          "medianEndRssBytes": 126255104,
+          "medianSampledPeakRssBytes": 126517248,
+          "medianProcessLifetimePeakRssBytes": 127565824,
+          "medianMaxTimerLagMs": 34.74647200000004,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 12.843045000000018,
+          "currentMedianMs": 11.59909300000001,
+          "improvementVsPrevious": 1.1072456268778952,
+          "medianBaselineRssBytes": 93159424,
+          "medianEndRssBytes": 93552640,
+          "medianSampledPeakRssBytes": 93597696,
+          "medianProcessLifetimePeakRssBytes": 93745152,
+          "medianMaxTimerLagMs": 6.761918999999978,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 3.371062289094499,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/xml/medium//1",
+      "kind": "sync",
+      "mode": "xml",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 13.83835700000003,
+          "currentMedianMs": 13.031033000000036,
+          "improvementVsPrevious": 1.0619539525377606,
+          "medianBaselineRssBytes": 89210880,
+          "medianEndRssBytes": 89341952,
+          "medianSampledPeakRssBytes": 89341952,
+          "medianProcessLifetimePeakRssBytes": 89571328,
+          "medianMaxTimerLagMs": 8.120640000000037,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 2.253275000000002,
+          "currentMedianMs": 2.7115749999999963,
+          "improvementVsPrevious": 0.8309838378064428,
+          "medianBaselineRssBytes": 72200192,
+          "medianEndRssBytes": 72925184,
+          "medianSampledPeakRssBytes": 72925184,
+          "medianProcessLifetimePeakRssBytes": 73056256,
+          "medianMaxTimerLagMs": 0.09193800000002739,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 4.805706277716845,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/crossDocument/medium//1",
+      "kind": "sync",
+      "mode": "crossDocument",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 37.258740999999986,
+          "currentMedianMs": 35.92801700000001,
+          "improvementVsPrevious": 1.037038615295689,
+          "medianBaselineRssBytes": 117428224,
+          "medianEndRssBytes": 117428224,
+          "medianSampledPeakRssBytes": 117616640,
+          "medianProcessLifetimePeakRssBytes": 119406592,
+          "medianMaxTimerLagMs": 31.637336000000005,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 13.656278000000043,
+          "currentMedianMs": 11.944558999999998,
+          "improvementVsPrevious": 1.143305332578628,
+          "medianBaselineRssBytes": 104251392,
+          "medianEndRssBytes": 104660992,
+          "medianSampledPeakRssBytes": 104660992,
+          "medianProcessLifetimePeakRssBytes": 107184128,
+          "medianMaxTimerLagMs": 7.057109999999994,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 3.007898156809307,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/query/large//1",
+      "kind": "sync",
+      "mode": "query",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 160.45633999999995,
+          "currentMedianMs": 150.57063199999993,
+          "improvementVsPrevious": 1.065654954546515,
+          "medianBaselineRssBytes": 251994112,
+          "medianEndRssBytes": 252375040,
+          "medianSampledPeakRssBytes": 252506112,
+          "medianProcessLifetimePeakRssBytes": 255963136,
+          "medianMaxTimerLagMs": 161.6775909999999,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 34.20613000000003,
+          "currentMedianMs": 41.640916999999945,
+          "improvementVsPrevious": 0.8214547724777549,
+          "medianBaselineRssBytes": 130764800,
+          "medianEndRssBytes": 133779456,
+          "medianSampledPeakRssBytes": 133779456,
+          "medianProcessLifetimePeakRssBytes": 133779456,
+          "medianMaxTimerLagMs": 36.77582899999993,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 3.6159297836788786,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/mutations/large//1",
+      "kind": "sync",
+      "mode": "mutations",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 256.93597,
+          "currentMedianMs": 239.65361200000007,
+          "improvementVsPrevious": 1.07211390579834,
+          "medianBaselineRssBytes": 277970944,
+          "medianEndRssBytes": 277970944,
+          "medianSampledPeakRssBytes": 277970944,
+          "medianProcessLifetimePeakRssBytes": 282451968,
+          "medianMaxTimerLagMs": 234.89940300000012,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 165.0656329999997,
+          "currentMedianMs": 189.48629900000014,
+          "improvementVsPrevious": 0.8711217321311425,
+          "medianBaselineRssBytes": 210640896,
+          "medianEndRssBytes": 240787456,
+          "medianSampledPeakRssBytes": 240787456,
+          "medianProcessLifetimePeakRssBytes": 243130368,
+          "medianMaxTimerLagMs": 184.77644199999986,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 1.2647543028955348,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/xml/large//1",
+      "kind": "sync",
+      "mode": "xml",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 73.57656199999997,
+          "currentMedianMs": 65.01527400000009,
+          "improvementVsPrevious": 1.1316811800254793,
+          "medianBaselineRssBytes": 153808896,
+          "medianEndRssBytes": 154202112,
+          "medianSampledPeakRssBytes": 154202112,
+          "medianProcessLifetimePeakRssBytes": 155336704,
+          "medianMaxTimerLagMs": 62.875968,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 28.646500999999944,
+          "currentMedianMs": 27.997829000000024,
+          "improvementVsPrevious": 1.0231686535409557,
+          "medianBaselineRssBytes": 116105216,
+          "medianEndRssBytes": 118546432,
+          "medianSampledPeakRssBytes": 118546432,
+          "medianProcessLifetimePeakRssBytes": 119169024,
+          "medianMaxTimerLagMs": 23.963315999999963,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 2.3221541213070496,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "sync/crossDocument/large//1",
+      "kind": "sync",
+      "mode": "crossDocument",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 220.49337600000035,
+          "currentMedianMs": 204.27927099999988,
+          "improvementVsPrevious": 1.0793722482003594,
+          "medianBaselineRssBytes": 274305024,
+          "medianEndRssBytes": 274960384,
+          "medianSampledPeakRssBytes": 274960384,
+          "medianProcessLifetimePeakRssBytes": 278638592,
+          "medianMaxTimerLagMs": 199.45178299999998,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 163.17875400000003,
+          "currentMedianMs": 163.81153999999992,
+          "improvementVsPrevious": 0.9961371097542951,
+          "medianBaselineRssBytes": 262049792,
+          "medianEndRssBytes": 293642240,
+          "medianSampledPeakRssBytes": 293642240,
+          "medianProcessLifetimePeakRssBytes": 293642240,
+          "medianMaxTimerLagMs": 158.96510599999988,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 1.2470383405222853,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/tiny//1",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 32.17999199999997,
+          "currentMedianMs": 27.315611999999987,
+          "improvementVsPrevious": 1.1780805789743969,
+          "medianBaselineRssBytes": 127373312,
+          "medianEndRssBytes": 127516672,
+          "medianSampledPeakRssBytes": 127946752,
+          "medianProcessLifetimePeakRssBytes": 129175552,
+          "medianMaxTimerLagMs": 1.6806810000000496,
+          "medianTimerTicksDuringWork": 5
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 2.3507979999999975,
+          "currentMedianMs": 2.165140000000008,
+          "improvementVsPrevious": 1.085748727564956,
+          "medianBaselineRssBytes": 69296128,
+          "medianEndRssBytes": 69427200,
+          "medianSampledPeakRssBytes": 69427200,
+          "medianProcessLifetimePeakRssBytes": 69427200,
+          "medianMaxTimerLagMs": 0.19199499999999148,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 12.616095033115588,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/medium//1",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 313.0102850000003,
+          "currentMedianMs": 249.1189139999999,
+          "improvementVsPrevious": 1.256469370286354,
+          "medianBaselineRssBytes": 309964800,
+          "medianEndRssBytes": 314363904,
+          "medianSampledPeakRssBytes": 314363904,
+          "medianProcessLifetimePeakRssBytes": 314363904,
+          "medianMaxTimerLagMs": 3.8938210000000026,
+          "medianTimerTicksDuringWork": 46
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 40.35407200000003,
+          "currentMedianMs": 43.69574300000005,
+          "improvementVsPrevious": 0.9235241062270066,
+          "medianBaselineRssBytes": 90632192,
+          "medianEndRssBytes": 91000832,
+          "medianSampledPeakRssBytes": 91000832,
+          "medianProcessLifetimePeakRssBytes": 91156480,
+          "medianMaxTimerLagMs": 1.306229999999971,
+          "medianTimerTicksDuringWork": 8
+        }
+      },
+      "speedupVsCheerio": 5.701217027022509,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/large//1",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 3683.6848499999996,
+          "currentMedianMs": 2887.607785,
+          "improvementVsPrevious": 1.2756873939512527,
+          "medianBaselineRssBytes": 954765312,
+          "medianEndRssBytes": 990081024,
+          "medianSampledPeakRssBytes": 1003999232,
+          "medianProcessLifetimePeakRssBytes": 1024495616,
+          "medianMaxTimerLagMs": 5.035158000000592,
+          "medianTimerTicksDuringWork": 556
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 495.2208150000006,
+          "currentMedianMs": 511.4833349999999,
+          "improvementVsPrevious": 0.9682051811130868,
+          "medianBaselineRssBytes": 235511808,
+          "medianEndRssBytes": 238563328,
+          "medianSampledPeakRssBytes": 238563328,
+          "medianProcessLifetimePeakRssBytes": 241577984,
+          "medianMaxTimerLagMs": 26.81331799999998,
+          "medianTimerTicksDuringWork": 93
+        }
+      },
+      "speedupVsCheerio": 5.6455559495403715,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/nestedCallback/medium//1",
+      "kind": "pool",
+      "mode": "nestedCallback",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 211.524992,
+          "currentMedianMs": 243.6789060000001,
+          "improvementVsPrevious": 0.868048020537321,
+          "medianBaselineRssBytes": 290664448,
+          "medianEndRssBytes": 292380672,
+          "medianSampledPeakRssBytes": 292458496,
+          "medianProcessLifetimePeakRssBytes": 292642816,
+          "medianMaxTimerLagMs": 6.373513000000003,
+          "medianTimerTicksDuringWork": 44
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 705.654477,
+          "currentMedianMs": 272.2747439999998,
+          "improvementVsPrevious": 2.591700084382415,
+          "medianBaselineRssBytes": 328298496,
+          "medianEndRssBytes": 334852096,
+          "medianSampledPeakRssBytes": 334852096,
+          "medianProcessLifetimePeakRssBytes": 337367040,
+          "medianMaxTimerLagMs": 19.136231999999836,
+          "medianTimerTicksDuringWork": 32
+        }
+      },
+      "speedupVsCheerio": 0.8949743278429095,
+      "rustFasterThanCheerio": false
+    },
+    {
+      "id": "pool/simple/tiny//2",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 2,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 22.764386999999942,
+          "currentMedianMs": 23.632389999999987,
+          "improvementVsPrevious": 0.9632706213802309,
+          "medianBaselineRssBytes": 154550272,
+          "medianEndRssBytes": 154615808,
+          "medianSampledPeakRssBytes": 154615808,
+          "medianProcessLifetimePeakRssBytes": 155860992,
+          "medianMaxTimerLagMs": 0.9290639999999257,
+          "medianTimerTicksDuringWork": 4
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 1.3497059999999976,
+          "currentMedianMs": 1.4930739999999787,
+          "improvementVsPrevious": 0.9039779676024209,
+          "medianBaselineRssBytes": 69722112,
+          "medianEndRssBytes": 69722112,
+          "medianSampledPeakRssBytes": 69722112,
+          "medianProcessLifetimePeakRssBytes": 69722112,
+          "medianMaxTimerLagMs": 0,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 15.828009864213243,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/medium//2",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 2,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 187.06117399999994,
+          "currentMedianMs": 198.02514999999994,
+          "improvementVsPrevious": 0.9446334165130035,
+          "medianBaselineRssBytes": 478261248,
+          "medianEndRssBytes": 482193408,
+          "medianSampledPeakRssBytes": 482193408,
+          "medianProcessLifetimePeakRssBytes": 482193408,
+          "medianMaxTimerLagMs": 5.163378000000193,
+          "medianTimerTicksDuringWork": 35
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 22.429231,
+          "currentMedianMs": 25.472634000000028,
+          "improvementVsPrevious": 0.880522642456213,
+          "medianBaselineRssBytes": 94466048,
+          "medianEndRssBytes": 94728192,
+          "medianSampledPeakRssBytes": 94728192,
+          "medianProcessLifetimePeakRssBytes": 94982144,
+          "medianMaxTimerLagMs": 1.4814369999999712,
+          "medianTimerTicksDuringWork": 4
+        }
+      },
+      "speedupVsCheerio": 7.774035068379647,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/large//2",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 2,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 1682.2929430000004,
+          "currentMedianMs": 1780.1250200000004,
+          "improvementVsPrevious": 0.9450420190150465,
+          "medianBaselineRssBytes": 1256103936,
+          "medianEndRssBytes": 1287696384,
+          "medianSampledPeakRssBytes": 1306800128,
+          "medianProcessLifetimePeakRssBytes": 1322004480,
+          "medianMaxTimerLagMs": 8.136450000001787,
+          "medianTimerTicksDuringWork": 329
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 238.645753,
+          "currentMedianMs": 306.37471099999993,
+          "improvementVsPrevious": 0.7789342410836254,
+          "medianBaselineRssBytes": 264720384,
+          "medianEndRssBytes": 267735040,
+          "medianSampledPeakRssBytes": 267735040,
+          "medianProcessLifetimePeakRssBytes": 270749696,
+          "medianMaxTimerLagMs": 25.397059000000013,
+          "medianTimerTicksDuringWork": 53
+        }
+      },
+      "speedupVsCheerio": 5.810287063804038,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/nestedCallback/medium//2",
+      "kind": "pool",
+      "mode": "nestedCallback",
+      "budget": 2,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 166.84774300000004,
+          "currentMedianMs": 190.152379,
+          "improvementVsPrevious": 0.8774423116736291,
+          "medianBaselineRssBytes": 386805760,
+          "medianEndRssBytes": 388575232,
+          "medianSampledPeakRssBytes": 388575232,
+          "medianProcessLifetimePeakRssBytes": 389099520,
+          "medianMaxTimerLagMs": 4.7561059999999316,
+          "medianTimerTicksDuringWork": 33
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 443.43004900000005,
+          "currentMedianMs": 254.99847699999987,
+          "improvementVsPrevious": 1.7389517546020492,
+          "medianBaselineRssBytes": 315863040,
+          "medianEndRssBytes": 322576384,
+          "medianSampledPeakRssBytes": 325623808,
+          "medianProcessLifetimePeakRssBytes": 327249920,
+          "medianMaxTimerLagMs": 15.493286000000126,
+          "medianTimerTicksDuringWork": 32
+        }
+      },
+      "speedupVsCheerio": 0.7457000576517172,
+      "rustFasterThanCheerio": false
+    },
+    {
+      "id": "pool/simple/tiny//4",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 4,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 13.857074000000011,
+          "currentMedianMs": 14.319153999999912,
+          "improvementVsPrevious": 0.9677299371178001,
+          "medianBaselineRssBytes": 217473024,
+          "medianEndRssBytes": 218046464,
+          "medianSampledPeakRssBytes": 218234880,
+          "medianProcessLifetimePeakRssBytes": 224559104,
+          "medianMaxTimerLagMs": 0.38672900000000254,
+          "medianTimerTicksDuringWork": 2
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 1.1161670000000186,
+          "currentMedianMs": 1.6806860000000086,
+          "improvementVsPrevious": 0.6641139391891245,
+          "medianBaselineRssBytes": 69615616,
+          "medianEndRssBytes": 69615616,
+          "medianSampledPeakRssBytes": 69615616,
+          "medianProcessLifetimePeakRssBytes": 69615616,
+          "medianMaxTimerLagMs": 0.15275099999999497,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 8.519827023013127,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/medium//4",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 4,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 118.80274000000009,
+          "currentMedianMs": 133.7176800000001,
+          "improvementVsPrevious": 0.8884594767124289,
+          "medianBaselineRssBytes": 690753536,
+          "medianEndRssBytes": 695058432,
+          "medianSampledPeakRssBytes": 695472128,
+          "medianProcessLifetimePeakRssBytes": 695865344,
+          "medianMaxTimerLagMs": 3.0721240000000307,
+          "medianTimerTicksDuringWork": 24
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 14.690884000000011,
+          "currentMedianMs": 21.388852000000043,
+          "improvementVsPrevious": 0.6868477092646198,
+          "medianBaselineRssBytes": 97554432,
+          "medianEndRssBytes": 97828864,
+          "medianSampledPeakRssBytes": 97828864,
+          "medianProcessLifetimePeakRssBytes": 98091008,
+          "medianMaxTimerLagMs": 1.2395759999999996,
+          "medianTimerTicksDuringWork": 4
+        }
+      },
+      "speedupVsCheerio": 6.251746470544553,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/large//4",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 4,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 1198.2644420000001,
+          "currentMedianMs": 1464.4553809999998,
+          "improvementVsPrevious": 0.8182321274833025,
+          "medianBaselineRssBytes": 1746792448,
+          "medianEndRssBytes": 1782439936,
+          "medianSampledPeakRssBytes": 1798172672,
+          "medianProcessLifetimePeakRssBytes": 1816821760,
+          "medianMaxTimerLagMs": 6.282671000000846,
+          "medianTimerTicksDuringWork": 266
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 143.109895,
+          "currentMedianMs": 183.678246,
+          "improvementVsPrevious": 0.7791336106290997,
+          "medianBaselineRssBytes": 338210816,
+          "medianEndRssBytes": 341487616,
+          "medianSampledPeakRssBytes": 341487616,
+          "medianProcessLifetimePeakRssBytes": 344272896,
+          "medianMaxTimerLagMs": 24.857479000000012,
+          "medianTimerTicksDuringWork": 29
+        }
+      },
+      "speedupVsCheerio": 7.972938618980495,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/nestedCallback/medium//4",
+      "kind": "pool",
+      "mode": "nestedCallback",
+      "budget": 4,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 91.00609900000018,
+          "currentMedianMs": 106.15440399999989,
+          "improvementVsPrevious": 0.8572993259893417,
+          "medianBaselineRssBytes": 492097536,
+          "medianEndRssBytes": 522715136,
+          "medianSampledPeakRssBytes": 522715136,
+          "medianProcessLifetimePeakRssBytes": 522715136,
+          "medianMaxTimerLagMs": 2.9648839999999836,
+          "medianTimerTicksDuringWork": 19
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 414.676735,
+          "currentMedianMs": 219.34931199999983,
+          "improvementVsPrevious": 1.890485687960582,
+          "medianBaselineRssBytes": 330678272,
+          "medianEndRssBytes": 338280448,
+          "medianSampledPeakRssBytes": 338280448,
+          "medianProcessLifetimePeakRssBytes": 339582976,
+          "medianMaxTimerLagMs": 11.993538000000171,
+          "medianTimerTicksDuringWork": 27
+        }
+      },
+      "speedupVsCheerio": 0.4839513880034416,
+      "rustFasterThanCheerio": false
+    },
+    {
+      "id": "pool/simple/tiny//8",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 7.333209000000011,
+          "currentMedianMs": 7.339012999999966,
+          "improvementVsPrevious": 0.9992091579617103,
+          "medianBaselineRssBytes": 339763200,
+          "medianEndRssBytes": 339726336,
+          "medianSampledPeakRssBytes": 340025344,
+          "medianProcessLifetimePeakRssBytes": 344080384,
+          "medianMaxTimerLagMs": 0.4242390000000569,
+          "medianTimerTicksDuringWork": 1
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 0.8117089999999934,
+          "currentMedianMs": 0.8943429999999921,
+          "improvementVsPrevious": 0.9076036822561372,
+          "medianBaselineRssBytes": 70180864,
+          "medianEndRssBytes": 70180864,
+          "medianSampledPeakRssBytes": 70180864,
+          "medianProcessLifetimePeakRssBytes": 70180864,
+          "medianMaxTimerLagMs": 0.005516000000000076,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 8.206038399137725,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/medium//8",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 74.358473,
+          "currentMedianMs": 87.39487099999997,
+          "improvementVsPrevious": 0.8508333744207944,
+          "medianBaselineRssBytes": 880902144,
+          "medianEndRssBytes": 886276096,
+          "medianSampledPeakRssBytes": 886276096,
+          "medianProcessLifetimePeakRssBytes": 886276096,
+          "medianMaxTimerLagMs": 1.6065530000000763,
+          "medianTimerTicksDuringWork": 16
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 11.001150999999993,
+          "currentMedianMs": 12.659367999999972,
+          "improvementVsPrevious": 0.8690126552921139,
+          "medianBaselineRssBytes": 109953024,
+          "medianEndRssBytes": 110215168,
+          "medianSampledPeakRssBytes": 110215168,
+          "medianProcessLifetimePeakRssBytes": 110501888,
+          "medianMaxTimerLagMs": 1.1067970000000003,
+          "medianTimerTicksDuringWork": 2
+        }
+      },
+      "speedupVsCheerio": 6.903572990373624,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/simple/large//8",
+      "kind": "pool",
+      "mode": "simple",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 802.1834489999992,
+          "currentMedianMs": 797.5486900000005,
+          "improvementVsPrevious": 1.0058112552350862,
+          "medianBaselineRssBytes": 2614095872,
+          "medianEndRssBytes": 2625949696,
+          "medianSampledPeakRssBytes": 2656260096,
+          "medianProcessLifetimePeakRssBytes": 2669117440,
+          "medianMaxTimerLagMs": 3.49062800000047,
+          "medianTimerTicksDuringWork": 151
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 99.76891299999988,
+          "currentMedianMs": 114.70334200000002,
+          "improvementVsPrevious": 0.8697995303397513,
+          "medianBaselineRssBytes": 402460672,
+          "medianEndRssBytes": 405475328,
+          "medianSampledPeakRssBytes": 405475328,
+          "medianProcessLifetimePeakRssBytes": 408354816,
+          "medianMaxTimerLagMs": 24.058533000000125,
+          "medianTimerTicksDuringWork": 16
+        }
+      },
+      "speedupVsCheerio": 6.953142568417931,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "pool/nestedCallback/medium//8",
+      "kind": "pool",
+      "mode": "nestedCallback",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 56.592044999999985,
+          "currentMedianMs": 54.30397299999993,
+          "improvementVsPrevious": 1.0421345230117889,
+          "medianBaselineRssBytes": 710631424,
+          "medianEndRssBytes": 761749504,
+          "medianSampledPeakRssBytes": 761749504,
+          "medianProcessLifetimePeakRssBytes": 761749504,
+          "medianMaxTimerLagMs": 1.0218800000000101,
+          "medianTimerTicksDuringWork": 10
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 378.24937199999977,
+          "currentMedianMs": 174.05908599999998,
+          "improvementVsPrevious": 2.1731090326419373,
+          "medianBaselineRssBytes": 328916992,
+          "medianEndRssBytes": 336650240,
+          "medianSampledPeakRssBytes": 336650240,
+          "medianProcessLifetimePeakRssBytes": 337592320,
+          "medianMaxTimerLagMs": 7.606849999999895,
+          "medianTimerTicksDuringWork": 24
+        }
+      },
+      "speedupVsCheerio": 0.31198585634305775,
+      "rustFasterThanCheerio": false
+    },
+    {
+      "id": "cold/simple/tiny//1",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 172.04689699999997,
+          "currentMedianMs": 163.26201500000002,
+          "improvementVsPrevious": 1.0538084869282052,
+          "medianBaselineRssBytes": 97452032,
+          "medianEndRssBytes": 108507136,
+          "medianSampledPeakRssBytes": 108507136,
+          "medianProcessLifetimePeakRssBytes": 108507136,
+          "medianMaxTimerLagMs": 3.6756230000000016,
+          "medianTimerTicksDuringWork": 7
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 6.510141000000001,
+          "currentMedianMs": 33.542985,
+          "improvementVsPrevious": 0.19408353192180125,
+          "medianBaselineRssBytes": 66412544,
+          "medianEndRssBytes": 68395008,
+          "medianSampledPeakRssBytes": 68395008,
+          "medianProcessLifetimePeakRssBytes": 68395008,
+          "medianMaxTimerLagMs": 0.09050499999999317,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 4.867247652527049,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "cold/simple/large//1",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 3229.013062,
+          "currentMedianMs": 3252.916051,
+          "improvementVsPrevious": 0.9926518272758217,
+          "medianBaselineRssBytes": 159232000,
+          "medianEndRssBytes": 931205120,
+          "medianSampledPeakRssBytes": 931205120,
+          "medianProcessLifetimePeakRssBytes": 931205120,
+          "medianMaxTimerLagMs": 9.530989999999974,
+          "medianTimerTicksDuringWork": 593
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 426.767766,
+          "currentMedianMs": 527.0835630000001,
+          "improvementVsPrevious": 0.8096776222179402,
+          "medianBaselineRssBytes": 132374528,
+          "medianEndRssBytes": 224194560,
+          "medianSampledPeakRssBytes": 236994560,
+          "medianProcessLifetimePeakRssBytes": 241958912,
+          "medianMaxTimerLagMs": 32.98285299999999,
+          "medianTimerTicksDuringWork": 89
+        }
+      },
+      "speedupVsCheerio": 6.171537644781382,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "cold/simple/tiny//2",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 2,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 151.36131200000003,
+          "currentMedianMs": 152.163977,
+          "improvementVsPrevious": 0.9947249998598554,
+          "medianBaselineRssBytes": 126345216,
+          "medianEndRssBytes": 144474112,
+          "medianSampledPeakRssBytes": 145551360,
+          "medianProcessLifetimePeakRssBytes": 146145280,
+          "medianMaxTimerLagMs": 2.6519069999999942,
+          "medianTimerTicksDuringWork": 5
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 5.579948000000005,
+          "currentMedianMs": 28.95945999999999,
+          "improvementVsPrevious": 0.1926813552462652,
+          "medianBaselineRssBytes": 66469888,
+          "medianEndRssBytes": 68636672,
+          "medianSampledPeakRssBytes": 68636672,
+          "medianProcessLifetimePeakRssBytes": 68636672,
+          "medianMaxTimerLagMs": 0.14076900000000592,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 5.254378949054991,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "cold/simple/large//2",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 2,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 1970.2003849999999,
+          "currentMedianMs": 1915.1899500000002,
+          "improvementVsPrevious": 1.0287232266439157,
+          "medianBaselineRssBytes": 188657664,
+          "medianEndRssBytes": 1270272000,
+          "medianSampledPeakRssBytes": 1270272000,
+          "medianProcessLifetimePeakRssBytes": 1270272000,
+          "medianMaxTimerLagMs": 12.832808999999997,
+          "medianTimerTicksDuringWork": 330
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 254.496936,
+          "currentMedianMs": 319.325128,
+          "improvementVsPrevious": 0.7969837437910617,
+          "medianBaselineRssBytes": 132530176,
+          "medianEndRssBytes": 262324224,
+          "medianSampledPeakRssBytes": 276877312,
+          "medianProcessLifetimePeakRssBytes": 280084480,
+          "medianMaxTimerLagMs": 33.424749000000006,
+          "medianTimerTicksDuringWork": 49
+        }
+      },
+      "speedupVsCheerio": 5.997617418946122,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "cold/simple/tiny//4",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 4,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 144.390072,
+          "currentMedianMs": 154.02716499999997,
+          "improvementVsPrevious": 0.9374325106873196,
+          "medianBaselineRssBytes": 183578624,
+          "medianEndRssBytes": 211410944,
+          "medianSampledPeakRssBytes": 215597056,
+          "medianProcessLifetimePeakRssBytes": 211759104,
+          "medianMaxTimerLagMs": 1.5456380000000252,
+          "medianTimerTicksDuringWork": 3
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 5.305845999999999,
+          "currentMedianMs": 27.826961000000008,
+          "improvementVsPrevious": 0.19067285141198126,
+          "medianBaselineRssBytes": 66023424,
+          "medianEndRssBytes": 68300800,
+          "medianSampledPeakRssBytes": 68300800,
+          "medianProcessLifetimePeakRssBytes": 68300800,
+          "medianMaxTimerLagMs": 0.1367219999999918,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 5.535177377076854,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "cold/simple/large//4",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 4,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 1366.611123,
+          "currentMedianMs": 1340.620583,
+          "improvementVsPrevious": 1.019386946858476,
+          "medianBaselineRssBytes": 244932608,
+          "medianEndRssBytes": 1662914560,
+          "medianSampledPeakRssBytes": 1662914560,
+          "medianProcessLifetimePeakRssBytes": 1662914560,
+          "medianMaxTimerLagMs": 13.953676000000002,
+          "medianTimerTicksDuringWork": 219
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 165.20718799999997,
+          "currentMedianMs": 214.46653799999999,
+          "improvementVsPrevious": 0.7703168500812932,
+          "medianBaselineRssBytes": 132210688,
+          "medianEndRssBytes": 245379072,
+          "medianSampledPeakRssBytes": 259829760,
+          "medianProcessLifetimePeakRssBytes": 263143424,
+          "medianMaxTimerLagMs": 34.35083399999999,
+          "medianTimerTicksDuringWork": 29
+        }
+      },
+      "speedupVsCheerio": 6.250954556836274,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "cold/simple/tiny//8",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 152.401297,
+          "currentMedianMs": 169.227127,
+          "improvementVsPrevious": 0.900572501003341,
+          "medianBaselineRssBytes": 298958848,
+          "medianEndRssBytes": 326332416,
+          "medianSampledPeakRssBytes": 330956800,
+          "medianProcessLifetimePeakRssBytes": 326332416,
+          "medianMaxTimerLagMs": 0.7797460000000171,
+          "medianTimerTicksDuringWork": 3
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 5.498377999999999,
+          "currentMedianMs": 27.370277,
+          "improvementVsPrevious": 0.20088865012217444,
+          "medianBaselineRssBytes": 65982464,
+          "medianEndRssBytes": 68669440,
+          "medianSampledPeakRssBytes": 68669440,
+          "medianProcessLifetimePeakRssBytes": 68669440,
+          "medianMaxTimerLagMs": 0.12404700000000446,
+          "medianTimerTicksDuringWork": 0
+        }
+      },
+      "speedupVsCheerio": 6.182879588686661,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "cold/simple/large//8",
+      "kind": "cold",
+      "mode": "simple",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 1114.8281069999998,
+          "currentMedianMs": 1159.355813,
+          "improvementVsPrevious": 0.9615927176965816,
+          "medianBaselineRssBytes": 360464384,
+          "medianEndRssBytes": 2645782528,
+          "medianSampledPeakRssBytes": 2645913600,
+          "medianProcessLifetimePeakRssBytes": 2645782528,
+          "medianMaxTimerLagMs": 11.315990999999997,
+          "medianTimerTicksDuringWork": 190
+        },
+        "rusteerio": {
+          "metric": "coldInitializationAndWorkMs",
+          "previousMedianMs": 126.430586,
+          "currentMedianMs": 168.101232,
+          "improvementVsPrevious": 0.7521098120208899,
+          "medianBaselineRssBytes": 131936256,
+          "medianEndRssBytes": 333434880,
+          "medianSampledPeakRssBytes": 348094464,
+          "medianProcessLifetimePeakRssBytes": 351162368,
+          "medianMaxTimerLagMs": 33.645984,
+          "medianTimerTicksDuringWork": 19
+        }
+      },
+      "speedupVsCheerio": 6.896771660781164,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "stream/decodeStream/large/html/1",
+      "kind": "stream",
+      "mode": "decodeStream",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 1103.0035970000001,
+          "currentMedianMs": 1107.780256,
+          "improvementVsPrevious": 0.9956880807595835,
+          "medianBaselineRssBytes": 149426176,
+          "medianEndRssBytes": 698474496,
+          "medianSampledPeakRssBytes": 698474496,
+          "medianProcessLifetimePeakRssBytes": 699146240,
+          "medianMaxTimerLagMs": 1102.946817,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 289.349465,
+          "currentMedianMs": 346.214836,
+          "improvementVsPrevious": 0.8357512010259434,
+          "medianBaselineRssBytes": 139272192,
+          "medianEndRssBytes": 372588544,
+          "medianSampledPeakRssBytes": 372588544,
+          "medianProcessLifetimePeakRssBytes": 372588544,
+          "medianMaxTimerLagMs": 0.9046089999999936,
+          "medianTimerTicksDuringWork": 68
+        }
+      },
+      "speedupVsCheerio": 3.1996903102095833,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "stream/decodeStream/large/xml/1",
+      "kind": "stream",
+      "mode": "decodeStream",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 190.678334,
+          "currentMedianMs": 190.803321,
+          "improvementVsPrevious": 0.9993449432675231,
+          "medianBaselineRssBytes": 125956096,
+          "medianEndRssBytes": 230846464,
+          "medianSampledPeakRssBytes": 230846464,
+          "medianProcessLifetimePeakRssBytes": 230846464,
+          "medianMaxTimerLagMs": 189.730129,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 105.479439,
+          "currentMedianMs": 161.999614,
+          "improvementVsPrevious": 0.6511091995564878,
+          "medianBaselineRssBytes": 103854080,
+          "medianEndRssBytes": 275968000,
+          "medianSampledPeakRssBytes": 275968000,
+          "medianProcessLifetimePeakRssBytes": 275968000,
+          "medianMaxTimerLagMs": 0.7239819999999924,
+          "medianTimerTicksDuringWork": 32
+        }
+      },
+      "speedupVsCheerio": 1.177801084143324,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "stream/decodeStream/large/html/8",
+      "kind": "stream",
+      "mode": "decodeStream",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 596.86833,
+          "currentMedianMs": 592.339215,
+          "improvementVsPrevious": 1.0076461508630659,
+          "medianBaselineRssBytes": 149381120,
+          "medianEndRssBytes": 688132096,
+          "medianSampledPeakRssBytes": 709296128,
+          "medianProcessLifetimePeakRssBytes": 688201728,
+          "medianMaxTimerLagMs": 594.216553,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 289.623932,
+          "currentMedianMs": 341.086352,
+          "improvementVsPrevious": 0.8491220193999438,
+          "medianBaselineRssBytes": 138850304,
+          "medianEndRssBytes": 372064256,
+          "medianSampledPeakRssBytes": 372064256,
+          "medianProcessLifetimePeakRssBytes": 372064256,
+          "medianMaxTimerLagMs": 0.8020779999999945,
+          "medianTimerTicksDuringWork": 67
+        }
+      },
+      "speedupVsCheerio": 1.7366253780802112,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "stream/decodeStream/large/xml/8",
+      "kind": "stream",
+      "mode": "decodeStream",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 124.677481,
+          "currentMedianMs": 119.84757900000001,
+          "improvementVsPrevious": 1.0403003718581583,
+          "medianBaselineRssBytes": 125960192,
+          "medianEndRssBytes": 228712448,
+          "medianSampledPeakRssBytes": 228712448,
+          "medianProcessLifetimePeakRssBytes": 228712448,
+          "medianMaxTimerLagMs": 115.23202799999999,
+          "medianTimerTicksDuringWork": 0
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 106.07265100000001,
+          "currentMedianMs": 162.278246,
+          "improvementVsPrevious": 0.6536467679099761,
+          "medianBaselineRssBytes": 103288832,
+          "medianEndRssBytes": 275357696,
+          "medianSampledPeakRssBytes": 275357696,
+          "medianProcessLifetimePeakRssBytes": 275357696,
+          "medianMaxTimerLagMs": 0.6331299999999942,
+          "medianTimerTicksDuringWork": 32
+        }
+      },
+      "speedupVsCheerio": 0.7385313925564614,
+      "rustFasterThanCheerio": false
+    },
+    {
+      "id": "retention/boundedLiveDom///1",
+      "kind": "retention",
+      "mode": "boundedLiveDom",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 731.843925,
+          "currentMedianMs": 593.2778920000001,
+          "improvementVsPrevious": 1.233560081824185,
+          "medianBaselineRssBytes": 82026496,
+          "medianEndRssBytes": 92962816,
+          "medianSampledPeakRssBytes": 94044160,
+          "medianProcessLifetimePeakRssBytes": 94990336,
+          "medianMaxTimerLagMs": 36.236682,
+          "medianTimerTicksDuringWork": 20,
+          "medianRssGrowthAfterFirstCheckpointBytes": 761856,
+          "medianFinalHeapUsedBytes": 13377616
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 544.925885,
+          "currentMedianMs": 614.7605629999999,
+          "improvementVsPrevious": 0.8864034516800975,
+          "medianBaselineRssBytes": 62984192,
+          "medianEndRssBytes": 97579008,
+          "medianSampledPeakRssBytes": 97869824,
+          "medianProcessLifetimePeakRssBytes": 98758656,
+          "medianMaxTimerLagMs": 35.480137,
+          "medianTimerTicksDuringWork": 20,
+          "medianRssGrowthAfterFirstCheckpointBytes": 15212544,
+          "medianFinalHeapUsedBytes": 7915760
+        }
+      },
+      "speedupVsCheerio": 0.9650552226460891,
+      "rustFasterThanCheerio": false
+    },
+    {
+      "id": "concurrent/simple/medium//1",
+      "kind": "concurrent",
+      "mode": "simple",
+      "budget": 1,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 551.3358390000003,
+          "currentMedianMs": 485.0653050000001,
+          "improvementVsPrevious": 1.1366218802229118,
+          "medianBaselineRssBytes": 422686720,
+          "medianEndRssBytes": 423510016,
+          "medianSampledPeakRssBytes": 423510016,
+          "medianProcessLifetimePeakRssBytes": 424296448,
+          "medianMaxTimerLagMs": 5.487985999999637,
+          "medianTimerTicksDuringWork": 89
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 98.667487,
+          "currentMedianMs": 106.58366999999998,
+          "improvementVsPrevious": 0.925727993791169,
+          "medianBaselineRssBytes": 93339648,
+          "medianEndRssBytes": 93339648,
+          "medianSampledPeakRssBytes": 93339648,
+          "medianProcessLifetimePeakRssBytes": 93974528,
+          "medianMaxTimerLagMs": 8.43320800000015,
+          "medianTimerTicksDuringWork": 19
+        }
+      },
+      "speedupVsCheerio": 4.551028361098846,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "concurrent/simple/medium//2",
+      "kind": "concurrent",
+      "mode": "simple",
+      "budget": 2,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 405.5951100000002,
+          "currentMedianMs": 316.9424940000001,
+          "improvementVsPrevious": 1.2797119909077261,
+          "medianBaselineRssBytes": 549842944,
+          "medianEndRssBytes": 550723584,
+          "medianSampledPeakRssBytes": 550723584,
+          "medianProcessLifetimePeakRssBytes": 552656896,
+          "medianMaxTimerLagMs": 6.703078999999889,
+          "medianTimerTicksDuringWork": 56
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 55.73439999999994,
+          "currentMedianMs": 59.95460700000001,
+          "improvementVsPrevious": 0.9296099630842368,
+          "medianBaselineRssBytes": 97202176,
+          "medianEndRssBytes": 97202176,
+          "medianSampledPeakRssBytes": 97202176,
+          "medianProcessLifetimePeakRssBytes": 97755136,
+          "medianMaxTimerLagMs": 8.12924700000002,
+          "medianTimerTicksDuringWork": 9
+        }
+      },
+      "speedupVsCheerio": 5.28637430648157,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "concurrent/simple/medium//4",
+      "kind": "concurrent",
+      "mode": "simple",
+      "budget": 4,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 248.37102400000003,
+          "currentMedianMs": 202.224964,
+          "improvementVsPrevious": 1.2281917083194538,
+          "medianBaselineRssBytes": 906309632,
+          "medianEndRssBytes": 914829312,
+          "medianSampledPeakRssBytes": 914829312,
+          "medianProcessLifetimePeakRssBytes": 914829312,
+          "medianMaxTimerLagMs": 4.112630999999965,
+          "medianTimerTicksDuringWork": 37
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 32.575109,
+          "currentMedianMs": 34.28081700000001,
+          "improvementVsPrevious": 0.9502430761787266,
+          "medianBaselineRssBytes": 100388864,
+          "medianEndRssBytes": 100388864,
+          "medianSampledPeakRssBytes": 100388864,
+          "medianProcessLifetimePeakRssBytes": 101044224,
+          "medianMaxTimerLagMs": 2.894822999999974,
+          "medianTimerTicksDuringWork": 5
+        }
+      },
+      "speedupVsCheerio": 5.899070725181373,
+      "rustFasterThanCheerio": true
+    },
+    {
+      "id": "concurrent/simple/medium//8",
+      "kind": "concurrent",
+      "mode": "simple",
+      "budget": 8,
+      "engines": {
+        "cheerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 135.04902800000002,
+          "currentMedianMs": 112.55049499999996,
+          "improvementVsPrevious": 1.1998972372356076,
+          "medianBaselineRssBytes": 1266937856,
+          "medianEndRssBytes": 1327230976,
+          "medianSampledPeakRssBytes": 1327230976,
+          "medianProcessLifetimePeakRssBytes": 1327230976,
+          "medianMaxTimerLagMs": 2.2597039999999424,
+          "medianTimerTicksDuringWork": 22
+        },
+        "rusteerio": {
+          "metric": "elapsedMs",
+          "previousMedianMs": 20.033762999999965,
+          "currentMedianMs": 19.06641300000001,
+          "improvementVsPrevious": 1.0507358148593526,
+          "medianBaselineRssBytes": 107122688,
+          "medianEndRssBytes": 107122688,
+          "medianSampledPeakRssBytes": 107122688,
+          "medianProcessLifetimePeakRssBytes": 107716608,
+          "medianMaxTimerLagMs": 2.3470709999999997,
+          "medianTimerTicksDuringWork": 2
+        }
+      },
+      "speedupVsCheerio": 5.903076525196422,
+      "rustFasterThanCheerio": true
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+name: Bug report
+description: Report a parsing, compatibility, native loading or performance problem.
+title: "[Bug]: "
+body:
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Describe the actual and expected output. For compatibility reports, include Cheerio 1.2.0's output.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Include a small HTML/XML input, parser options and executable JavaScript or TypeScript.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include rusteerio and Node versions, OS, architecture and worker setting.
+    validations:
+      required: true

@@ -1,0 +1,141 @@
+{
+  "name": "cheerox",
+  "version": "0.22.0",
+  "description": "Cheerio 0.22.0-compatible HTML/XML processing on a Rust engine, with parallel, non-blocking extraction",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dvaJi/cheerox.git"
+  },
+  "homepage": "https://github.com/dvaJi/cheerox#readme",
+  "bugs": {
+    "url": "https://github.com/dvaJi/cheerox/issues"
+  },
+  "keywords": [
+    "cheerio",
+    "rust",
+    "html",
+    "scraping",
+    "napi",
+    "parallel"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json",
+    "./slim": {
+      "import": {
+        "types": "./dist/slim.d.mts",
+        "default": "./dist/slim.mjs"
+      },
+      "require": {
+        "types": "./dist/slim.d.ts",
+        "default": "./dist/slim.cjs"
+      }
+    },
+    "./utils": {
+      "import": {
+        "types": "./dist/utils.d.mts",
+        "default": "./dist/utils.mjs"
+      },
+      "require": {
+        "types": "./dist/utils.d.ts",
+        "default": "./dist/utils.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "*.node",
+    "src",
+    "native/src",
+    "Cargo.toml",
+    "Cargo.lock",
+    "build.rs",
+    "tsconfig.json",
+    "tsup.config.ts",
+    "scripts/check-native.mjs",
+    "scripts/check-release.mjs",
+    "scripts/fix-declarations.mjs",
+    "scripts/generate-notices.mjs",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "RELEASING.md",
+    "scripts/notices",
+    "native/vendor"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "overrides": {
+    "esbuild": "0.28.2"
+  },
+  "scripts": {
+    "build": "npm run build:native && npm run build:ts",
+    "build:native": "napi build --platform --release --js false --dts native-binding.d.ts",
+    "build:ts": "tsup && node scripts/fix-declarations.mjs",
+    "check": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs bench/*.test.mjs bench/suite/*.test.mjs",
+    "test:types": "tsc -p test/tsconfig.json --noEmit",
+    "bench": "node bench/benchmark.mjs",
+    "prepack": "npm run build:ts && node scripts/check-native.mjs",
+    "prepublishOnly": "npm run release:check",
+    "test:upstream": "node scripts/check-upstream.mjs && vitest run --config vitest.config.mts",
+    "test:package": "node scripts/test-package.mjs",
+    "bench:engine": "node bench/engine.mjs",
+    "bench:fair": "node --expose-gc bench/fair.mjs",
+    "bench:operations": "node bench/operations.mjs",
+    "bench:gate": "node bench/gate.mjs",
+    "release:check": "node scripts/check-release.mjs",
+    "notices:generate": "node scripts/generate-notices.mjs",
+    "notices:check": "node scripts/generate-notices.mjs --check"
+  },
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.4",
+    "@types/node": "^22.19.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "4.1.11",
+    "cheerio": "1.2.0",
+    "domhandler": "^5.0.3",
+    "domutils": "^3.2.2",
+    "encoding-sniffer": "^0.2.1"
+  },
+  "napi": {
+    "name": "cheerox",
+    "triples": {
+      "defaults": false,
+      "additional": [
+        "x86_64-unknown-linux-gnu",
+        "aarch64-unknown-linux-gnu",
+        "x86_64-unknown-linux-musl",
+        "aarch64-unknown-linux-musl",
+        "x86_64-apple-darwin",
+        "aarch64-apple-darwin",
+        "x86_64-pc-windows-msvc",
+        "aarch64-pc-windows-msvc"
+      ]
+    }
+  },
+  "author": {
+    "name": "Context.dev team",
+    "url": "https://context.dev"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

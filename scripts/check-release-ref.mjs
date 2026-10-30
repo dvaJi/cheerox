@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { appendFileSync } from 'node:fs';
+import { validateMetadata, validateVersion } from './check-release.mjs';
+
+const version = process.env.RELEASE_VERSION;
+const distTag = process.env.NPM_DIST_TAG;
+const tag = validateVersion(version, distTag);
+assert.equal(process.env.GITHUB_EVENT_NAME, 'workflow_dispatch', 'Publishing requires an explicit workflow dispatch');
+assert.equal(process.env.GITHUB_REF, 'refs/heads/main', 'Dispatch the release workflow from main');
+assert.equal(process.env.GITHUB_REPOSITORY, 'dvaJi/cheerox', 'Publishing from a fork is disabled');
+assert.equal(process.env.REPOSITORY_VISIBILITY, 'public', 'Make the repository public before releasing with npm provenance');
+const git = args => execFileSync('git', args, { encoding: 'utf8' }).trim();
+const commit = git(['rev-parse', `refs/tags/${tag}^{commit}`]);
+assert.equal(commit, process.env.GITHUB_SHA, 'The version tag must point to this exact main workflow commit so npm provenance identifies the built source');
+assert.equal(git(['rev-parse', 'HEAD']), commit, 'The release checkout must match the version tag');
+execFileSync('git', ['merge-base', '--is-ancestor', commit, 'refs/remotes/origin/main']);
+const metadata = JSON.parse(git(['show', `${commit}:package.json`]));
+assert.equal(metadata.version, version, 'The tag and package version differ');
+validateMetadata(metadata, git(['show', `${commit}:Cargo.toml`]));
+assert.ok(process.env.GITHUB_OUTPUT, 'This reference check runs inside the release workflow');
+appendFileSync(process.env.GITHUB_OUTPUT, `commit=${commit}\nversion=${version}\ntag=${tag}\n`);
+console.log(`Validated ${tag} at ${commit} for npm ${distTag}.`);

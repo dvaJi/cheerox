@@ -1,0 +1,11 @@
+node_modules/
+target/
+dist/
+*.node
+native-binding.d.ts
+*.tgz
+.DS_Store
+.boat-state.json
+bench/corpus/pages/
+
+target/

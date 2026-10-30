@@ -1,0 +1,6 @@
+01:41:03 done ops jsdom extract
+01:41:38 done ops rusteerio extract
+01:42:02 done mem jsdom 
+01:42:24 done ops node-html-parser parse
+01:42:40 done ops htmlparser2 parse
+JOBS_DONE

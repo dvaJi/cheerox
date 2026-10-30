@@ -1,0 +1,6 @@
+{"lib": "cheerio", "op": "parse", "repeats": 5, "pages": 3000, "timesMs": [27048.7, 26800.1, 26009.9, 26108.4, 28712.4], "medianMs": 26800.1, "msPerPage": 8.9334, "mbPerSec": 19.04, "vm": "bx_r9xrbqe3"}
+{"lib": "cheerio", "op": "extract", "repeats": 5, "pages": 3000, "timesMs": [33072.5, 28890.8, 32223, 37948.2, 59999], "medianMs": 33072.5, "msPerPage": 11.0242, "mbPerSec": 15.43, "vm": "bx_r9xrbqe3"}
+{"lib": "cheerio", "op": "serialize", "repeats": 5, "pages": 3000, "timesMs": [35146.6, 31324.1, 25619.8, 23934.2, 24597.7], "medianMs": 25619.8, "msPerPage": 8.5399, "mbPerSec": 19.91, "vm": "bx_r9xrbqe3"}
+{"lib": "parse5", "op": "parse", "repeats": 5, "pages": 3000, "timesMs": [11353.8, 10613.7, 10319.1, 10219.1, 10148.6], "medianMs": 10319.1, "msPerPage": 3.4397, "mbPerSec": 49.44, "vm": "bx_r9xrbqe3"}
+{"lib": "parse5", "op": "extract", "repeats": 5, "pages": 3000, "timesMs": [10432.8, 9942.2, 9997, 9381.5, 9059], "medianMs": 9942.2, "msPerPage": 3.3141, "mbPerSec": 51.31, "vm": "bx_r9xrbqe3"}
+{"lib": "parse5", "op": "serialize", "repeats": 5, "pages": 3000, "timesMs": [11904.9, 12491.4, 11696.8, 11350.7, 11318.2], "medianMs": 11696.8, "msPerPage": 3.8989, "mbPerSec": 43.62, "vm": "bx_r9xrbqe3"}

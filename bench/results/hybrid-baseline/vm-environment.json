@@ -1,0 +1,25 @@
+{
+  "environment": "VM",
+  "machineType": "large",
+  "vcpus": 8,
+  "memoryGiB": 16,
+  "accountEnvironmentIncluded": false,
+  "snapshotsEnabled": false,
+  "ttlSeconds": 14400,
+  "node": "v24.18.1",
+  "npm": "11.16.0",
+  "rustc": "1.97.1 (8bab26f4f 2026-07-14)",
+  "cargo": "1.97.1 (c980f4866 2026-06-30)",
+  "architecture": "x86_64",
+  "kernel": "Linux 6.8.0-117-generic",
+  "operatingSystem": "Ubuntu",
+  "createdAt": "2026-10-12T23:29:32Z",
+  "status": "stopped",
+  "stoppedAt": "2026-10-12T23:38:43.608076+00:00",
+  "ephemeralStorageRemovedOnStop": true,
+  "testedNodeVersions": [
+    "20.19.0",
+    "22.23.3",
+    "24.18.1"
+  ]
+}

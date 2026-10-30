@@ -1,0 +1,74 @@
+{
+  "validatedAt": "2026-10-12T23:37:19.735797+00:00",
+  "environment": "VM",
+  "platform": "linux-x64-gnu",
+  "rust": {
+    "toolchain": "1.97.1",
+    "testsPassed": 9,
+    "testsFailed": 0,
+    "formatCheck": "passed",
+    "clippyAllTargetsWarningsDenied": "passed",
+    "releaseAddonBuild": "passed"
+  },
+  "typescript": {
+    "build": "passed",
+    "sourceTypecheck": "passed",
+    "commonJsAndEsmConsumerTypecheck": "passed"
+  },
+  "nodeVersions": [
+    {
+      "version": "24.18.1",
+      "runtimeTestsPassed": 60,
+      "upstreamTestsPassed": 739,
+      "failed": 0,
+      "packedTarball": {
+        "commonJs": "passed",
+        "esm": "passed",
+        "slimSubpath": "passed",
+        "utilsSubpath": "passed",
+        "rustAddon": "passed",
+        "parallelExtraction": "passed"
+      }
+    },
+    {
+      "version": "22.23.3",
+      "runtimeTestsPassed": 60,
+      "upstreamTestsPassed": 739,
+      "failed": 0,
+      "packedTarball": {
+        "commonJs": "passed",
+        "esm": "passed",
+        "slimSubpath": "passed",
+        "utilsSubpath": "passed",
+        "rustAddon": "passed",
+        "parallelExtraction": "passed"
+      }
+    },
+    {
+      "version": "20.19.0",
+      "runtimeTestsPassed": 60,
+      "upstreamTestsPassed": 739,
+      "failed": 0,
+      "packedTarball": {
+        "commonJs": "passed",
+        "esm": "passed",
+        "slimSubpath": "passed",
+        "utilsSubpath": "passed",
+        "rustAddon": "passed",
+        "parallelExtraction": "passed"
+      }
+    }
+  ],
+  "sourceSha256": {
+    "Cargo.toml": "e2d82c45be37e4749c20eb7e9abefccb2498ea5d7acec8e2834f49f2f20b8f56",
+    "Cargo.lock": "92c89bb01f40572617172fd755ede1eb1c3918abb2075ff9b4043d37b0ed2fd9",
+    "native/src/lib.rs": "d8888d692642b2456c1eaee4a01bb725a52d5ee00f70913c04f348b4c52d334c",
+    "native/src/sink.rs": "cbbea8f0246fbe927a5ca71a85788d6076ddaffbd1e39379036ea83f54247e4b",
+    "src/index.ts": "3032dd16940cbdf788bcdd2e536318f37890e1199cc03b83b033ff65e460f720",
+    "src/native.ts": "9be0b87a252715c0817ad962db4c7e5fd05073c8ed1983e41e5f0472cdcaeb47",
+    "src/slim.ts": "a502b28e09040ebc293dbf9d58a1a5035fa561d63e7a58a82f67eb123f61797f",
+    "src/utils.ts": "4938947abe3daeada5b50681555b37b22a9e23da581c97981dffaeb1c4c286e6",
+    "package.json": "388d2a758f0894a41e731a6405cfd149167fc9f02627b489dd604c226900ab2c",
+    "package-lock.json": "341cf11cbc0480adbe9013775792ece5f45f62adeacbb223efe9e09d572f3420"
+  }
+}
