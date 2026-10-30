@@ -286,7 +286,7 @@ function formatAttrs(attribs: Record<string, string> | undefined, opts: LegacyOp
   return output;
 }
 
-function renderWith(opts: LegacyOptions, dom: unknown): string {
+function renderWith(opts: LegacyOptions, dom: unknown, parentName?: string): string {
   let output = '';
   const nodes = Array.isArray(dom) || (dom && typeof dom === 'object' && 'length' in (dom as object))
     ? Array.from(dom as ArrayLike<LegacyNode>)
@@ -298,7 +298,7 @@ function renderWith(opts: LegacyOptions, dom: unknown): string {
     else if (elem.type === 'directive') output += `<${elem.data}>`;
     else if (elem.type === 'comment') output += `<!--${elem.data}-->`;
     else if (elem.type === 'cdata') output += `<![CDATA[${elem.children && elem.children[0] ? elem.children[0].data : ''}]]>`;
-    else output += renderText(elem, opts);
+    else output += renderText(elem, opts, parentName);
   }
   return output;
 }
@@ -313,15 +313,15 @@ function renderTag(elem: LegacyNode, opts: LegacyOptions): string {
     tag += '/>';
   } else {
     tag += '>';
-    if (elem.children) tag += renderWith(effective, elem.children);
+    if (elem.children) tag += renderWith(effective, elem.children, elem.name);
     if (!singleTag[elem.name as string] || effective.xmlMode) tag += `</${elem.name}>`;
   }
   return tag;
 }
 
-function renderText(elem: LegacyNode, opts: LegacyOptions): string {
+function renderText(elem: LegacyNode, opts: LegacyOptions, parentName?: string): string {
   let data = elem.data || '';
-  if (opts.decodeEntities && !(elem.parent && elem.parent.name !== undefined && elem.parent.name in unencodedElements)) {
+  if (opts.decodeEntities && !(parentName !== undefined && parentName in unencodedElements)) {
     data = encodeXML(data);
   }
   return data;
@@ -1977,10 +1977,22 @@ function staticText(this: any, elems?: ArrayLike<LegacyNode>): string {
   if (!elems) {
     elems = staticRoot.call(this) as unknown as ArrayLike<LegacyNode>;
   }
+  const list = Array.from(elems ?? []) as LegacyNode[];
+  if (list.length) {
+    // The native text extraction is the same traversal, one call deep.
+    const document = bindingOf(list[0])?.document;
+    if (document) {
+      const ids = idsOf(document, list);
+      if (ids.length) {
+        const text = document.text(ids);
+        if (typeof text === 'string') return text;
+      }
+    }
+  }
   let ret = '';
-  const len = elems.length;
+  const len = list.length;
   for (let i = 0; i < len; i++) {
-    const elem = (elems as ArrayLike<LegacyNode>)[i];
+    const elem = list[i];
     if (elem.type === 'text') ret += elem.data;
     else if (elem.children && elem.type !== 'comment') {
       ret += staticText(elem.children);

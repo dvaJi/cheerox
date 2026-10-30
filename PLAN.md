@@ -66,7 +66,7 @@ for the pinned revisions.
   writes on attached nodes fight the engine's invariants (a detached
   `next` target makes the written node vanish) and are never used.
 
-### Phase E — Verification (IN PROGRESS)
+### Phase E — Verification (MOSTLY DONE)
 - [x] Legacy suite at oracle parity (576/577, same failing test).
 - [x] Differential harness `scripts/differential.mjs` (`npm run
   test:differential`): 55 operations — selections, traversal, attributes,
@@ -74,24 +74,42 @@ for the pinned revisions.
   malformed pages — 55/55 match. Report: `test/differential/report.json`.
 - [x] Modern suites stay green: `npm test` 514/514, upstream 777/777,
   cargo 57/57.
-- [ ] Package installation checks: adapt `scripts/test-package.mjs` to the
-  new entry points and run it against a packed tarball.
-- [ ] TypeScript consumer tests: extend `test/tsconfig.json` targets with
-  legacy CJS/ESM/`cheerox/modern` import shapes.
-- [ ] Benchmarks: `bench/` currently compares modern vs cheerio@1.2.0. Add
-  a legacy-vs-oracle benchmark (`bench/legacy.mjs`) covering parse-only,
-  parse+query, attr/text extraction, mutations, serialization, cold start,
-  memory. Keep sync vs async separate.
+- [x] Package installation checks: `scripts/test-package.mjs` packs the
+  tarball, installs it into a clean project, and verifies the callable
+  legacy root, ESM named surface, `cheerox/modern`, and parallel
+  extraction (`npm run test:package`).
+- [x] TypeScript consumer tests: `test/consumer-legacy.cts/.mts` (callable
+  CJS import, legacy selector signatures, ESM named/default) plus the
+  modern consumers; `npm run test:types` green. `dist/index.d.ts` is a
+  hand-written function+namespace `export =` declaration (see
+  `scripts/write-entrypoints.mjs`; const+namespace merges are
+  module-illegal, function+namespace merges are not).
+- [x] Benchmarks: `bench/legacy.mjs` (`npm run bench:legacy`) — parse
+  1.8–2.3x faster than cheerio@0.22.0; per-node operations slower
+  (measured honestly, outputs verified). Report: docs/BENCHMARK.md.
 
-### Phase F — Documentation and release readiness (NOT STARTED)
-- [ ] Rewrite README.md for cheerox (installation, 0.22.0 compatibility,
-  modern extras, benchmarks, credits).
+### Phase F — Documentation and release readiness (PARTIALLY DONE)
+- [x] README.md rewritten for cheerox.
+- [x] docs/BENCHMARK.md with the measured profile.
 - [ ] Validate the 8 native targets build (`napi build` matrix) or reuse
   Rusteerio's release workflow (.github/workflows) with the new names.
-- [ ] `npm pack` + clean-room install test in a temp project for
-  require/import/TS/bundler consumption.
 - [ ] Review LICENSE/THIRD_PARTY_NOTICES generation for the renamed
-  package.
+  package (`npm run notices:check`).
+
+## Known performance profile (see docs/BENCHMARK.md)
+
+Faster: parsing (1.8–2.3x). Slower than the oracle today: per-node
+operations over loaded trees (queries 0.58x, mutations 0.17x, serialization
+0.31x) because the facade materializes live views over the native arena
+while 0.22.0 operates on plain JS objects from parse time. Next planned
+optimizations, in order of expected payoff:
+
+1. Native port of the dom-serializer 0.1.x rules (removes per-node hops in
+   all `$.html()`/`.html()`/`toString()` paths).
+2. A scoped-select native op that returns matches for `{selector,
+   contextIds, roots}` in one call (removes the `select('*')`
+   materialization step in `scopedSelect`).
+3. Batched attribute writes for `attr(map)`/`addClass` loops.
 
 ## Key architectural decisions
 

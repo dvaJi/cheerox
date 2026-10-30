@@ -106,6 +106,7 @@
     "test:native": "cargo test",
     "test:compat": "npm run test:legacy && npm run test:upstream",
     "bench": "node bench/benchmark.mjs",
+    "bench:legacy": "node bench/legacy.mjs",
     "prepack": "npm run build:ts && node scripts/check-native.mjs",
     "prepublishOnly": "npm run release:check",
     "test:upstream": "node scripts/check-upstream.mjs && vitest run --config vitest.config.mts",
