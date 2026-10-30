@@ -11,7 +11,10 @@ export function createTokenizerSession(options: CheerioOptions): { write(chunk: 
   const callbacks = Object.fromEntries(tokenCallbacks.map((name) => [name, (...args: number[]) => {
     if (name === 'ontextentity' || name === 'onattribentity') {
       const codePoint = +args[0];
-      String.fromCodePoint(codePoint);
+      // Validate through an indirect call: a bare known-builtin statement is
+      // optimized away by the bundler's pure-built-in pass, which would drop
+      // the RangeError the 0.22.0-facing behavior depends on.
+      (0, String.fromCodePoint)(codePoint);
       args[0] = codePoint;
     }
     events.push([name, ...args]);

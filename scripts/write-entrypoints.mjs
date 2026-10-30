@@ -10,7 +10,7 @@
  * the legacy/modern bundles.
  */
 import assert from 'node:assert/strict';
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -81,6 +81,14 @@ export = cheerio;
 // A real CommonJS declaration twin: importing the .cjs directly resolves
 // index.d.cts, not the exports map.
 copyFileSync(dist + 'index.d.ts', dist + 'index.d.cts');
+
+// tsdown emits CJS declarations as .d.cts; publish .d.ts twins so tooling
+// that assumes a plain .d.ts still resolves the CJS-flavored declarations.
+for (const name of readdirSync(dist).filter((file) => file.endsWith('.d.cts'))) {
+  const twin = dist + name.slice(0, -6) + '.d.ts';
+  if (name === 'index.d.cts') continue; // the hand-written export= declaration wins
+  copyFileSync(dist + name, twin);
+}
 
 assert.match(readFileSync(dist + 'index.d.ts', 'utf8'), /export = cheerio;/, 'index.d.ts must declare the callable export=');
 assert.match(readFileSync(dist + 'index.d.ts', 'utf8'), /declare function cheerio/, 'index.d.ts must declare the callable function');
