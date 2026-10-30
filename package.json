@@ -74,7 +74,7 @@
     "Cargo.lock",
     "build.rs",
     "tsconfig.json",
-    "tsup.config.ts",
+    "tsdown.config.ts",
     "scripts/check-native.mjs",
     "scripts/check-release.mjs",
     "scripts/fix-declarations.mjs",
