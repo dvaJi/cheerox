@@ -51,6 +51,14 @@ jobs:
         if: ${{ !inputs.release }}
       - run: npm ci
       - run: npm run build
+      - name: DEBUG native binary state
+        if: ${{ !inputs.release }}
+        shell: bash
+        run: |
+          echo "--- root .node files ---"
+          ls -la *.node || echo "NO .node AT ROOT"
+          echo "--- dist .node files ---"
+          ls -la dist/*.node 2>/dev/null || echo "none in dist"
       - run: cargo fmt --all -- --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test
