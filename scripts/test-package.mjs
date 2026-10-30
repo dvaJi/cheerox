@@ -29,14 +29,14 @@ try {
   }
   runNpm(['install', '--ignore-scripts', '--no-audit', '--no-fund', '--prefix', directory, tarball], directory);
   const installed = JSON.parse(runNpm(['ls', '--all', '--omit=dev', '--json'], directory));
-  assert.deepEqual(Object.keys(installed.dependencies?.cheerox?.dependencies ?? {}), [], 'installed package has no transitive npm dependencies');
+  assert.deepEqual(Object.keys(installed.dependencies?.["@dvaji/cheerox"]?.dependencies ?? {}), [], 'installed package has no transitive npm dependencies');
 
   // The root entry: the callable, Cheerio 0.22.0-compatible CommonJS module
   // plus the additive modern extensions; both module systems.
   for (const mode of ['commonjs', 'module']) {
     const source = mode === 'module'
-      ? 'import r from "cheerox"; import * as named from "cheerox"; import * as modern from "cheerox/modern";'
-      : 'const r = require("cheerox"); const named = r; const modern = require("cheerox/modern");';
+      ? 'import r from "@dvaji/cheerox"; import * as named from "@dvaji/cheerox"; import * as modern from "@dvaji/cheerox/modern";'
+      : 'const r = require("@dvaji/cheerox"); const named = r; const modern = require("@dvaji/cheerox/modern");';
     execFileSync(process.execPath, [`--input-type=${mode}`, '-e', source + `
       const assert = ${mode === 'module' ? '(await import("node:assert/strict")).default' : 'require("node:assert/strict")'};
       // Callable legacy surface
@@ -63,8 +63,8 @@ try {
   // The 1.2.0-style facade and helper entries keep working.
   for (const mode of ['commonjs', 'module']) {
     const source = mode === 'module'
-      ? 'import * as slim from "cheerox/slim"; import * as utils from "cheerox/utils"; import * as modern from "cheerox/modern";'
-      : 'const slim = require("cheerox/slim"), utils = require("cheerox/utils"), modern = require("cheerox/modern");';
+      ? 'import * as slim from "@dvaji/cheerox/slim"; import * as utils from "@dvaji/cheerox/utils"; import * as modern from "@dvaji/cheerox/modern";'
+      : 'const slim = require("@dvaji/cheerox/slim"), utils = require("@dvaji/cheerox/utils"), modern = require("@dvaji/cheerox/modern");';
     execFileSync(process.execPath, [`--input-type=${mode}`, '-e', source + `
       const assert = ${mode === 'module' ? '(await import("node:assert/strict")).default' : 'require("node:assert/strict")'};
       assert.equal(slim.load("<h1>Slim</h1>")("h1").text(), "Slim");

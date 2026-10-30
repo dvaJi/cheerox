@@ -21,7 +21,7 @@ export function validateVersion(version, distTag = 'latest') {
 }
 
 export function validateMetadata(metadata, cargo) {
-  assert.equal(metadata.name, 'cheerox');
+  assert.equal(metadata.name, '@dvaji/cheerox');
   validateVersion(metadata.version, metadata.version.includes('-') ? 'next' : 'latest');
   assert.equal(metadata.license, 'MIT');
   assert.notEqual(metadata.private, true, 'The release package cannot be private');

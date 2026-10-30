@@ -91,11 +91,11 @@ jobs:
         env:
           SOURCE_COMMIT: ${{ needs.release-ref.outputs.commit }}
       - name: Test the artifact being published
-        run: npm run test:package -- "release/cheerox-${RELEASE_VERSION}.tgz"
+        run: npm run test:package -- "release/dvaji-cheerox-${RELEASE_VERSION}.tgz"
         env:
           RELEASE_VERSION: ${{ needs.release-ref.outputs.version }}
       - name: Publish the verified tarball with OIDC and provenance
-        run: npm publish "./release/cheerox-${RELEASE_VERSION}.tgz" --ignore-scripts --access public --provenance --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"
+        run: npm publish "./release/dvaji-cheerox-${RELEASE_VERSION}.tgz" --ignore-scripts --access public --provenance --registry=https://registry.npmjs.org/ --tag "$NPM_DIST_TAG"
         env:
           RELEASE_VERSION: ${{ needs.release-ref.outputs.version }}
           NPM_DIST_TAG: ${{ inputs.npm_tag }}

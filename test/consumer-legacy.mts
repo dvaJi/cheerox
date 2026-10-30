@@ -1,6 +1,6 @@
 // An ESM consumer of the cheerox root entry, type-checked both ways.
-import cheerio, { load as legacyLoad, html as staticHtml, version } from 'cheerox';
-import * as named from 'cheerox';
+import cheerio, { load as legacyLoad, html as staticHtml, version } from '@dvaji/cheerox';
+import * as named from '@dvaji/cheerox';
 
 const $ = cheerio.load('<p>ESM default</p>');
 const text: string = $('p').text();

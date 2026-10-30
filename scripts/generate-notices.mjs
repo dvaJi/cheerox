@@ -20,7 +20,7 @@ const metadata = JSON.parse(execFileSync(process.env.CARGO || 'cargo', [
 ], { cwd: root, encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 }));
 const vendored = new Set(['html5ever@0.35.0', 'markup5ever@0.35.0', 'html5gum@0.8.4']);
 for (const pkg of metadata.packages) {
-  if (!pkg.source && pkg.name !== 'cheerox' && !vendored.has(`${pkg.name}@${pkg.version}`)) throw new Error(`Review notices for the new local dependency ${pkg.name}@${pkg.version}`);
+  if (!pkg.source && pkg.name !== '@dvaji/cheerox' && !vendored.has(`${pkg.name}@${pkg.version}`)) throw new Error(`Review notices for the new local dependency ${pkg.name}@${pkg.version}`);
 }
 const packages = metadata.packages.filter((pkg) => pkg.source || vendored.has(`${pkg.name}@${pkg.version}`))
   .sort((a, b) => compare(a.name, b.name) || compare(a.version, b.version));

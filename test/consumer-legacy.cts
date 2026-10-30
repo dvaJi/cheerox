@@ -1,5 +1,5 @@
 // A Cheerio 0.22.0-era CommonJS consumer, type-checked against cheerox.
-import cheerio = require('cheerox');
+import cheerio = require('@dvaji/cheerox');
 
 const $ = cheerio.load('<ul id="fruits"><li class="apple">Apple</li></ul>');
 const appleText: string = $('.apple').text();

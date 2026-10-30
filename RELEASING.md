@@ -1,6 +1,6 @@
 # Releasing cheerox
 
-The public npm package name is **`cheerox`**. Releases include all eight
+The public npm package name is **`@dvaji/cheerox`**. Releases include all eight
 native binaries, self-contained TypeScript declarations, source files and
 license notices. Consumers install no additional npm packages and need no
 Rust toolchain on supported platforms.
@@ -17,7 +17,7 @@ settings:
 | Field | Value |
 | --- | --- |
 | Organization | `dvaJi` |
-| Repository | `cheerox` |
+| Repository | `dvaJi/cheerox` |
 | Workflow filename | `publish.yml` |
 | Environment | `npm` |
 | Allowed action | Direct publishing with `npm publish` |

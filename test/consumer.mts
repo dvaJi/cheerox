@@ -1,6 +1,6 @@
-import * as cheerox from 'cheerox/modern';
+import * as cheerox from '@dvaji/cheerox/modern';
 import type { Cheerio, CheerioAPI, CheerioOptions, CheerioRequestOptions, load as cheerioLoad, fromURL as cheerioFromURL } from 'cheerio';
-import * as cheeroxSlim from 'cheerox/slim';
+import * as cheeroxSlim from '@dvaji/cheerox/slim';
 
 // @ts-expect-error Cheerio is exported only as a type, as in upstream Cheerio.
 void cheerox.Cheerio;

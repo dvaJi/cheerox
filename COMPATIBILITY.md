@@ -111,7 +111,7 @@ native engine supports them, but 0.22.0 did not, and parity wins.
 ## Modules and entry points
 
 ```js
-const cheerio = require('cheerox');      // callable, as in 0.22.0
+const cheerio = require('@dvaji/cheerox');      // callable, as in 0.22.0
 const $ = cheerio.load('<div/>');
 cheerio('<div>');                        // bare construction
 cheerio.html(element);                   // statics on the module
@@ -119,9 +119,9 @@ $('li', '#container');                   // legacy selector signatures
 $('li', '<ul><li>');
 $('li', 'ul', '<ul><li>');
 $.version; $.fn; $.root(); $.contains(); $.parseHTML();
-import * as cheerio from 'cheerox';      // ESM: named exports + callable default
-import cheerio from 'cheerox';
-import { loadAsync, extractAll } from 'cheerox';  // modern extras (additive)
+import * as cheerio from '@dvaji/cheerox';      // ESM: named exports + callable default
+import cheerio from '@dvaji/cheerox';
+import { loadAsync, extractAll } from '@dvaji/cheerox';  // modern extras (additive)
 import * as modern from 'cheerox/modern';         // full 1.2.0-style facade
 ```
 

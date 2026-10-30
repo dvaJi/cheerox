@@ -14,7 +14,7 @@ reference itself reproduces; see [COMPATIBILITY.md](COMPATIBILITY.md)).
 ## Installation
 
 ```sh
-npm install cheerox
+npm install @dvaji/cheerox
 ```
 
 Node.js 20.19+ is recommended. Prebuilt native binaries ship for macOS
@@ -24,7 +24,7 @@ toolchain needed at install time.
 ## The 0.22.0 API, unchanged
 
 ```js
-const cheerio = require('cheerox');
+const cheerio = require('@dvaji/cheerox');
 
 const $ = cheerio.load('<div class="item">Hello</div>');
 console.log($('.item').text()); // Hello
@@ -59,8 +59,8 @@ all verified by the upstream suite in [`test/legacy/`](test/legacy).
 TypeScript and ESM:
 
 ```ts
-import * as cheerio from 'cheerox';
-import cheerioDefault from 'cheerox';
+import * as cheerio from '@dvaji/cheerox';
+import cheerioDefault from '@dvaji/cheerox';
 const $ = cheerio.load('<p>typed</p>');
 ```
 
@@ -70,7 +70,7 @@ The engine's asynchronous, parallel capabilities stay available
 from the same package; they keep the legacy parsing defaults:
 
 ```ts
-import { configureWorkers, loadAsync, loadAll, extractAll, workerPoolInfo } from 'cheerox';
+import { configureWorkers, loadAsync, loadAll, extractAll, workerPoolInfo } from '@dvaji/cheerox';
 
 configureWorkers({ threads: 4 });
 const $ = await loadAsync(largeHtml);

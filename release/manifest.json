@@ -1,0 +1,18 @@
+{
+  "format": 1,
+  "name": "cheerox",
+  "version": "0.1.0",
+  "commit": "e443a8e783ec41d6d0f03ca2f19f92b54ae25ea8",
+  "filename": "cheerox-0.1.0.tgz",
+  "sha256": "19d48932e3fd2835bca862c1989b12917c90a11ebdafd11dcea6a340e510aabd",
+  "targets": [
+    "darwin-x64",
+    "darwin-arm64",
+    "linux-x64-gnu",
+    "linux-arm64-gnu",
+    "linux-x64-musl",
+    "linux-arm64-musl",
+    "win32-x64-msvc",
+    "win32-arm64-msvc"
+  ]
+}

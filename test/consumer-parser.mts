@@ -1,4 +1,4 @@
-import * as cheerox from 'cheerox/modern';
+import * as cheerox from '@dvaji/cheerox/modern';
 import { Tokenizer as ReferenceTokenizer } from 'htmlparser2-modern';
 import { adapter } from 'parse5-htmlparser2-tree-adapter';
 import type { ParserError as ReferenceParserError } from 'parse5';
