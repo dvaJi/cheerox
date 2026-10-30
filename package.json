@@ -120,7 +120,7 @@
     "notices:check": "node scripts/generate-notices.mjs --check"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^2.18.4",
+    "@napi-rs/cli": "^3.10.9",
     "@types/node": "^26.6.6",
     "cheerio": "1.2.0",
     "cheerio-legacy-reference": "npm:cheerio@^0.22.0",
