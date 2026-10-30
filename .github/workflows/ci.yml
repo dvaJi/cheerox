@@ -44,7 +44,6 @@ jobs:
       # Review and regenerate the bundled standard-library notices when changing Rust.
       - uses: dtolnay/rust-toolchain@1.99.0
         with:
-          toolchain: 1.99.0
           components: rustfmt, clippy
       - name: Check the reviewed Rust compiler
         run: node -e "require('node:assert/strict').equal(require('node:child_process').execFileSync('rustc', ['--version'], {encoding:'utf8'}).split(' ')[1], '1.99.0')"
@@ -91,7 +90,6 @@ jobs:
           cache: ${{ !inputs.release && 'npm' || '' }}
       - uses: dtolnay/rust-toolchain@1.99.0
         with:
-          toolchain: 1.99.0
           components: rustfmt, clippy
       - name: Check the reviewed Rust compiler and libc baseline
         run: |
