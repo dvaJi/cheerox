@@ -187,7 +187,7 @@ jobs:
       - run: npm run build:ts
       - run: node scripts/check-native.mjs --all
       - run: npm run release:check
-      - run: mkdir release
+      - run: mkdir -p release
       - run: npm pack --ignore-scripts --pack-destination release
       - name: Verify the exact release tarball
         run: npm run release:check -- --tarball release --commit "$SOURCE_COMMIT" --manifest release/manifest.json

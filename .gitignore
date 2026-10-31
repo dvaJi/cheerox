@@ -9,3 +9,5 @@ native-binding.d.ts
 bench/corpus/pages/
 
 target/
+
+release/
