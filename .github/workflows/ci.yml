@@ -107,6 +107,14 @@ jobs:
         if: ${{ !inputs.release }}
       - run: npm ci
       - run: npm run build
+      - name: DEBUG binary state (gnu container)
+        shell: bash
+        run: |
+          echo "--- cwd ---"; pwd
+          echo "--- root .node ---"; ls -la *.node || echo "NO .node AT ROOT"
+          echo "--- artifacts ---"; ls -la artifacts 2>/dev/null || echo "no artifacts dir"
+          echo "--- dist .node ---"; ls -la dist/*.node 2>/dev/null || echo "none in dist"
+          echo "--- find all .node ---"; find . -name "*.node" -not -path "./target/*" -not -path "./node_modules/*" | head -20
       - run: cargo fmt --all -- --check
       - run: cargo clippy --all-targets -- -D warnings
       - run: cargo test
