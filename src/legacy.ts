@@ -15,9 +15,9 @@
  * own invariants.
  */
 import { requireNative, type NativeDocument } from './native.js';
-import { getNode, importNodes, nodeBinding, operation, rootNode, viewId, viewIdIn } from './nodes.js';
+import { getNode, getNodesOfType, hasMaterializedAttributes, hasMaterializedChildren, importNodes, nodeBinding, operation, rootNode, setRootIfCached, viewId, viewIdIn } from './nodes.js';
 import { routeDocument } from './router.js';
-import { cleanParserOptions } from './hooks.js';
+import { cleanParserOptions, hasParserHooks } from './hooks.js';
 import type { CheerioOptions } from './types.js';
 import { version as packageVersion } from '../package.json';
 
@@ -75,6 +75,12 @@ type CheerioConstructor = {
 };
 
 type CheerioPrototype = Record<string, any>;
+type AttributeDocument = NativeDocument & {
+  setAttribute?: (ids: number[], name: string, value: string | null) => void;
+  addClass?: (ids: number[], name: string) => void;
+  insertHtml?: (targetIds: number[], html: string, position: string) => number[] | undefined;
+  remove?: (ids: number[]) => void;
+};
 
 /**
  * A loaded `$`: the callable initialize function with the static methods,
@@ -117,6 +123,8 @@ function cloneDom(dom: LegacyNode[], options: LegacyOptions): LegacyNode[] {
 }
 
 const quickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/;
+const simpleTagExpr = /^\s*([A-Za-z][\w-]*)\s*$/;
+const specialTagExpr = /^(?:script|style)$/i;
 
 const isHtml = (str: string): boolean => {
   if (str.charAt(0) === '<' && str.charAt(str.length - 1) === '>' && str.length >= 3) return true;
@@ -138,7 +146,8 @@ function newDocument(options: LegacyOptions): NativeDocument {
 }
 
 /** As nodes under the legacy model: views that read like plain objects. */
-function asNodes(document: NativeDocument, ids: number[]): LegacyNode[] {
+function asNodes(document: NativeDocument, ids: number[], knownType?: string): LegacyNode[] {
+  if (knownType) return getNodesOfType(document, ids, knownType) as LegacyNode[];
   return ids.map((id) => getNode(document, id) as LegacyNode);
 }
 
@@ -219,27 +228,32 @@ export function update(arrInput: unknown, parent: LegacyNode | null): LegacyNode
 /** lib/parse.js: parse into a fresh document and return its `<root>` node. */
 export function parse(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): LegacyNode {
   const opts = legacyOptions(options);
+  let document: NativeDocument;
   let root: LegacyNode;
   if (typeof content === 'string' || Buffer.isBuffer(content)) {
-    const document = routeDocument(
+    document = routeDocument(
       new (requireNative().NativeDocument)(Buffer.isBuffer(content) ? content.toString() : content, false, JSON.stringify(cleanParserOptions(opts))),
       opts,
     );
     root = rootNode(document, document.rootId()) as LegacyNode;
   } else {
     // A pre-parsed DOM: 0.22.0 wraps it in the synthetic root via update().
-    const document = newDocument(opts);
+    document = newDocument(opts);
     const nodes = Array.isArray(content) || (content && typeof content === 'object' && 'length' in (content as object))
       ? Array.from(content as ArrayLike<LegacyNode>)
       : [content as LegacyNode];
     root = rootNode(document, document.rootId()) as LegacyNode;
     writeChildren(root, nodes);
   }
-  const children = Array.from(root.children ?? []) as LegacyNode[];
-  if (opts.normalizeWhitespace) normalizeWhitespace(children);
-  for (const child of children) {
-    (child as LegacyNode).root = root;
+  let children: LegacyNode[];
+  if (opts.normalizeWhitespace) {
+    children = Array.from(root.children ?? []) as LegacyNode[];
+    normalizeWhitespace(children);
+  } else {
+    const record = operation<{ children?: number[] }>(document, 'node', { id: viewId(root)! });
+    children = asNodes(document, record.children ?? []);
   }
+  for (const child of children) child.root = root;
   return root;
 }
 
@@ -354,7 +368,15 @@ function bindingOf(node: unknown): { document: NativeDocument; id: number } | un
 }
 
 function idsOf(document: NativeDocument, nodes: ArrayLike<unknown>): number[] {
-  return importNodes(document, nodes as unknown[]);
+  const len = (nodes as any).length;
+  if (typeof len !== 'number' || len < 0) return importNodes(document, nodes as unknown[]);
+  const out = new Array<number>(len);
+  for (let i = 0; i < len; i++) {
+    const id = viewIdIn(document, (nodes as any)[i]);
+    if (id === undefined) return importNodes(document, nodes as unknown[]);
+    out[i] = id;
+  }
+  return out;
 }
 
 /**
@@ -539,6 +561,7 @@ function uniqueSort(nodes: LegacyNode[]): LegacyNode[] {
  */
 
 const isNode = (obj: unknown): boolean => {
+  if (viewId(obj) !== undefined) return true;
   const node = obj as LegacyNode;
   return !!(obj && typeof obj === 'object' && (node.name || node.type === 'text' || node.type === 'comment'));
 };
@@ -663,14 +686,27 @@ function getAttr(elem: LegacyNode | undefined, name?: string): unknown {
 function setAttr(el: LegacyNode, name: string, value: unknown): void {
   if (value === null) {
     removeAttribute(el, name);
+    return;
+  }
+  const stringValue = value + '';
+  const binding = bindingOf(el);
+  const document = binding?.document as AttributeDocument | undefined;
+  if (binding && document?.setAttribute) {
+    document.setAttribute([binding.id], name, stringValue);
   } else {
-    el.attribs![name] = value + '';
+    el.attribs![name] = stringValue;
   }
 }
 
 function removeAttribute(elem: LegacyNode, name: string): void {
   if (!elem.attribs || !hasOwn.call(elem.attribs, name)) return;
-  delete elem.attribs[name];
+  const binding = bindingOf(elem);
+  const document = binding?.document as AttributeDocument | undefined;
+  if (binding && document?.setAttribute) {
+    document.setAttribute([binding.id], name, null);
+  } else {
+    delete elem.attribs[name];
+  }
 }
 
 const splitClass = (className?: string): string[] => (className ? className.trim().split(rspace) : []);
@@ -735,11 +771,42 @@ const attributesApi: CheerioPrototype = {
     // Set the value (with attr map support)
     if (typeof name === 'object' || value !== undefined) {
       if (typeof value === 'function') {
+        // Compute the per-element values first, preserving 0.22.0's read-before-write.
+        const computed = new Array<unknown>(this.length);
+        for (let index = 0; index < this.length; index++) {
+          const el = this[index] as LegacyNode;
+          computed[index] = value.call(el, index, el.attribs ? el.attribs[name] : undefined);
+        }
+        // Batch the writes across the selection when every element is a native node.
+        const groups = new Map<NativeDocument, Array<{ id: number; name: string; value: string | null }>>();
+        let usable = this.length > 0;
+        for (let index = 0; index < this.length; index++) {
+          const el = this[index] as LegacyNode;
+          if (!isTag(el)) { usable = false; break; }
+          if (!el.attribs) el.attribs = {};
+          const binding = bindingOf(el);
+          if (!binding) { usable = false; break; }
+          const group = groups.get(binding.document);
+          const entry = { id: binding.id, name, value: computed[index] === null ? null : (computed[index] + '') };
+          if (group) group.push(entry);
+          else groups.set(binding.document, [entry]);
+        }
+        if (usable) {
+          for (const [document, writes] of groups) {
+            operation(document, 'setAttrs', { writes });
+          }
+          return this;
+        }
         return domEach(this, function (i, el) {
-          setAttr(el, name, value.call(el, i, el.attribs![name]));
+          if (!isTag(el)) return;
+          setAttr(el, name, computed[i]);
         });
       }
       if (typeof name === 'string') {
+        if (this.length === 1 && isTag(this[0])) {
+          setAttr(this[0], name, value);
+          return this;
+        }
         // Batch the plain set across the selection: one native call instead
         // of one per element. `null` removes, as in setAttr.
         const groups = new Map<NativeDocument, Array<{ id: number; name: string; value: string | null }>>();
@@ -756,7 +823,13 @@ const attributesApi: CheerioPrototype = {
         }
         if (usable) {
           for (const [document, writes] of groups) {
-            operation(document, 'setAttrs', { writes });
+            const attributeDocument = document as AttributeDocument;
+            const firstValue = writes[0]?.value;
+            if (attributeDocument.setAttribute && writes.every((write) => write.value === firstValue)) {
+              attributeDocument.setAttribute(writes.map((write) => write.id), name, firstValue ?? null);
+            } else {
+              operation(document, 'setAttrs', { writes });
+            }
           }
           return this;
         }
@@ -931,9 +1004,32 @@ const attributesApi: CheerioPrototype = {
     // Return if no value or not a string or function
     if (!value || typeof value !== 'string') return this;
 
-    const classNames = value.split(rspace);
     const numElements = this.length;
+    if (numElements === 1 && isTag(this[0]) && !hasMaterializedAttributes(this[0])) {
+      const binding = bindingOf(this[0]);
+      const document = binding?.document as AttributeDocument | undefined;
+      if (binding && document?.addClass) {
+        document.addClass([binding.id], value);
+        return this;
+      }
+    }
+    const groups = new Map<AttributeDocument, number[]>();
+    let native = true;
+    for (let i = 0; i < numElements; i++) {
+      if (!isTag(this[i])) continue;
+      const binding = bindingOf(this[i]);
+      const document = binding?.document as AttributeDocument | undefined;
+      if (!binding || !document?.addClass || hasMaterializedAttributes(this[i])) { native = false; break; }
+      const ids = groups.get(document);
+      if (ids) ids.push(binding.id);
+      else groups.set(document, [binding.id]);
+    }
+    if (native) {
+      for (const [document, ids] of groups) document.addClass!(ids, value);
+      return this;
+    }
 
+    const classNames = value.split(rspace);
     for (let i = 0; i < numElements; i++) {
       // If selected element isn't a tag, move on
       if (!isTag(this[i])) continue;
@@ -1071,14 +1167,17 @@ const traversingApi: CheerioPrototype = {
 
     // The native within-select covers the 0.22.0 candidate set (every
     // descendant of the matched elements) in one call, at any document size.
-    const document = bindingOf(this[0])?.document;
+    const binding = bindingOf(this[0]);
+    const document = binding?.document;
     if (document && selectorOrHaystack) {
-      const contexts = idsOf(document, this.toArray());
+      const contexts = this.length === 1 && binding ? [binding.id] : idsOf(document, this.toArray());
       if (contexts.length) {
         try {
-          validateLegacySelector(selectorOrHaystack);
-          const found = operation<number[]>(document, 'select', { selector: selectorOrHaystack, contexts });
-          if (found) return this._make(asNodes(document, found) as LegacyNode[]);
+          const simpleTag = simpleTagExpr.exec(selectorOrHaystack);
+          if (!simpleTag) validateLegacySelector(selectorOrHaystack);
+          const knownType = simpleTag && !specialTagExpr.test(simpleTag[1]) ? 'tag' : undefined;
+          const found = document.select(selectorOrHaystack, contexts);
+          if (found) return this._make(asNodes(document, found, knownType) as LegacyNode[]);
         } catch (error) {
           throw error instanceof SyntaxError ? error : new SyntaxError((error as Error)?.message ?? String(error));
         }
@@ -1493,6 +1592,61 @@ function traverseParents(self: CheerioInstance, elem: LegacyNode | null | undefi
   return elems;
 }
 
+function insertAdjacentStatic(this: CheerioInstance, elems: any[], position: 'before' | 'after'): boolean {
+  if (elems.length !== 1 || typeof elems[0] !== 'string') return false;
+  const options = legacyOptions(this.options);
+  if (options.normalizeWhitespace || hasParserHooks(options)) return false;
+
+  let document: NativeDocument | undefined;
+  const targetIds: number[] = [];
+  for (let i = 0; i < this.length; i++) {
+    const el = this[i];
+    if (!isTag(el)) return false;
+    const binding = bindingOf(el);
+    if (!binding || (document && binding.document !== document)) return false;
+    document ??= binding.document;
+    const parent = el.parent || el.root;
+    if (!parent || bindingOf(parent)?.document !== document || hasMaterializedChildren(parent)) return false;
+    targetIds.push(binding.id);
+  }
+  if (!document) return false;
+
+  const fused = (document as AttributeDocument).insertHtml?.(targetIds, elems[0], position);
+  if (fused) {
+    for (let i = 0; i < fused.length; i++) setRootIfCached(document, fused[i], null);
+    return true;
+  }
+
+  const nodeIds = operation<number[]>(document, 'create', { html: elems[0], options });
+  if (!nodeIds.length) return true;
+  const inserted = operation<number[]>(document, 'insert', { targetIds, nodeIds, position });
+  for (let i = 0; i < inserted.length; i++) setRootIfCached(document, inserted[i], null);
+  return true;
+}
+
+function removeNative(elems: CheerioInstance): boolean {
+  const groups = new Map<NativeDocument, { ids: number[]; nodes: LegacyNode[] }>();
+  for (let i = 0; i < elems.length; i++) {
+    const el = elems[i];
+    const binding = bindingOf(el);
+    if (!binding) return false;
+    const parent = el.parent || el.root;
+    if (!parent) continue;
+    if (bindingOf(parent)?.document !== binding.document || hasMaterializedChildren(parent)) return false;
+    let group = groups.get(binding.document);
+    if (!group) groups.set(binding.document, group = { ids: [], nodes: [] });
+    group.ids.push(binding.id);
+    group.nodes.push(el);
+  }
+  for (const [document, group] of groups) {
+    const nativeDocument = document as AttributeDocument;
+    if (nativeDocument.remove) nativeDocument.remove(group.ids);
+    else operation(document, 'remove', { ids: group.ids });
+    for (const node of group.nodes) node.root = null;
+  }
+  return true;
+}
+
 /*
  * api/manipulation.js
  */
@@ -1577,6 +1731,7 @@ const manipulationApi: CheerioPrototype = {
   },
 
   after(this: CheerioInstance, ...elems: any[]) {
+    if (insertAdjacentStatic.call(this, elems, 'after')) return this;
     const lastIdx = this.length - 1;
 
     domEach(this, function (this: CheerioInstance, i, el) {
@@ -1636,6 +1791,7 @@ const manipulationApi: CheerioPrototype = {
   },
 
   before(this: CheerioInstance, ...elems: any[]) {
+    if (insertAdjacentStatic.call(this, elems, 'before')) return this;
     const lastIdx = this.length - 1;
 
     domEach(this, function (this: CheerioInstance, i, el) {
@@ -1697,6 +1853,7 @@ const manipulationApi: CheerioPrototype = {
 
   remove(this: CheerioInstance, selector?: any) {
     const elems: CheerioInstance = selector ? this.filter(selector) : this;
+    if (removeNative(elems)) return this;
 
     domEach(elems, function (_i, el) {
       const parent = el.parent || el.root;
@@ -2033,22 +2190,28 @@ function staticText(this: any, elems?: ArrayLike<LegacyNode>): string {
   if (!elems) {
     elems = staticRoot.call(this) as unknown as ArrayLike<LegacyNode>;
   }
-  const list = Array.from(elems ?? []) as LegacyNode[];
-  if (list.length) {
-    // The native text extraction is the same traversal, one call deep.
-    const document = bindingOf(list[0])?.document;
+  const src = (elems ?? []) as ArrayLike<LegacyNode>;
+  const len = (src as any).length >>> 0;
+  if (len > 0) {
+    const first = (src as any)[0] as LegacyNode | undefined;
+    const document = bindingOf(first)?.document;
     if (document) {
-      const ids = idsOf(document, list);
-      if (ids.length) {
+      const ids = new Array<number>(len);
+      let ok = true;
+      for (let i = 0; i < len; i++) {
+        const id = viewIdIn(document, (src as any)[i]);
+        if (id === undefined) { ok = false; break; }
+        ids[i] = id;
+      }
+      if (ok) {
         const text = document.text(ids);
         if (typeof text === 'string') return text;
       }
     }
   }
   let ret = '';
-  const len = list.length;
   for (let i = 0; i < len; i++) {
-    const elem = list[i];
+    const elem = (src as any)[i] as LegacyNode;
     if (elem.type === 'text') ret += elem.data;
     else if (elem.children && elem.type !== 'comment') {
       ret += staticText(elem.children);

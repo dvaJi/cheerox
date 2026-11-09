@@ -552,20 +552,27 @@ fn parse_compound(source: &str) -> Result<Vec<Test>> {
 
 thread_local! {
     /// Parsed selectors by source; queries reuse a handful of selectors many times.
-    static PARSED: std::cell::RefCell<std::collections::HashMap<String, std::rc::Rc<Vec<Complex>>>> =
+    /// A two-generation cache avoids the cliff of clearing all 512 entries at once.
+    static PARSED_CURRENT: std::cell::RefCell<std::collections::HashMap<String, std::rc::Rc<Vec<Complex>>>> =
+        std::cell::RefCell::new(std::collections::HashMap::new());
+    static PARSED_PREVIOUS: std::cell::RefCell<std::collections::HashMap<String, std::rc::Rc<Vec<Complex>>>> =
         std::cell::RefCell::new(std::collections::HashMap::new());
 }
 const PARSED_LIMIT: usize = 512;
 
 fn parse(source: &str) -> Result<std::rc::Rc<Vec<Complex>>> {
-    if let Some(parsed) = PARSED.with(|cache| cache.borrow().get(source).cloned()) {
+    if let Some(parsed) = PARSED_CURRENT.with(|cache| cache.borrow().get(source).cloned()) {
+        return Ok(parsed);
+    }
+    if let Some(parsed) = PARSED_PREVIOUS.with(|cache| cache.borrow().get(source).cloned()) {
         return Ok(parsed);
     }
     let parsed = std::rc::Rc::new(parse_uncached(source)?);
-    PARSED.with(|cache| {
+    PARSED_CURRENT.with(|cache| {
         let mut cache = cache.borrow_mut();
         if cache.len() >= PARSED_LIMIT {
-            cache.clear();
+            let previous = std::mem::take(&mut *cache);
+            PARSED_PREVIOUS.with(|p| *p.borrow_mut() = previous);
         }
         cache.insert(source.to_owned(), parsed.clone());
     });

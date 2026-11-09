@@ -7,6 +7,9 @@ interface NativeMemoryStats { live: number; slots: number; retained: number; rec
 interface PinnedCollection extends NativeMemoryStats { free: Uint32Array }
 interface ManagedNativeDocument extends NativeDocument {
   setAttribute?(ids: number[], name: string, value: string | null): void;
+  addClass?(ids: number[], name: string): void;
+  insertHtml?(targetIds: number[], html: string, position: string): number[];
+  removeNodes?(ids: number[]): void;
   slotCount?(): number;
   routingIndex?(): number;
   detachedSlots?(root: number): Uint32Array;
@@ -599,6 +602,23 @@ export class RoutedDocument implements NativeDocument {
    * updated in place instead of being read back.
    */
   setAttribute(ids: number[], name: string, value: string | null): void {
+    const own = this.state;
+    if (ids.length === 1 && own.raw.setAttribute) {
+      const id = ids[0];
+      if (id >= own.base && id < own.base + STRIDE) {
+        registry.writes++;
+        const local = id - own.base;
+        invalidateNodes(own, [local]);
+        own.raw.setAttribute([local], name, value);
+        const target = ((cachedView(own, local) as Record<symbol, { target?: Record<string, string> } | undefined> | undefined)?.[VIEW_ATTRIBUTES])?.target;
+        if (target) {
+          if (value === null) delete target[name];
+          else if (name === '__proto__') Object.defineProperty(target, name, { value, writable: true, enumerable: true, configurable: true });
+          else target[name] = value;
+        }
+        return;
+      }
+    }
     registry.writes++;
     for (const { state, locals } of this.groups(ids)) {
       if (!state.raw.setAttribute) { this.call(state, 'attr', { ids: locals, name, value }); continue; }
@@ -610,6 +630,39 @@ export class RoutedDocument implements NativeDocument {
         if (value === null) delete target[name];
         else if (name === '__proto__') Object.defineProperty(target, name, { value, writable: true, enumerable: true, configurable: true });
         else target[name] = value;
+      }
+    }
+  }
+
+  addClass(ids: number[], name: string): void {
+    const own = this.state;
+    if (ids.length === 1 && own.raw.addClass) {
+      const id = ids[0];
+      if (id >= own.base && id < own.base + STRIDE) {
+        registry.writes++;
+        const local = id - own.base;
+        invalidateNodes(own, [local]);
+        own.raw.addClass([local], name);
+        const target = ((cachedView(own, local) as Record<symbol, { target?: Record<string, string> } | undefined> | undefined)?.[VIEW_ATTRIBUTES])?.target;
+        if (target) {
+          const value = own.raw.attr(local, 'class');
+          if (value == null) delete target.class;
+          else target.class = value;
+        }
+        return;
+      }
+    }
+    registry.writes++;
+    for (const { state, locals } of this.groups(ids)) {
+      if (!state.raw.addClass) { this.call(state, 'addClass', { ids: locals, name }); continue; }
+      invalidateNodes(state, locals);
+      state.raw.addClass(locals, name);
+      for (const local of locals) {
+        const target = ((cachedView(state, local) as Record<symbol, { target?: Record<string, string> } | undefined> | undefined)?.[VIEW_ATTRIBUTES])?.target;
+        if (!target) continue;
+        const value = state.raw.attr(local, 'class');
+        if (value == null) delete target.class;
+        else target.class = value;
       }
     }
   }
@@ -649,6 +702,7 @@ export class RoutedDocument implements NativeDocument {
   private call<T = any>(state: DocumentState, command: string, args: any): T {
     if (command === 'extractPlan' && JSON.stringify(args.plan).includes('innerHTML')) invalidate(state);
     const isWrite = Object.hasOwn(args, 'value') || writeCommands.has(command);
+    const recordOnlyWrite = recordOnlyWrites.has(command) || command === 'setNode' && attributeFields.has(args.field);
     if (isWrite) {
       registry.writes++;
       const changed = recordOnlyWrites.has(command) ? args.ids ?? [] : command === 'setNode' && attributeFields.has(args.field) ? [args.id] : undefined;
@@ -658,7 +712,10 @@ export class RoutedDocument implements NativeDocument {
     const result = rawOperation(state.raw, command, { ...args, options: args.options ?? this.options });
     const hasSerializedHtml = command === 'render' || command === 'outerHtml' || (command === 'html' && !isWrite) || (command === 'prop' && (args.name === 'innerHTML' || args.name === 'outerHTML'));
     if (hasSerializedHtml) refreshSerializedNodes(state, args.options ?? this.options);
-    if (isWrite) { refreshWrittenAttributes(state, command, args); refreshChildLists(state); scheduleCollectionIfDue(state); }
+    if (isWrite) {
+      refreshWrittenAttributes(state, command, args);
+      if (!recordOnlyWrite) { refreshChildLists(state); scheduleCollectionIfDue(state); }
+    }
     return result;
   }
 
@@ -719,6 +776,14 @@ export class RoutedDocument implements NativeDocument {
   select(selector: string, contexts?: number[]): number[] {
     const ids = contexts ?? [this.rootId()];
     if (!ids.length) return this.call(this.state, 'select', { selector, contexts: [] });
+    if (ids.length === 1) {
+      const own = this.state;
+      const id = ids[0];
+      if (id >= own.base && id < own.base + STRIDE) {
+        const found = own.raw.select(selector, [id - own.base]);
+        return this.globals(own, found);
+      }
+    }
     const groups = this.groups(ids);
     if (this.isMixed(groups)) return this.scratch('select', { selector, contexts: ids }, ids);
     const group = groups[0];
@@ -756,6 +821,31 @@ export class RoutedDocument implements NativeDocument {
   tagName(id: number): string | undefined { const state = this.owner(id); return recordAt(state, id - state.base)?.name; }
   exportTree(): string { return JSON.stringify((JSON.parse(this.raw.exportTree()) as NativeNodeRecord[]).map((record) => globalRecord(this.state, record))); }
   create(html: string, contextId?: number): number[] { return this.operate('create', { html, contextId }); }
+
+  insertHtml(targetIds: number[], html: string, position: string): number[] | undefined {
+    const groups = this.groups(targetIds);
+    if (groups.length !== 1) return undefined;
+    const { state, locals } = groups[0];
+    const insertHtml = state.raw.insertHtml;
+    if (!insertHtml) return undefined;
+    registry.writes++;
+    invalidate(state);
+    const inserted = insertHtml.call(state.raw, locals, html, position);
+    if (state.hasChildLists) refreshChildLists(state);
+    scheduleCollectionIfDue(state);
+    return this.globals(state, inserted);
+  }
+
+  remove(ids: number[]): void {
+    registry.writes++;
+    for (const { state, locals } of this.groups(ids)) {
+      if (!state.raw.removeNodes) { this.call(state, 'remove', { ids: locals }); continue; }
+      invalidate(state);
+      state.raw.removeNodes(locals);
+      if (state.hasChildLists) refreshChildLists(state);
+      scheduleCollectionIfDue(state);
+    }
+  }
 
   op(command: string, json: string): string { return JSON.stringify(this.operate(command, JSON.parse(json)) ?? null); }
 

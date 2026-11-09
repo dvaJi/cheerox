@@ -646,7 +646,7 @@ impl NativeDocument {
             let index = if self.tree_detached.get() {
                 immutable::TreeIndex::build_mapped(html, &ids, &self.reverse.borrow())
             } else {
-                immutable::TreeIndex::build(html, ids.len())
+                immutable::TreeIndex::build(html, &ids)
             };
             *self.tree_index.borrow_mut() = Some(index);
         }
@@ -1064,6 +1064,16 @@ impl NativeDocument {
         self.ensure_arena()?;
         if let Some(arena) = self.arena_for_attribute_write().as_mut() {
             arena.set_attr(&ids, &name, value.as_deref());
+        }
+        Ok(())
+    }
+
+    #[napi(js_name = "addClass")]
+    pub fn add_class_for_js(&self, ids: Vec<u32>, name: String) -> Result<()> {
+        self.ensure_arena()?;
+        if let Some(arena) = self.arena_for_attribute_write().as_mut() {
+            let args = serde_json::json!({ "ids": ids, "name": name });
+            let _ = attributes::execute(arena, "addClass", &args)?;
         }
         Ok(())
     }
@@ -1531,6 +1541,31 @@ impl NativeDocument {
             .create_fragment(&html, context_id)
     }
 
+    #[napi(js_name = "removeNodes")]
+    pub fn remove_nodes_for_js(&self, env: Env, ids: Vec<u32>) -> Result<()> {
+        self.ensure_arena()?;
+        self.arena_for_write().as_mut().unwrap().detach_many(&ids);
+        self.report_heap_bytes(env);
+        Ok(())
+    }
+
+    #[napi(js_name = "insertHtml")]
+    pub fn insert_html_for_js(
+        &self,
+        env: Env,
+        target_ids: Vec<u32>,
+        html: String,
+        position: String,
+    ) -> Result<Vec<u32>> {
+        let created = self.create(html, None, None)?;
+        let inserted = self
+            .arena_for_write()
+            .as_mut()
+            .unwrap()
+            .insert(&target_ids, &created, &position);
+        Ok(self.reported(env, inserted))
+    }
+
     /// Move a branch between native documents. JavaScript only redirects its
     /// existing stable handles using the returned complete descendant mapping.
     #[napi(js_name = "adopt")]
@@ -1915,21 +1950,29 @@ fn with_attribute(
 
 thread_local! {
     /// Parse-tree selectors by source, or `None` for sources they cannot express.
-    static SELECTORS: RefCell<HashMap<String, Option<std::rc::Rc<Selector>>>> = RefCell::new(HashMap::new());
+    /// A two-generation cache avoids the cliff of clearing all 512 entries at once.
+    static SELECTORS_CURRENT: RefCell<HashMap<String, Option<std::rc::Rc<Selector>>>> =
+        RefCell::new(HashMap::new());
+    static SELECTORS_PREVIOUS: RefCell<HashMap<String, Option<std::rc::Rc<Selector>>>> =
+        RefCell::new(HashMap::new());
 }
 
 /// A selector for the parse tree, parsed once per source per thread.
 fn parsed_selector(source: &str) -> Option<std::rc::Rc<Selector>> {
-    if let Some(parsed) = SELECTORS.with(|cache| cache.borrow().get(source).cloned()) {
+    if let Some(parsed) = SELECTORS_CURRENT.with(|cache| cache.borrow().get(source).cloned()) {
+        return parsed;
+    }
+    if let Some(parsed) = SELECTORS_PREVIOUS.with(|cache| cache.borrow().get(source).cloned()) {
         return parsed;
     }
     let parsed = Selector::parse(&normalize_attribute_namespaces(source))
         .ok()
         .map(std::rc::Rc::new);
-    SELECTORS.with(|cache| {
+    SELECTORS_CURRENT.with(|cache| {
         let mut cache = cache.borrow_mut();
         if cache.len() >= 512 {
-            cache.clear();
+            let previous = std::mem::take(&mut *cache);
+            SELECTORS_PREVIOUS.with(|p| *p.borrow_mut() = previous);
         }
         cache.insert(source.to_owned(), parsed.clone());
     });

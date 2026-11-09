@@ -52,6 +52,14 @@ export function nodeBinding(node: unknown): NodeBinding | undefined {
   return id === undefined ? undefined : { document: routedFor((node as View)[VIEW_STATE]), id };
 }
 
+export function hasMaterializedChildren(node: unknown): boolean {
+  return !!(node as View | null | undefined)?.[VIEW_CHILD_TARGET];
+}
+
+export function hasMaterializedAttributes(node: unknown): boolean {
+  return !!(node as View | null | undefined)?.[VIEW_ATTRIBUTES];
+}
+
 export function nodeId(node: unknown, document?: NativeDocument): number | undefined {
   const id = node && typeof node === 'object' ? viewId(node) : undefined;
   return id !== undefined && (!document || isRouted(document)) ? id : undefined;
@@ -178,21 +186,28 @@ function traverseSnapshot(snapshot: NodeSnapshot, base: number, local: number, k
 }
 
 /** The node object for an arena slot, created on first use and then shared. */
-export function viewAt(state: DocumentState, local: number): AnyNode | undefined {
+export function viewAt(state: DocumentState, local: number, knownType?: string): AnyNode | undefined {
   const existing = state.views[local] ?? cachedView(state, local);
-  if (existing) return existing as AnyNode;
+  if (existing) { applyPendingRoot(state, local, existing); return existing as AnyNode; }
   const parsed = state.adapterNodes?.[local];
-  if (parsed) { state.adapterNodes![local] = undefined; return adoptObject(state, local, parsed); }
-  const snapshot = structureSnapshot(state, local);
+  if (parsed) {
+    state.adapterNodes![local] = undefined;
+    const view = adoptObject(state, local, parsed);
+    applyPendingRoot(state, local, view);
+    return view;
+  }
+  const snapshot = knownType ? undefined : structureSnapshot(state, local);
   let constructor: ViewConstructor;
-  if (snapshot && !snapshot.hasExtraFields(local)) constructor = viewConstructor(state, snapshot.typeOf(local), false);
+  if (knownType && !state.options.sourceCodeLocationInfo) constructor = viewConstructor(state, knownType, false);
+  else if (snapshot && !snapshot.hasExtraFields(local)) constructor = viewConstructor(state, snapshot.typeOf(local), false);
   else {
     const record = recordAt(state, local);
     if (!record) return undefined;
     constructor = viewConstructor(state, record.type, record.sourceCodeLocation !== undefined);
   }
-  const view = new constructor(state, local);
+  const view = constructor(state, local);
   cacheView(state, local, view);
+  applyPendingRoot(state, local, view);
   return view as unknown as AnyNode;
 }
 
@@ -202,20 +217,48 @@ export function rootNode(document: NativeDocument, id: number): AnyNode {
   const state = stateIn(document, id);
   const local = id - state.base;
   const existing = cachedView(state, local);
-  if (existing) return existing as AnyNode;
+  if (existing) { applyPendingRoot(state, local, existing); return existing as AnyNode; }
   if (state.adapterNodes?.[local] || state.options.sourceCodeLocationInfo) return viewAt(state, local) as AnyNode;
-  const view = new (viewConstructor(state, 'root', false))(state, local);
+  const view = (viewConstructor(state, 'root', false))(state, local);
   cacheView(state, local, view);
+  applyPendingRoot(state, local, view);
   return view as unknown as AnyNode;
 }
 
 /** Stable DOM node identities; each property reads or updates the Rust arena. */
-export function getNode(document: NativeDocument, id: number, original?: any): AnyNode {
+export function getNode(document: NativeDocument, id: number, original?: any, knownType?: string): AnyNode {
   if (!isRouted(document)) throw new TypeError('Native nodes require a routed document');
   const state = stateIn(document, id);
   const local = id - state.base;
-  if (original === undefined) return viewAt(state, local) as AnyNode;
-  return adoptObject(state, local, original);
+  if (original === undefined) return viewAt(state, local, knownType) as AnyNode;
+  const view = adoptObject(state, local, original);
+  applyPendingRoot(state, local, view);
+  return view;
+}
+
+export function getNodesOfType(document: NativeDocument, ids: number[], type: string): AnyNode[] {
+  if (!ids.length) return [];
+  const state = stateIn(document, ids[0]);
+  if (state.options.sourceCodeLocationInfo || state.adapterNodes) return ids.map((id) => getNode(document, id));
+  const constructor = viewConstructor(state, type, false);
+  const result = new Array<AnyNode>(ids.length);
+  for (let index = 0; index < ids.length; index++) {
+    const id = ids[index];
+    if (stateIn(document, id) !== state) {
+      result[index] = getNode(document, id);
+      continue;
+    }
+    const local = id - state.base;
+    let view = state.views[local] as AnyNode | undefined;
+    if (!view && (local >= state.baseline || state.weakViews.size)) view = cachedView(state, local) as AnyNode | undefined;
+    if (!view) {
+      view = constructor(state, local) as unknown as AnyNode;
+      cacheView(state, local, view);
+    }
+    if ((state as any)._pendingRoots) applyPendingRoot(state, local, view);
+    result[index] = view;
+  }
+  return result;
 }
 
 function viewRecord(view: View): NativeNodeRecord {
@@ -429,9 +472,10 @@ function fillFromSnapshot(state: DocumentState, snapshot: NodeSnapshot, local: n
     let node = (views[child] ?? (state.weakViews.size ? cachedView(state, child) : undefined)) as AnyNode | undefined;
     if (node === undefined) {
       const constructor = isStrong && child < state.baseline && snapshot.isPresent(child) && !snapshot.hasExtraFields(child) ? constructors(snapshot.typeReference(child)) : undefined;
-      if (constructor) views[child] = node = new constructor(state, child) as unknown as AnyNode;
+      if (constructor) views[child] = node = constructor(state, child) as unknown as AnyNode;
       else node = viewAt(state, child)!;
     }
+    if ((state as any)._pendingRoots) applyPendingRoot(state, child, node);
     target[index] = node;
   }
   truncate(target, count);
@@ -509,7 +553,7 @@ function accessorsFor(type: string): Record<string, Accessor> {
   }
 }
 
-type ViewConstructor = new (state: DocumentState, local: number) => View;
+type ViewConstructor = (state: DocumentState, local: number) => View;
 const viewConstructors = new Map<string, ViewConstructor>();
 const plainConstructors: Record<string, ViewConstructor | undefined> = Object.create(null);
 
@@ -523,6 +567,32 @@ const plainConstructors: Record<string, ViewConstructor | undefined> = Object.cr
  * - the synthetic root keeps its `name` of "root" and an `attribs` object.
  */
 const rootReferences = new WeakMap<object, unknown>();
+function applyPendingRoot(state: DocumentState, local: number, view: unknown): void {
+  const pending = (state as any)._pendingRoots as Map<number, unknown> | undefined;
+  if (pending === undefined) return;
+  if (pending.has(local)) {
+    rootReferences.set(view as object, pending.get(local));
+    pending.delete(local);
+    if (pending.size === 0) (state as any)._pendingRoots = undefined;
+  }
+}
+export function setRootIfCached(document: NativeDocument, id: number, root: unknown): void {
+  const state = stateIn(document, id);
+  const local = id - state.base;
+  const view = cachedView(state, local);
+  if (view) { rootReferences.set(view, root); return; }
+  let pending = (state as any)._pendingRoots as Map<number, unknown> | undefined;
+  if (!pending) (state as any)._pendingRoots = pending = new Map();
+  pending.set(local, root);
+}
+/** Fast path for callers that already resolved state+local (e.g. static adjacent insert). */
+export function setRootIfCachedLocal(state: DocumentState, local: number, root: unknown): void {
+  const view = cachedView(state, local);
+  if (view) { rootReferences.set(view, root); return; }
+  let pending = (state as any)._pendingRoots as Map<number, unknown> | undefined;
+  if (!pending) (state as any)._pendingRoots = pending = new Map();
+  pending.set(local, root);
+}
 const legacyParentAccessor: Accessor = {
   get() {
     const state = this[VIEW_STATE];
@@ -579,28 +649,27 @@ function viewConstructor(state: DocumentState, type: string, hasLocation: boolea
   if (legacy) accessors = { ...accessors, ...legacyAccessors(type), ...(type === 'root' ? { attribs: elementAccessors.attribs } : {}) };
   const childrenDescriptor = 'children' in accessors ? { ...childAccessors.children, configurable: true, enumerable: true } : undefined;
   for (const [field, accessor] of Object.entries(accessors)) Object.defineProperty(prototype, field, { ...accessor, configurable: true, enumerable: false });
-  constructor = function (this: View, state: DocumentState, local: number) {
-    this[VIEW_STATE] = state;
-    this[VIEW_LOCAL] = local;
-    this[VIEW_SELF] = this;
-    this[VIEW_ATTRIBUTES] = undefined;
-    this[VIEW_CHILDREN] = undefined;
-    this[VIEW_CHILD_TARGET] = undefined;
-    if (childrenDescriptor) Object.defineProperty(this, 'children', childrenDescriptor);
-    if (legacy) {
-      // Own enumerable fields for the 0.22.0 node shape, reading and writing
-      // through the live accessors.
-      const fields = legacyOwnFields[type];
-      if (fields) {
-        for (const field of fields) {
-          const descriptor = Object.getOwnPropertyDescriptor(prototype, field);
-          if (descriptor && (descriptor.get || descriptor.set)) {
-            Object.defineProperty(this, field, { get: descriptor.get, set: descriptor.set, configurable: true, enumerable: true });
-          }
-        }
+  const ownDescriptors: PropertyDescriptorMap = {};
+  if (childrenDescriptor) ownDescriptors.children = childrenDescriptor;
+  if (legacy) {
+    const fields = legacyOwnFields[type];
+    if (fields) {
+      for (const field of fields) {
+        const descriptor = Object.getOwnPropertyDescriptor(prototype, field);
+        if (descriptor && (descriptor.get || descriptor.set)) ownDescriptors[field] = { get: descriptor.get, set: descriptor.set, configurable: true, enumerable: true };
       }
     }
-  } as unknown as ViewConstructor;
+  }
+  constructor = function (state: DocumentState, local: number): View {
+    const view = Object.create(prototype, ownDescriptors) as View;
+    view[VIEW_STATE] = state;
+    view[VIEW_LOCAL] = local;
+    view[VIEW_SELF] = view;
+    view[VIEW_ATTRIBUTES] = undefined;
+    view[VIEW_CHILDREN] = undefined;
+    view[VIEW_CHILD_TARGET] = undefined;
+    return view;
+  };
   Object.defineProperty(prototype, inspectSymbol, { configurable: true, writable: true, value: inspectNode });
   constructor.prototype = prototype;
   viewConstructors.set(key, constructor);

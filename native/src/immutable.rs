@@ -17,10 +17,12 @@ pub(crate) struct TreeIndex {
     child_start: Vec<u32>,
     child_end: Vec<u32>,
     children: Vec<u32>,
+    name_index: crate::id_hash::IdMap<String, Vec<u32>>,
 }
 
 impl TreeIndex {
-    pub(crate) fn build(html: &Html, count: usize) -> Self {
+    pub(crate) fn build(html: &Html, ids: &[NodeId]) -> Self {
+        let count = ids.len();
         let mut parent = vec![NONE; count];
         let mut stack: Vec<u32> = Vec::new();
         let mut next = 0u32;
@@ -61,11 +63,22 @@ impl TreeIndex {
                 *end += 1;
             }
         }
+        // Tag-name candidate index (lowercased), mirroring the arena's.
+        let mut name_index: crate::id_hash::IdMap<String, Vec<u32>> = crate::id_hash::IdMap::default();
+        for local in 0..count {
+            if let Some(node) = html.tree.get(ids[local]) {
+                if let Node::Element(element) = node.value() {
+                    let key = element.name().to_ascii_lowercase();
+                    name_index.entry(key).or_default().push(local as u32);
+                }
+            }
+        }
         Self {
             parent,
             child_start,
             child_end,
             children,
+            name_index,
         }
     }
 
@@ -92,11 +105,22 @@ impl TreeIndex {
             children.extend(node.children().filter_map(|child| local(Some(child))));
             child_end[index] = children.len() as u32;
         }
+        // Tag-name candidate index (lowercased), mirroring the arena's.
+        let mut name_index: crate::id_hash::IdMap<String, Vec<u32>> = crate::id_hash::IdMap::default();
+        for (index, id) in ids.iter().enumerate() {
+            if let Some(node) = html.tree.get(*id) {
+                if let Node::Element(element) = node.value() {
+                    let key = element.name().to_ascii_lowercase();
+                    name_index.entry(key).or_default().push(index as u32);
+                }
+            }
+        }
         Self {
             parent,
             child_start,
             child_end,
             children,
+            name_index,
         }
     }
 
@@ -232,8 +256,11 @@ impl SelectDom for TreeDom<'_> {
             .as_array()
             .map(|ids| ids.iter().any(|value| value.as_u64() == Some(id as u64)))
     }
-    fn pseudo_alias(&self, name: &str) -> Option<&str> {
-        self.options.get("pseudos")?.get(name)?.as_str()
+    fn elements_named(&self, lowercase_name: &str) -> Option<&[u32]> {
+        self.index.name_index.get(lowercase_name).map(|v| v.as_slice())
+    }
+    fn is_id_order_document_order(&self) -> bool {
+        true
     }
 }
 

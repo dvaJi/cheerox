@@ -1,9 +1,9 @@
 {
-  "generated": "2026-10-30T21:14:56.050Z",
+  "generated": "2026-11-09T15:23:48.436Z",
   "oracle": "cheerio@0.22.0 (cheerio-legacy-reference)",
   "implementation": "cheerox legacy facade",
-  "total": 55,
-  "passed": 55,
+  "total": 58,
+  "passed": 58,
   "failed": 0,
   "differences": []
 }

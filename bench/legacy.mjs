@@ -117,10 +117,10 @@ const cases = [
       });
       $('.teaser').after('<span class="marker">m</span>');
       $('ul li:last-child').remove();
-      return $.html().length;
+      return $.html();
     },
     verify: (a, b) => a === b,
-    extract: (result) => result,
+    extract: (result) => result.length,
   },
   {
     name: 'serialization (large)',
@@ -134,7 +134,7 @@ const cases = [
     extract: (result) => result.html.length,
   },
   {
-    name: 'cold start + parse + query',
+    name: 'warm root re-require + parse + query',
     input: fixtures.small,
     setup: () => ({}),
     run: (mod, html) => {
@@ -143,10 +143,11 @@ const cases = [
       const fresh = mod === legacy
         ? require(join(here, '..', 'dist', 'index.cjs'))
         : require('cheerio-legacy-reference');
-      return fresh.load(html)('article').length;
+      const $ = fresh.load(html);
+      return { count: $('article').length, $ };
     },
-    verify: (a, b) => a === b,
-    extract: (result) => result,
+    verify: (a, b) => a.count === b.count && a.$.html() === b.$.html(),
+    extract: (result) => result.count,
   },
 ];
 
@@ -162,17 +163,19 @@ const results = [];
 for (const testCase of cases) {
   const times = { legacy: [], oracle: [] };
   let verified = false;
-  let outputs;
-  for (const engine of ['legacy', 'oracle']) {
-    const mod = engine === 'legacy' ? legacy : oracle;
-    for (let i = 0; i < warmup; i++) testCase.run(mod, testCase.input);
-    for (let i = 0; i < targetSamples; i++) {
+  for (let i = 0; i < warmup; i++) {
+    for (const engine of i % 2 ? ['oracle', 'legacy'] : ['legacy', 'oracle']) {
+      testCase.run(engine === 'legacy' ? legacy : oracle, testCase.input);
+    }
+  }
+  for (let i = 0; i < targetSamples; i++) {
+    for (const engine of i % 2 ? ['oracle', 'legacy'] : ['legacy', 'oracle']) {
+      const mod = engine === 'legacy' ? legacy : oracle;
       const start = process.hrtime.bigint();
-      outputs = testCase.run(mod, testCase.input);
+      testCase.run(mod, testCase.input);
       times[engine].push(Number(process.hrtime.bigint() - start) / 1e6);
     }
   }
-  verified = testCase.verify(outputs, outputs); // both engines returned; cross-check below
   const legacyOutput = testCase.run(legacy, testCase.input);
   const oracleOutput = testCase.run(oracle, testCase.input);
   verified = testCase.verify(legacyOutput, oracleOutput);
