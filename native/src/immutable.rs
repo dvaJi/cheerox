@@ -288,6 +288,14 @@ impl SelectDom for TreeDom<'_> {
             .and_then(Value::as_bool)
             .unwrap_or(!self.xml_mode())
     }
+    fn custom_pseudo(&self, id: u32, name: &str, arg: Option<&str>) -> Option<bool> {
+        let key = format!("{}({})", name, arg.unwrap_or(""));
+        self.options
+            .get("__pseudoMatches")?
+            .get(&key)?
+            .as_array()
+            .map(|ids| ids.iter().any(|value| value.as_u64() == Some(id as u64)))
+    }
     fn pseudo_alias(&self, name: &str) -> Option<&str> {
         self.options
             .get("pseudos")
