@@ -64,8 +64,28 @@ impl TreeIndex {
             }
         }
         // Tag-name candidate index (lowercased), mirroring the arena's.
-        let mut name_index: crate::id_hash::IdMap<String, Vec<u32>> = crate::id_hash::IdMap::default();
+        // Only nodes still attached to the tree are indexed.
+        let mut name_index: crate::id_hash::IdMap<String, Vec<u32>> =
+            crate::id_hash::IdMap::default();
+        let mut reachable = vec![false; count];
+        if count > 0 {
+            reachable[0] = true;
+            let mut stack = vec![0u32];
+            while let Some(node) = stack.pop() {
+                let start = child_start[node as usize] as usize;
+                let end = child_end[node as usize] as usize;
+                for &child in &children[start..end] {
+                    if (child as usize) < reachable.len() && !reachable[child as usize] {
+                        reachable[child as usize] = true;
+                        stack.push(child);
+                    }
+                }
+            }
+        }
         for local in 0..count {
+            if !reachable[local] {
+                continue;
+            }
             if let Some(node) = html.tree.get(ids[local]) {
                 if let Node::Element(element) = node.value() {
                     let key = element.name().to_ascii_lowercase();
@@ -106,8 +126,28 @@ impl TreeIndex {
             child_end[index] = children.len() as u32;
         }
         // Tag-name candidate index (lowercased), mirroring the arena's.
-        let mut name_index: crate::id_hash::IdMap<String, Vec<u32>> = crate::id_hash::IdMap::default();
+        // Only nodes still attached to the tree are indexed.
+        let mut name_index: crate::id_hash::IdMap<String, Vec<u32>> =
+            crate::id_hash::IdMap::default();
+        let mut reachable = vec![false; ids.len()];
+        if !ids.is_empty() {
+            reachable[0] = true;
+            let mut stack = vec![0u32];
+            while let Some(node) = stack.pop() {
+                let start = child_start[node as usize] as usize;
+                let end = child_end[node as usize] as usize;
+                for &child in &children[start..end] {
+                    if (child as usize) < reachable.len() && !reachable[child as usize] {
+                        reachable[child as usize] = true;
+                        stack.push(child);
+                    }
+                }
+            }
+        }
         for (index, id) in ids.iter().enumerate() {
+            if !reachable[index] {
+                continue;
+            }
             if let Some(node) = html.tree.get(*id) {
                 if let Node::Element(element) = node.value() {
                     let key = element.name().to_ascii_lowercase();
@@ -248,16 +288,18 @@ impl SelectDom for TreeDom<'_> {
             .and_then(Value::as_bool)
             .unwrap_or(!self.xml_mode())
     }
-    fn custom_pseudo(&self, id: u32, name: &str, arg: Option<&str>) -> Option<bool> {
-        let key = format!("{}({})", name, arg.unwrap_or(""));
+    fn pseudo_alias(&self, name: &str) -> Option<&str> {
         self.options
-            .get("__pseudoMatches")?
-            .get(&key)?
-            .as_array()
-            .map(|ids| ids.iter().any(|value| value.as_u64() == Some(id as u64)))
+            .get("pseudos")
+            .and_then(Value::as_object)
+            .and_then(|pseudos| pseudos.get(name))
+            .and_then(Value::as_str)
     }
     fn elements_named(&self, lowercase_name: &str) -> Option<&[u32]> {
-        self.index.name_index.get(lowercase_name).map(|v| v.as_slice())
+        self.index
+            .name_index
+            .get(lowercase_name)
+            .map(|v| v.as_slice())
     }
     fn is_id_order_document_order(&self) -> bool {
         true

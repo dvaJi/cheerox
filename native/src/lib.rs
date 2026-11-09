@@ -1558,11 +1558,11 @@ impl NativeDocument {
         position: String,
     ) -> Result<Vec<u32>> {
         let created = self.create(html, None, None)?;
-        let inserted = self
-            .arena_for_write()
-            .as_mut()
-            .unwrap()
-            .insert(&target_ids, &created, &position);
+        let inserted =
+            self.arena_for_write()
+                .as_mut()
+                .unwrap()
+                .insert(&target_ids, &created, &position);
         Ok(self.reported(env, inserted))
     }
 

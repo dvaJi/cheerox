@@ -771,35 +771,8 @@ const attributesApi: CheerioPrototype = {
     // Set the value (with attr map support)
     if (typeof name === 'object' || value !== undefined) {
       if (typeof value === 'function') {
-        // Compute the per-element values first, preserving 0.22.0's read-before-write.
-        const computed = new Array<unknown>(this.length);
-        for (let index = 0; index < this.length; index++) {
-          const el = this[index] as LegacyNode;
-          computed[index] = value.call(el, index, el.attribs ? el.attribs[name] : undefined);
-        }
-        // Batch the writes across the selection when every element is a native node.
-        const groups = new Map<NativeDocument, Array<{ id: number; name: string; value: string | null }>>();
-        let usable = this.length > 0;
-        for (let index = 0; index < this.length; index++) {
-          const el = this[index] as LegacyNode;
-          if (!isTag(el)) { usable = false; break; }
-          if (!el.attribs) el.attribs = {};
-          const binding = bindingOf(el);
-          if (!binding) { usable = false; break; }
-          const group = groups.get(binding.document);
-          const entry = { id: binding.id, name, value: computed[index] === null ? null : (computed[index] + '') };
-          if (group) group.push(entry);
-          else groups.set(binding.document, [entry]);
-        }
-        if (usable) {
-          for (const [document, writes] of groups) {
-            operation(document, 'setAttrs', { writes });
-          }
-          return this;
-        }
         return domEach(this, function (i, el) {
-          if (!isTag(el)) return;
-          setAttr(el, name, computed[i]);
+          setAttr(el, name, value.call(el, i, el.attribs![name]));
         });
       }
       if (typeof name === 'string') {
