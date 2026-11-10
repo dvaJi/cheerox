@@ -466,16 +466,18 @@ function fillFromSnapshot(state: DocumentState, snapshot: NodeSnapshot, local: n
   const childIds = snapshot.childIds;
   const views = state.views;
   const isStrong = !state.adapterNodes;
+  const hasWeakViews = state.weakViews.size > 0;
+  const hasPendingRoots = !!(state as any)._pendingRoots;
   const constructors = snapshotConstructors(state, snapshot);
   for (let index = 0; index < count; index++) {
     const child = childIds[first + index];
-    let node = (views[child] ?? (state.weakViews.size ? cachedView(state, child) : undefined)) as AnyNode | undefined;
+    let node = (views[child] ?? (hasWeakViews ? cachedView(state, child) : undefined)) as AnyNode | undefined;
     if (node === undefined) {
-      const constructor = isStrong && child < state.baseline && snapshot.isPresent(child) && !snapshot.hasExtraFields(child) ? constructors(snapshot.typeReference(child)) : undefined;
+      const constructor = isStrong && child < state.baseline && snapshot.isPlain(child) ? constructors(snapshot.typeReference(child)) : undefined;
       if (constructor) views[child] = node = constructor(state, child) as unknown as AnyNode;
       else node = viewAt(state, child)!;
     }
-    if ((state as any)._pendingRoots) applyPendingRoot(state, child, node);
+    if (hasPendingRoots) applyPendingRoot(state, child, node);
     target[index] = node;
   }
   truncate(target, count);
@@ -660,8 +662,13 @@ function viewConstructor(state: DocumentState, type: string, hasLocation: boolea
       }
     }
   }
+  const createView = legacy
+    ? () => Object.create(prototype, ownDescriptors) as View
+    : childrenDescriptor
+      ? () => Object.defineProperty(Object.create(prototype), 'children', childrenDescriptor) as View
+      : () => Object.create(prototype) as View;
   constructor = function (state: DocumentState, local: number): View {
-    const view = Object.create(prototype, ownDescriptors) as View;
+    const view = createView();
     view[VIEW_STATE] = state;
     view[VIEW_LOCAL] = local;
     view[VIEW_SELF] = view;

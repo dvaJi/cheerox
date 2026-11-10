@@ -52,6 +52,30 @@ fn extract(
                     if name == "textContent" {
                         return Ok(Value::String(document.text_ids(&[id])));
                     }
+                    if matches!(name, "tagName" | "nodeName" | "name" | "type" | "nodeType")
+                        && document.arena.borrow().is_none()
+                    {
+                        return Ok(document
+                            .with_node(id, |node, _| {
+                                node.value().as_element().map(|element| match name {
+                                    "tagName" | "nodeName" => {
+                                        Value::String(element.name().to_uppercase())
+                                    }
+                                    "name" => Value::String(element.name().to_owned()),
+                                    "type" => Value::String(
+                                        match element.name() {
+                                            "script" => "script",
+                                            "style" => "style",
+                                            _ => "tag",
+                                        }
+                                        .to_owned(),
+                                    ),
+                                    _ => json!(1),
+                                })
+                            })
+                            .flatten()
+                            .unwrap_or(Value::Null));
+                    }
                     if matches!(name, "id" | "class" | "title" | "alt")
                         || name.starts_with("data-")
                         || name.starts_with("aria-")
@@ -210,6 +234,25 @@ pub(crate) fn execute_arena(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn tag_names_do_not_materialize_the_arena() {
+        let document = NativeDocument::parse_options(
+            "<main><img src='/x'><svg><linearGradient id='g'/></svg></main>",
+            true,
+            json!({}),
+            None,
+        );
+        let plan = json!({"version":1,"entries":[
+            {"key":"images","selector":"img","all":true,"value":{"kind":"property","name":"tagName"}},
+            {"key":"gradients","selector":"svg","all":true,"value":{"kind":"property","name":"nodeName"}}
+        ]});
+        assert_eq!(
+            execute(&document, &plan).unwrap(),
+            json!({"images":["IMG"],"gradients":["SVG"]})
+        );
+        assert!(document.arena.borrow().is_none());
+    }
 
     #[test]
     fn nested_maps_preserve_native_property_and_missing_value_semantics() {

@@ -3,6 +3,19 @@ import { test } from 'node:test';
 import oracle from 'cheerio-legacy-reference';
 import cheerox from '../dist/index.mjs';
 
+test('compound tag selectors preserve node identity and special element kinds', () => {
+  for (const options of [{}, { xmlMode: true }]) {
+    const input = '<main><article><a href="/">x</a><script src="/s">x</script><style media="all">y</style></article></main>';
+    const actual = cheerox.load(input, options);
+    for (const selector of ['article a', 'a[href]', 'article script', 'script[src]', 'article style', 'style[media]']) {
+      const node = actual(selector)[0];
+      assert.equal(node.type, actual(node.name)[0].type, selector);
+      assert.strictEqual(node, actual(selector)[0], selector);
+      assert.equal(actual(node).parent()[0].name, 'article');
+    }
+  }
+});
+
 test('typed legacy attributes preserve live views and simple tag node kinds', () => {
   const $ = cheerox.load('<main><article id="a" class="card"><a href="/">x</a></article><script>x</script><style>y</style></main>');
   const article = $('article')[0];

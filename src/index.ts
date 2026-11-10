@@ -9,7 +9,7 @@
  * additive exports; the 1.2.0-style facade itself lives behind the modern
  * entry point.
  */
-import legacy from './legacy.js';
+import legacy from './cheerio-compat.js';
 
 export default legacy;
 
@@ -25,8 +25,8 @@ export {
   evaluate,
   update,
   parse,
-} from './legacy.js';
-export type { CheerioInstance, CheerioConstructor, LegacyNode, LegacyOptions } from './legacy.js';
+} from './cheerio-compat.js';
+export type { CheerioInstance, CheerioConstructor, LegacyNode, LegacyOptions } from './cheerio-compat.js';
 
 export {
   loadAsync,
