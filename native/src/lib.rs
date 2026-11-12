@@ -2865,10 +2865,12 @@ mod tests {
     #[ignore = "diagnostic timing; run explicitly in release mode"]
     fn profile_load_fixture_phases() {
         // The exact operations.mjs generated-2000 fixture.
-        let card = |i: usize| format!(
+        let card = |i: usize| {
+            format!(
             "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
             i % 7, i, i, i, i, i, i, i
-        );
+        )
+        };
         let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
         for i in 0..2000 {
             source.push_str(&card(i));
@@ -2898,11 +2900,8 @@ mod tests {
                     ..Default::default()
                 },
             };
-            let html = html5ever::driver::parse_document(
-                sink::CompatibleSink::new(sized),
-                options,
-            )
-            .one(source.as_str());
+            let html = html5ever::driver::parse_document(sink::CompatibleSink::new(sized), options)
+                .one(source.as_str());
             let parse_t = start.elapsed();
 
             let start = std::time::Instant::now();
@@ -2949,7 +2948,10 @@ mod tests {
         }
         impl NullSink {
             fn new() -> Self {
-                Self { next: std::cell::Cell::new(0), names: RefCell::new(Vec::new()) }
+                Self {
+                    next: std::cell::Cell::new(0),
+                    names: RefCell::new(Vec::new()),
+                }
             }
         }
         impl TreeSink for NullSink {
@@ -2959,37 +2961,60 @@ mod tests {
 
             fn finish(self) -> Self::Output {}
             fn parse_error(&self, _msg: Cow<'static, str>) {}
-            fn get_document(&self) -> Self::Handle { 0 }
-            fn same_node(&self, x: &Self::Handle, y: &Self::Handle) -> bool { x == y }
+            fn get_document(&self) -> Self::Handle {
+                0
+            }
+            fn same_node(&self, x: &Self::Handle, y: &Self::Handle) -> bool {
+                x == y
+            }
             fn elem_name<'a>(&'a self, target: &'a Self::Handle) -> Self::ElemName<'a> {
                 std::cell::Ref::map(self.names.borrow(), |names| &names[*target as usize])
             }
-            fn create_element(&self, name: QualName, _attrs: Vec<Attribute>, _flags: ElementFlags) -> Self::Handle {
+            fn create_element(
+                &self,
+                name: QualName,
+                _attrs: Vec<Attribute>,
+                _flags: ElementFlags,
+            ) -> Self::Handle {
                 let id = self.next.get();
                 self.next.set(id + 1);
                 self.names.borrow_mut().push(name);
                 id
             }
-            fn create_comment(&self, _text: StrTendril) -> Self::Handle { u32::MAX - 1 }
+            fn create_comment(&self, _text: StrTendril) -> Self::Handle {
+                u32::MAX - 1
+            }
             fn append_doctype_to_document(&self, _: StrTendril, _: StrTendril, _: StrTendril) {}
             fn append(&self, _parent: &Self::Handle, _child: NodeOrText<Self::Handle>) {}
             fn append_before_sibling(&self, _: &Self::Handle, _: NodeOrText<Self::Handle>) {}
-            fn append_based_on_parent_node(&self, _: &Self::Handle, _: &Self::Handle, _: NodeOrText<Self::Handle>) {}
+            fn append_based_on_parent_node(
+                &self,
+                _: &Self::Handle,
+                _: &Self::Handle,
+                _: NodeOrText<Self::Handle>,
+            ) {
+            }
             fn remove_from_parent(&self, _: &Self::Handle) {}
             fn reparent_children(&self, _: &Self::Handle, _: &Self::Handle) {}
             fn add_attrs_if_missing(&self, _: &Self::Handle, _: Vec<Attribute>) {}
-            fn get_template_contents(&self, target: &Self::Handle) -> Self::Handle { *target }
+            fn get_template_contents(&self, target: &Self::Handle) -> Self::Handle {
+                *target
+            }
             fn mark_script_already_started(&self, _: &Self::Handle) {}
             fn pop(&self, _: &Self::Handle) {}
             fn set_current_line(&self, _: u64) {}
             fn set_quirks_mode(&self, _: QuirksMode) {}
-            fn create_pi(&self, _: StrTendril, _: StrTendril) -> Self::Handle { u32::MAX - 2 }
+            fn create_pi(&self, _: StrTendril, _: StrTendril) -> Self::Handle {
+                u32::MAX - 2
+            }
         }
 
-        let card = |i: usize| format!(
+        let card = |i: usize| {
+            format!(
             "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
             i % 7, i, i, i, i, i, i, i
-        );
+        )
+        };
         let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
         for i in 0..2000 {
             source.push_str(&card(i));
@@ -3009,27 +3034,76 @@ mod tests {
                 type Output = ();
                 type ElemName<'a> = std::cell::Ref<'a, html5ever::QualName>;
                 fn finish(self) -> Self::Output {}
-                fn parse_error(&self, msg: Cow<'static, str>) { self.0.parse_error(msg) }
-                fn get_document(&self) -> Self::Handle { self.0.get_document() }
-                fn same_node(&self, x: &Self::Handle, y: &Self::Handle) -> bool { self.0.same_node(x, y) }
-                fn elem_name<'a>(&'a self, target: &'a Self::Handle) -> Self::ElemName<'a> { self.0.elem_name(target) }
-                fn create_element(&self, name: QualName, attrs: Vec<Attribute>, flags: ElementFlags) -> Self::Handle { self.0.create_element(name, attrs, flags) }
-                fn create_comment(&self, text: StrTendril) -> Self::Handle { self.0.create_comment(text) }
-                fn append_doctype_to_document(&self, a: StrTendril, b: StrTendril, c: StrTendril) { self.0.append_doctype_to_document(a, b, c) }
-                fn append(&self, parent: &Self::Handle, child: NodeOrText<Self::Handle>) { self.0.append(parent, child) }
-                fn append_before_sibling(&self, s: &Self::Handle, n: NodeOrText<Self::Handle>) { self.0.append_before_sibling(s, n) }
-                fn append_based_on_parent_node(&self, e: &Self::Handle, p: &Self::Handle, c: NodeOrText<Self::Handle>) { self.0.append_based_on_parent_node(e, p, c) }
-                fn remove_from_parent(&self, t: &Self::Handle) { self.0.remove_from_parent(t) }
-                fn reparent_children(&self, n: &Self::Handle, np: &Self::Handle) { self.0.reparent_children(n, np) }
-                fn add_attrs_if_missing(&self, t: &Self::Handle, a: Vec<Attribute>) { self.0.add_attrs_if_missing(t, a) }
-                fn get_template_contents(&self, t: &Self::Handle) -> Self::Handle { self.0.get_template_contents(t) }
-                fn mark_script_already_started(&self, t: &Self::Handle) { self.0.mark_script_already_started(t) }
-                fn pop(&self, t: &Self::Handle) { self.0.pop(t) }
-                fn set_current_line(&self, n: u64) { self.0.set_current_line(n) }
-                fn set_quirks_mode(&self, m: QuirksMode) { self.0.set_quirks_mode(m) }
-                fn create_pi(&self, a: StrTendril, b: StrTendril) -> Self::Handle { self.0.create_pi(a, b) }
+                fn parse_error(&self, msg: Cow<'static, str>) {
+                    self.0.parse_error(msg)
+                }
+                fn get_document(&self) -> Self::Handle {
+                    self.0.get_document()
+                }
+                fn same_node(&self, x: &Self::Handle, y: &Self::Handle) -> bool {
+                    self.0.same_node(x, y)
+                }
+                fn elem_name<'a>(&'a self, target: &'a Self::Handle) -> Self::ElemName<'a> {
+                    self.0.elem_name(target)
+                }
+                fn create_element(
+                    &self,
+                    name: QualName,
+                    attrs: Vec<Attribute>,
+                    flags: ElementFlags,
+                ) -> Self::Handle {
+                    self.0.create_element(name, attrs, flags)
+                }
+                fn create_comment(&self, text: StrTendril) -> Self::Handle {
+                    self.0.create_comment(text)
+                }
+                fn append_doctype_to_document(&self, a: StrTendril, b: StrTendril, c: StrTendril) {
+                    self.0.append_doctype_to_document(a, b, c)
+                }
+                fn append(&self, parent: &Self::Handle, child: NodeOrText<Self::Handle>) {
+                    self.0.append(parent, child)
+                }
+                fn append_before_sibling(&self, s: &Self::Handle, n: NodeOrText<Self::Handle>) {
+                    self.0.append_before_sibling(s, n)
+                }
+                fn append_based_on_parent_node(
+                    &self,
+                    e: &Self::Handle,
+                    p: &Self::Handle,
+                    c: NodeOrText<Self::Handle>,
+                ) {
+                    self.0.append_based_on_parent_node(e, p, c)
+                }
+                fn remove_from_parent(&self, t: &Self::Handle) {
+                    self.0.remove_from_parent(t)
+                }
+                fn reparent_children(&self, n: &Self::Handle, np: &Self::Handle) {
+                    self.0.reparent_children(n, np)
+                }
+                fn add_attrs_if_missing(&self, t: &Self::Handle, a: Vec<Attribute>) {
+                    self.0.add_attrs_if_missing(t, a)
+                }
+                fn get_template_contents(&self, t: &Self::Handle) -> Self::Handle {
+                    self.0.get_template_contents(t)
+                }
+                fn mark_script_already_started(&self, t: &Self::Handle) {
+                    self.0.mark_script_already_started(t)
+                }
+                fn pop(&self, t: &Self::Handle) {
+                    self.0.pop(t)
+                }
+                fn set_current_line(&self, n: u64) {
+                    self.0.set_current_line(n)
+                }
+                fn set_quirks_mode(&self, m: QuirksMode) {
+                    self.0.set_quirks_mode(m)
+                }
+                fn create_pi(&self, a: StrTendril, b: StrTendril) -> Self::Handle {
+                    self.0.create_pi(a, b)
+                }
             }
-            html5ever::driver::parse_document(Shared(sink.clone()), Default::default()).one(source.as_str());
+            html5ever::driver::parse_document(Shared(sink.clone()), Default::default())
+                .one(source.as_str());
             let null_t = start.elapsed();
 
             let start = std::time::Instant::now();
@@ -3046,11 +3120,20 @@ mod tests {
                 real_samples.push(real_t);
             }
         }
-        let median = |mut v: Vec<std::time::Duration>| { v.sort_unstable(); v[v.len() / 2] };
-        println!("null sink parse: {:?}; scraper sink parse: {:?}", median(null_samples), median(real_samples));
+        let median = |mut v: Vec<std::time::Duration>| {
+            v.sort_unstable();
+            v[v.len() / 2]
+        };
+        println!(
+            "null sink parse: {:?}; scraper sink parse: {:?}",
+            median(null_samples),
+            median(real_samples)
+        );
 
         // Tokenizer only, with a token sink that drops everything.
-        use html5ever::tokenizer::{BufferQueue, Token, TokenSink, TokenSinkResult, Tokenizer, TokenizerOpts};
+        use html5ever::tokenizer::{
+            BufferQueue, Token, TokenSink, TokenSinkResult, Tokenizer, TokenizerOpts,
+        };
         struct DropSink;
         impl TokenSink for DropSink {
             type Handle = ();
@@ -3072,8 +3155,12 @@ mod tests {
             }
             last_stats = tokenizer.fast_scan_stats();
         }
-        println!("tokenizer only: {:?}; fast hits={}, bails={}",
-            median(token_samples), last_stats.0, last_stats.1);
+        println!(
+            "tokenizer only: {:?}; fast hits={}, bails={}",
+            median(token_samples),
+            last_stats.0,
+            last_stats.1
+        );
     }
 
     #[test]
@@ -3088,7 +3175,12 @@ mod tests {
         // Children and parents are u32 indexes; finish() returns the count.
         #[allow(dead_code)]
         enum FlatNode {
-            Element { name: QualName, attrs: Vec<(QualName, StrTendril)>, parent: u32, children: Vec<u32> },
+            Element {
+                name: QualName,
+                attrs: Vec<(QualName, StrTendril)>,
+                parent: u32,
+                children: Vec<u32>,
+            },
         }
         // TreeSink needs &'a QualName from &'a self; use RefCell-free storage
         // by returning through a raw pointer wrapper is unsafe; instead keep
@@ -3102,32 +3194,57 @@ mod tests {
             type Handle = u32;
             type Output = usize;
             type ElemName<'a> = std::cell::Ref<'a, QualName>;
-            fn finish(self) -> usize { self.0.nodes.borrow().len() }
+            fn finish(self) -> usize {
+                self.0.nodes.borrow().len()
+            }
             fn parse_error(&self, _: Cow<'static, str>) {}
-            fn get_document(&self) -> u32 { 0 }
-            fn same_node(&self, x: &u32, y: &u32) -> bool { x == y }
+            fn get_document(&self) -> u32 {
+                0
+            }
+            fn same_node(&self, x: &u32, y: &u32) -> bool {
+                x == y
+            }
             fn elem_name<'a>(&'a self, target: &'a u32) -> std::cell::Ref<'a, QualName> {
                 std::cell::Ref::map(self.0.names.borrow(), |names| &names[*target as usize])
             }
-            fn create_element(&self, name: QualName, attrs: Vec<Attribute>, _f: ElementFlags) -> u32 {
+            fn create_element(
+                &self,
+                name: QualName,
+                attrs: Vec<Attribute>,
+                _f: ElementFlags,
+            ) -> u32 {
                 let mut nodes = self.0.nodes.borrow_mut();
                 let id = nodes.len() as u32;
-                let converted: Vec<(QualName, StrTendril)> = attrs.into_iter().map(|a| (a.name, a.value)).collect();
-                nodes.push(FlatNode::Element { name: name.clone(), attrs: converted, parent: u32::MAX, children: Vec::new() });
+                let converted: Vec<(QualName, StrTendril)> =
+                    attrs.into_iter().map(|a| (a.name, a.value)).collect();
+                nodes.push(FlatNode::Element {
+                    name: name.clone(),
+                    attrs: converted,
+                    parent: u32::MAX,
+                    children: Vec::new(),
+                });
                 self.0.names.borrow_mut().push(name);
                 id
             }
-            fn create_comment(&self, _: StrTendril) -> u32 { u32::MAX - 1 }
+            fn create_comment(&self, _: StrTendril) -> u32 {
+                u32::MAX - 1
+            }
             fn append_doctype_to_document(&self, _: StrTendril, _: StrTendril, _: StrTendril) {}
             fn append(&self, parent: &u32, child: NodeOrText<u32>) {
                 let mut nodes = self.0.nodes.borrow_mut();
                 match child {
                     NodeOrText::AppendNode(id) => {
-                        if let FlatNode::Element { children, .. } = &mut nodes[*parent as usize] { children.push(id); }
-                        if let FlatNode::Element { parent: p, .. } = &mut nodes[id as usize] { *p = *parent; }
+                        if let FlatNode::Element { children, .. } = &mut nodes[*parent as usize] {
+                            children.push(id);
+                        }
+                        if let FlatNode::Element { parent: p, .. } = &mut nodes[id as usize] {
+                            *p = *parent;
+                        }
                     }
                     NodeOrText::AppendText(_) => {
-                        if let FlatNode::Element { children, .. } = &mut nodes[*parent as usize] { children.push(u32::MAX - 1); }
+                        if let FlatNode::Element { children, .. } = &mut nodes[*parent as usize] {
+                            children.push(u32::MAX - 1);
+                        }
                     }
                 }
             }
@@ -3145,18 +3262,24 @@ mod tests {
                     }
                 }
             }
-            fn get_template_contents(&self, t: &u32) -> u32 { *t }
+            fn get_template_contents(&self, t: &u32) -> u32 {
+                *t
+            }
             fn mark_script_already_started(&self, _: &u32) {}
             fn pop(&self, _: &u32) {}
             fn set_current_line(&self, _: u64) {}
             fn set_quirks_mode(&self, _: QuirksMode) {}
-            fn create_pi(&self, _: StrTendril, _: StrTendril) -> u32 { u32::MAX - 2 }
+            fn create_pi(&self, _: StrTendril, _: StrTendril) -> u32 {
+                u32::MAX - 2
+            }
         }
 
-        let card = |i: usize| format!(
+        let card = |i: usize| {
+            format!(
             "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
             i % 7, i, i, i, i, i, i, i
-        );
+        )
+        };
         let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
         for i in 0..2000 {
             source.push_str(&card(i));
@@ -3167,8 +3290,12 @@ mod tests {
         let mut real_samples = Vec::new();
         for iteration in 0..40 {
             let start = std::time::Instant::now();
-            let core = std::rc::Rc::new(FlatCore { nodes: RefCell::new(Vec::new()), names: RefCell::new(Vec::new()) });
-            let out = html5ever::driver::parse_document(FlatSinkWrap(core), Default::default()).one(source.as_str());
+            let core = std::rc::Rc::new(FlatCore {
+                nodes: RefCell::new(Vec::new()),
+                names: RefCell::new(Vec::new()),
+            });
+            let out = html5ever::driver::parse_document(FlatSinkWrap(core), Default::default())
+                .one(source.as_str());
             let flat_t = start.elapsed();
             std::hint::black_box(&out);
 
@@ -3186,8 +3313,15 @@ mod tests {
                 real_samples.push(real_t);
             }
         }
-        let median = |mut v: Vec<std::time::Duration>| { v.sort_unstable(); v[v.len() / 2] };
-        println!("flat sink parse: {:?}; scraper sink parse: {:?}", median(flat_samples), median(real_samples));
+        let median = |mut v: Vec<std::time::Duration>| {
+            v.sort_unstable();
+            v[v.len() / 2]
+        };
+        println!(
+            "flat sink parse: {:?}; scraper sink parse: {:?}",
+            median(flat_samples),
+            median(real_samples)
+        );
     }
 
     #[test]
@@ -3195,10 +3329,12 @@ mod tests {
     fn profile_load_fixture_gum_path() {
         // The html5gum tokenizer driving html5ever's tree builder — the
         // bridge already used for locations — versus the html5ever tokenizer.
-        let card = |i: usize| format!(
+        let card = |i: usize| {
+            format!(
             "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
             i % 7, i, i, i, i, i, i, i
-        );
+        )
+        };
         let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
         for i in 0..2000 {
             source.push_str(&card(i));
@@ -3236,8 +3372,15 @@ mod tests {
                 ever_samples.push(ever_t);
             }
         }
-        let median = |mut v: Vec<std::time::Duration>| { v.sort_unstable(); v[v.len() / 2] };
-        println!("gum+bridge parse: {:?}; html5ever parse: {:?}", median(gum_samples), median(ever_samples));
+        let median = |mut v: Vec<std::time::Duration>| {
+            v.sort_unstable();
+            v[v.len() / 2]
+        };
+        println!(
+            "gum+bridge parse: {:?}; html5ever parse: {:?}",
+            median(gum_samples),
+            median(ever_samples)
+        );
     }
 
     #[test]
