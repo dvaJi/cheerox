@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-24.04
     environment:
       name: npm
-      url: https://www.npmjs.com/package/cheerox
+      url: https://www.npmjs.com/package/@dvaji/cheerox
     permissions:
       contents: read
       id-token: write

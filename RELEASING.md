@@ -23,7 +23,7 @@ settings:
 | Allowed action | Direct publishing with `npm publish` |
 
 Configure the GitHub `npm` environment for maintainers and permit releases from
-`main`. The workflow uses GitHub-hosted runners, Node 24, npm 11.5.1 or newer,
+`master`. The workflow uses GitHub-hosted runners, Node 24, npm 11.5.1 or newer,
 and OIDC authentication. It requires no stored npm token.
 
 A new trusted-publisher configuration must complete its first successful
@@ -43,31 +43,31 @@ needed by this workflow.
 
 Update `package.json`, `package-lock.json`, `Cargo.toml` and `Cargo.lock` to the
 same semantic version. Regenerate the notices with `npm run notices:generate`
-and merge the release changes to `main`. Use `next` for prerelease versions.
+and merge the release changes to `master`. Use `next` for prerelease versions.
 Confirm the build, tests and packaging checks pass.
 
-Create a version tag on the current `main` commit:
+Create a version tag on the current `master` commit:
 
 ```sh
-git switch main
+git switch master
 git pull --ff-only
 git tag v0.1.1
 git push origin v0.1.1
 ```
 
 Replace `0.1.1` with the intended version. Dispatch publication before making
-another commit to `main`: the tag, package version, Cargo version and the
-workflow's `main` commit must identify the same release.
+another commit to `master`: the tag, package version, Cargo version and the
+workflow's `master` commit must identify the same release.
 
 ## Publish a release
 
-Run the **Publish to npm** workflow from `main`, with the exact package version
+Run the **Publish to npm** workflow from `master`, with the exact package version
 and npm dist-tag:
 
 ```sh
 gh workflow run publish.yml \
   --repo dvaJi/cheerox \
-  --ref main \
+  --ref master \
   -f version=0.1.1 \
   -f npm_tag=latest
 ```
