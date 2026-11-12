@@ -78,7 +78,7 @@ test('release ABI checks inspect actual ELF version requirements and Windows ARM
   assert.throws(() => validateNativeBinary('cheerox.win32-x64-msvc.node', pe), /wrong Windows CPU/);
 });
 
-test('release references require a public repository and the exact tagged main commit', () => {
+test('release references require a public repository and the exact tagged master commit', () => {
   const directory = mkdtempSync(join(tmpdir(), 'cheerox release ref '));
   try {
     mkdirSync(join(directory, 'scripts'));
@@ -86,19 +86,19 @@ test('release references require a public repository and the exact tagged main c
     writeFileSync(join(directory, 'package.json'), JSON.stringify(metadata));
     writeFileSync(join(directory, 'Cargo.toml'), cargo);
     const git = args => execFileSync('git', args, { cwd: directory, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-    git(['init', '--quiet', '--initial-branch=main']);
+    git(['init', '--quiet', '--initial-branch=master']);
     git(['add', '.']);
     git(['-c', 'user.name=Release test', '-c', 'user.email=release@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '--quiet', '-m', 'Release fixture']);
     const commit = git(['rev-parse', 'HEAD']);
     git(['-c', 'tag.gpgsign=false', 'tag', `v${metadata.version}`]);
-    git(['update-ref', 'refs/remotes/origin/main', commit]);
-    const environment = { ...process.env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/main', GITHUB_REPOSITORY: 'dvaJi/cheerox', GITHUB_SHA: commit, REPOSITORY_VISIBILITY: 'public', RELEASE_VERSION: metadata.version, NPM_DIST_TAG: metadata.version.includes('-') ? 'next' : 'latest', GITHUB_OUTPUT: join(directory, 'output') };
+    git(['update-ref', 'refs/remotes/origin/master', commit]);
+    const environment = { ...process.env, GITHUB_EVENT_NAME: 'workflow_dispatch', GITHUB_REF: 'refs/heads/master', GITHUB_REPOSITORY: 'dvaJi/cheerox', GITHUB_SHA: commit, REPOSITORY_VISIBILITY: 'public', RELEASE_VERSION: metadata.version, NPM_DIST_TAG: metadata.version.includes('-') ? 'next' : 'latest', GITHUB_OUTPUT: join(directory, 'output') };
     const check = changes => execFileSync(process.execPath, [join(directory, 'scripts/check-release-ref.mjs')], { cwd: directory, env: { ...environment, ...changes }, stdio: ['ignore', 'pipe', 'pipe'] });
     check({});
     assert.match(readFileSync(environment.GITHUB_OUTPUT, 'utf8'), new RegExp(`commit=${commit}`));
     assert.throws(() => check({ REPOSITORY_VISIBILITY: 'private' }), /repository public/);
     assert.throws(() => check({ GITHUB_REPOSITORY: 'another/cheerox' }), /fork is disabled/);
-    assert.throws(() => check({ GITHUB_SHA: '0'.repeat(40) }), /exact main workflow commit/);
+    assert.throws(() => check({ GITHUB_SHA: '0'.repeat(40) }), /exact master workflow commit/);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

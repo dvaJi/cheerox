@@ -12,7 +12,7 @@ assert.equal(process.env.GITHUB_REPOSITORY, 'dvaJi/cheerox', 'Publishing from a 
 assert.equal(process.env.REPOSITORY_VISIBILITY, 'public', 'Make the repository public before releasing with npm provenance');
 const git = args => execFileSync('git', args, { encoding: 'utf8' }).trim();
 const commit = git(['rev-parse', `refs/tags/${tag}^{commit}`]);
-assert.equal(commit, process.env.GITHUB_SHA, 'The version tag must point to this exact main workflow commit so npm provenance identifies the built source');
+assert.equal(commit, process.env.GITHUB_SHA, 'The version tag must point to this exact master workflow commit so npm provenance identifies the built source');
 assert.equal(git(['rev-parse', 'HEAD']), commit, 'The release checkout must match the version tag');
 execFileSync('git', ['merge-base', '--is-ancestor', commit, 'refs/remotes/origin/master']);
 const metadata = JSON.parse(git(['show', `${commit}:package.json`]));
