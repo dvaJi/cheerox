@@ -180,7 +180,13 @@ for (const [digest, text] of [...texts].sort(([a], [b]) => compare(a, b))) {
 }
 const generated = parts.join('\n') + '\n';
 if (check) {
-  if (!existsSync(output) || read(output) !== generated) throw new Error('THIRD_PARTY_NOTICES.md is stale. Run npm run notices:generate and commit the updated file.');
+  if (!existsSync(output) || read(output) !== generated) {
+    const existing = existsSync(output) ? read(output) : '';
+    let at = 0;
+    while (at < existing.length && at < generated.length && existing[at] === generated[at]) at++;
+    const context = (text) => text.slice(at, at + 160).replace(/\n/g, '\\n');
+    throw new Error(`THIRD_PARTY_NOTICES.md is stale at byte ${at}. Committed: "${context(existing)}" Generated: "${context(generated)}". Run npm run notices:generate and commit the updated file.`);
+  }
   console.log(`Third-party notices match ${records.length} locked Rust packages and Cheerio 1.2.0.`);
 } else {
   writeFileSync(output, generated);
