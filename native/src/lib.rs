@@ -68,9 +68,9 @@ struct OffsetNode<'a> {
     #[serde(skip_serializing_if = "Option::is_none")]
     namespace: Option<&'a Cow<'static, str>>,
     #[serde(rename = "attribsNamespace", skip_serializing_if = "Option::is_none")]
-    attribs_namespace: Option<&'a Box<Map<String, Value>>>,
+    attribs_namespace: Option<&'a Map<String, Value>>,
     #[serde(rename = "attribsPrefix", skip_serializing_if = "Option::is_none")]
-    attribs_prefix: Option<&'a Box<Map<String, Value>>>,
+    attribs_prefix: Option<&'a Map<String, Value>>,
     #[serde(flatten)]
     extras: &'a arena::FieldMap,
 }
@@ -129,8 +129,8 @@ fn offset_node(node: &arena::DomNode, base: u64) -> OffsetNode<'_> {
         prev: link(node.prev),
         next: link(node.next),
         namespace: node.namespace.as_ref(),
-        attribs_namespace: node.attribs_namespace.as_ref(),
-        attribs_prefix: node.attribs_prefix.as_ref(),
+        attribs_namespace: node.attribs_namespace.as_deref(),
+        attribs_prefix: node.attribs_prefix.as_deref(),
         extras: &node.extras,
     }
 }
@@ -1638,7 +1638,7 @@ impl NativeDocument {
                     .collect::<Vec<_>>(),
             )
             .map_err(json_error)?;
-            return Ok(JsText(self.reported(env, serialized)));
+            Ok(JsText(self.reported(env, serialized)))
         }
     }
 
@@ -2909,9 +2909,8 @@ mod tests {
             let prep_t = start.elapsed();
 
             let start = std::time::Instant::now();
-            let arena = document.ensure_arena().unwrap();
+            document.ensure_arena().unwrap();
             let arena_t = start.elapsed();
-            std::hint::black_box(&arena);
             std::hint::black_box(&document);
 
             if iteration >= 5 {
