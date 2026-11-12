@@ -1,0 +1,52 @@
+# Vendored from crates.io scraper 0.24.0.
+#
+# Local changes versus the published crate, matching cheerox's needs:
+# - `Attributes` is an insertion-ordered vector-backed map instead of
+#   `indexmap::IndexMap`, removing per-element hashing and index allocation
+#   from HTML tree construction.
+# - The `main`, `deterministic` and `default` features, the `getopts` and
+#   `indexmap` dependencies, the binary and the examples are removed.
+[package]
+edition = "2021"
+name = "scraper"
+version = "0.24.0"
+license = "ISC"
+repository = "https://github.com/causal-agent/scraper"
+description = "HTML parsing and querying with CSS selectors (vendored, vector-backed attributes)"
+build = false
+autolib = false
+autobins = false
+autoexamples = false
+autotests = false
+autobenches = false
+
+[lib]
+name = "scraper"
+path = "src/lib.rs"
+
+[features]
+atomic = []
+errors = []
+serde = ["dep:serde"]
+
+[dependencies.cssparser]
+version = "0.35.0"
+
+[dependencies.ego-tree]
+version = "0.10.0"
+
+[dependencies.html5ever]
+version = "0.35.0"
+
+[dependencies.precomputed-hash]
+version = "0.1.1"
+
+[dependencies.selectors]
+version = "0.31.0"
+
+[dependencies.serde]
+version = "1.0.218"
+optional = true
+
+[dependencies.tendril]
+version = "0.4.3"

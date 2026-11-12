@@ -10,38 +10,40 @@ Este archivo resume qué se investigó, qué cambios se retuvieron, qué experim
 
 Corrida de `node --expose-gc bench/operations.mjs --mode html`, 21 muestras por operación en Node 24.18.0, Windows x64, fixture HTML sintético (494 KB a 2.000 tarjetas). Cada operación verifica igualdad de salida con Cheerio 1.2. La columna «total» incluye carga; «op.» mide solo la operación. Son medianas diagnósticas de una corrida; las decisiones de rendimiento usan comparaciones pareadas (ver investigación).
 
-El resultado JSON completo está guardado en [2026-11-12-operations-html.json](./results/2026-11-12-operations-html.json).
+El resultado JSON completo está guardado en [2026-11-12-operations-html-vecattrs.json](./results/2026-11-12-operations-html-vecattrs.json).
 
-| Operación | 200 tarjetas total | 2.000 tarjetas total | 2.000 tarjetas op. |
-| --- | ---: | ---: | ---: |
-| Carga | 1,62× | 1,76× | — |
-| Selección por etiqueta | 2,26× | 1,97× | 8,92× |
-| Selección compuesta | 2,27× | 1,96× | 5,76× |
-| Texto de selección | 2,29× | 2,00× | 6,36× |
-| HTML de selección | 2,35× | 1,99× | 7,82× |
-| Serializar documento | 2,54× | 2,52× | 11,73× |
-| `attr` por elemento | 1,28× | 1,56× | 1,11× |
-| Propiedad `attribs` | 1,34× | 1,72× | 1,55× |
-| `map` y `get` | 1,68× | 2,19× | 3,72× |
-| `closest` por elemento | 1,61× | 1,99× | 2,43× |
-| Contar padres | 1,10× | 1,44× | 0,88× |
-| Padre y hermanos | 1,12× | 1,43× | 0,83× |
-| Hijos y siguiente | 1,12× | 1,48× | 0,94× |
-| `find` por elemento | 1,64× | 1,92× | 2,29× |
-| `is` y `filter` | 1,53× | 1,84× | 2,05× |
-| Recorrido de hijos en JS | 1,05× | 1,32× | 0,33× |
-| Recorrido y lectura de campos | 0,69× | 0,74× | 0,16× |
-| Contenidos y nodos de texto | 1,72× | 2,00× | 2,81× |
-| Establecer atributos | 1,32× | 1,56× | 1,13× |
-| Eliminar elementos | 1,60× | 1,78× | 1,89× |
-| Añadir y anteponer | 1,85× | 2,37× | 3,35× |
-| Reemplazar texto y HTML | 1,40× | 1,63× | 1,43× |
-| Mutar y serializar | 1,62× | 1,82× | 1,95× |
-| Reescribir atributos por elemento | 1,23× | 1,32× | 0,74× |
-| Clonar e insertar | 1,28× | 1,60× | 1,28× |
-| Mapa de extracción | 1,93× | 2,79× | 21,39× |
+Esta corrida incluye el sink de scraper con atributos en vector ordenado (vendor de scraper 0.24 con `Attributes` sobre `Vec`, sin indexmap).
 
-Dieciséis de veinticinco operaciones superan 1,5× total a 2.000 tarjetas (antes: ninguna); la carga pasó de paridad (0,99×) a 1,76×. El gate de rendimiento más reciente pasa en HTML y XML. Las tres cadenas de selección (contar padres, padre y hermanos, hijos y siguiente) quedan en 1,43–1,48×, y los recorridos JS siguen debajo: su costo por nodo es materialización de vistas, no lectura.
+| Operación | 2.000 tarjetas total | 2.000 tarjetas op. |
+| --- | ---: | ---: |
+| Carga | 1,79× | — |
+| Selección por etiqueta | 2,01× | 8,97× |
+| Selección compuesta | 2,01× | 6,09× |
+| Texto de selección | 2,03× | 6,94× |
+| HTML de selección | 1,99× | 7,60× |
+| Serializar documento | 2,29× | 10,61× |
+| `attr` por elemento | 1,60× | 1,02× |
+| Propiedad `attribs` | 1,66× | 1,17× |
+| `map` y `get` | 2,28× | 4,17× |
+| `closest` por elemento | 2,06× | 2,56× |
+| Contar padres | 1,42× | 0,80× |
+| Padre y hermanos | 1,46× | 0,83× |
+| Hijos y siguiente | 1,51× | 0,96× |
+| `find` por elemento | 1,88× | 2,06× |
+| `is` y `filter` | 1,79× | 1,79× |
+| Recorrido de hijos en JS | 1,32× | 0,32× |
+| Recorrido y lectura de campos | 0,79× | 0,17× |
+| Contenidos y nodos de texto | 1,98× | 2,58× |
+| Establecer atributos | 1,52× | 0,97× |
+| Eliminar elementos | 1,79× | 1,77× |
+| Añadir y anteponer | 2,03× | 2,39× |
+| Reemplazar texto y HTML | 1,64× | 1,41× |
+| Mutar y serializar | 1,86× | 2,02× |
+| Reescribir atributos por elemento | 1,42× | 0,82× |
+| Clonar e insertar | 1,58× | 1,17× |
+| Mapa de extracción | 2,74× | 20,88× |
+
+Diecisiete de veinticinco operaciones superan 1,5× total a 2.000 tarjetas; la carga quedó en 1,79×. El gate de rendimiento más reciente pasa en HTML y XML. Las cadenas de selección restantes (contar padres 1,42×, padre y hermanos 1,46×) y los recorridos JS siguen ligados a la materialización por nodo, no a la carga.
 
 Comparaciones pareadas contra el build de la cabeza del PR (30 rondas alternadas, fixture de artículos de 220 KB del harness, corrida final): carga 1,828× (1,804–1,849), recorrido de hijos 1,629× (1,610–1,663), recorrido con campos 1,313× (1,281–1,355), atributos 1,638× (1,619–1,683), selección por etiqueta 1,723× (1,693–1,763), extracción corta 1,828× (1,813–1,855), documentos mixtos 10,006× (9,814–10,204). En XML a 60 rondas: recorrido con campos 1,071× (1,049–1,082) y atributos 1,019× (1,001–1,033) total, con la operación sola en paridad; el costo restante de operación es materialización de objetos de atributos, el precio de lecturas ~4× más baratas en caliente.
 

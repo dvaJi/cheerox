@@ -1,8 +1,9 @@
-# Vendored HTML5 integration hooks
+# Vendored HTML5 integration hooks and attribute storage
 
 These directories contain html5ever 0.35.0, markup5ever 0.35.0 and html5gum 0.8.4,
 with their original license files (MIT OR Apache-2.0 for html5ever/markup5ever;
-MIT for html5gum). Their exact patched sources ship in
+MIT for html5gum), and scraper 0.24.0 with its original license file (ISC).
+Their exact patched sources ship in
 the npm package and are selected by the root Cargo manifest's
 `[patch.crates-io]` entries.
 
@@ -19,8 +20,16 @@ representation of lone JavaScript UTF-16 surrogates.
 The flag is disabled for upstream users of these crates. The original HTML5
 character-reference decoding rules remain in place.
 
+The vendored scraper keeps its public surface but replaces the
+`deterministic`-feature `indexmap::IndexMap` attribute storage with an
+insertion-ordered vector-backed map: elements hold a handful of attributes, so
+one ordered insertion costs less than a hash per attribute. Duplicate
+attributes keep the first value, as the HTML tree builder requires, and the
+`main`, `deterministic` and `default` features, the `getopts`/`indexmap`
+dependencies, the binary and the examples are removed.
 The patches preserve the HTML5 tree-building algorithms. Review changes against
 the original [html5ever archive](https://crates.io/api/v1/crates/html5ever/0.35.0/download)
 and [markup5ever archive](https://crates.io/api/v1/crates/markup5ever/0.35.0/download),
-and the [html5gum archive](https://crates.io/api/v1/crates/html5gum/0.8.4/download).
+the [html5gum archive](https://crates.io/api/v1/crates/html5gum/0.8.4/download),
+and the [scraper archive](https://crates.io/api/v1/crates/scraper/0.24.0/download).
 Do not remove or edit the original third-party notices when updating these sources.

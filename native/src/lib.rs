@@ -913,7 +913,8 @@ impl NativeDocument {
                 .map(|(name, value)| {
                     let qualified = element
                         .attrs
-                        .keys()
+                        .iter()
+                        .map(|(key, _)| key)
                         .rev()
                         .find(|key| key.local.as_ref() == name)
                         .cloned()

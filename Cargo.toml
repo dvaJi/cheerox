@@ -1,6 +1,6 @@
 [package]
 name = "cheerox"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "Rust HTML5 parser and CSS selector engine for the cheerox Node.js package"
 license = "MIT"
@@ -18,7 +18,7 @@ napi = { version = "2", default-features = false, features = ["napi8", "async"] 
 napi-derive = "2"
 memchr = "2"
 rayon = "1.10"
-scraper = { version = "0.24", default-features = false, features = ["atomic", "deterministic"] }
+scraper = { version = "0.24", default-features = false, features = ["atomic"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
 smallvec = "1"
@@ -44,3 +44,4 @@ strip = "symbols"
 html5ever = { path = "native/vendor/html5ever-0.35.0" }
 markup5ever = { path = "native/vendor/markup5ever-0.35.0" }
 html5gum = { path = "native/vendor/html5gum-0.8.4" }
+scraper = { path = "native/vendor/scraper-0.24.0" }

@@ -114,7 +114,7 @@ export function validateNativeBinary(name, data) {
 function allowedFile(path) {
   return requiredFiles.includes(path) || /^dist\/[\w./-]+\.(?:[cm]?js|map|[cm]?ts)$/.test(path)
     || /^(?:src\/[\w/-]+\.ts|native\/src\/[\w/-]+\.rs)$/.test(path)
-    || /^native\/vendor\/(?:(?:html5ever|markup5ever)-0\.35\.0|html5gum-0\.8\.4)\/(?:[\w./-]+\.(?:rs|c|h|html|md|toml|orig|json)|Cargo\.lock|LICENSE(?:-(?:MIT|APACHE))?)$/.test(path)
+    || /^native\/vendor\/(?:(?:html5ever|markup5ever)-0\.35\.0|html5gum-0\.8\.4|scraper-0\.24\.0)\/(?:[\w./-]+\.(?:rs|c|h|html|md|toml|orig|json)|Cargo\.lock|LICENSE(?:-(?:MIT|APACHE))?)$/.test(path)
     || /^scripts\/notices\/[\w-]+\.(?:txt|md|json)$/.test(path)
     || nativeTargets.some(target => path === `cheerox.${target}.node`);
 }
@@ -125,7 +125,7 @@ export function validatePackageFiles(files, { allTargets = true } = {}) {
     assert.ok(allowedFile(path), `Unexpected package file: ${path}`);
   }
   for (const path of requiredFiles) assert.ok(files.get(path)?.length > 0, `Package is missing ${path}`);
-  for (const path of ['native/vendor/html5gum-0.8.4/Cargo.toml', 'native/vendor/html5gum-0.8.4/src/lib.rs', 'native/vendor/html5gum-0.8.4/LICENSE']) assert.ok(files.get(path)?.length > 0, `Package is missing ${path}`);
+  for (const path of ['native/vendor/html5gum-0.8.4/Cargo.toml', 'native/vendor/html5gum-0.8.4/src/lib.rs', 'native/vendor/html5gum-0.8.4/LICENSE', 'native/vendor/scraper-0.24.0/Cargo.toml', 'native/vendor/scraper-0.24.0/src/lib.rs', 'native/vendor/scraper-0.24.0/src/node.rs', 'native/vendor/scraper-0.24.0/LICENSE']) assert.ok(files.get(path)?.length > 0, `Package is missing ${path}`);
   assert.match(files.get('LICENSE').toString(), /MIT License/);
   assert.match(files.get('THIRD_PARTY_NOTICES.md').toString(), /cheerio/i);
   assert.match(files.get('README.md').toString(), /drop-in replacement/i);

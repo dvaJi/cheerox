@@ -1,6 +1,6 @@
 {
   "name": "@dvaji/cheerox",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Cheerio 0.22.0-compatible HTML/XML processing on a Rust engine, with parallel, non-blocking extraction",
   "license": "MIT",
   "repository": {
