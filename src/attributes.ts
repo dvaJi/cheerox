@@ -97,6 +97,9 @@ function isElement(selection: Selection, id: number): boolean {
 }
 
 function nativeValue(value: unknown): unknown {
+  // Preserve JSON's primitive normalization without serializing and parsing it.
+  if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
+  if (typeof value === 'number') return Number.isFinite(value) ? (value === 0 ? 0 : value) : { __nativeNumber: String(value) };
   const seen = new WeakSet<object>();
   const json = JSON.stringify(value, (_key, value: unknown) => {
     if (typeof value === 'function' || typeof value === 'symbol' || typeof value === 'bigint' || value === undefined) return { __opaqueJavaScriptValue: true };

@@ -168,6 +168,13 @@ pub struct Tokenizer<Sink> {
 
     /// Track current line
     current_line: Cell<u64>,
+
+    /// Reusable lowercase scratch for the whole-tag fast scan.
+    fast_scratch: RefCell<Vec<u8>>,
+
+    /// Fast-scan diagnostics: committed tags and bails to the machine.
+    fast_hits: Cell<u32>,
+    fast_bails: Cell<u32>,
 }
 
 impl<Sink: TokenSink> Tokenizer<Sink> {
@@ -202,7 +209,22 @@ impl<Sink: TokenSink> Tokenizer<Sink> {
             state_profile: RefCell::new(BTreeMap::new()),
             time_in_sink: Cell::new(0),
             current_line: Cell::new(1),
+            fast_scratch: RefCell::new(Vec::new()),
+            fast_hits: Cell::new(0),
+            fast_bails: Cell::new(0),
         }
+    }
+
+    /// Whole-tag fast-scan counters (diagnostic).
+    pub fn fast_scan_stats(&self) -> (u32, u32) {
+        (self.fast_hits.get(), self.fast_bails.get())
+    }
+
+    #[inline]
+    fn fast_bail(&self, front: &[u8]) -> Option<ProcessResult<Sink::Handle>> {
+        let _ = front;
+        self.fast_bails.set(self.fast_bails.get() + 1);
+        None
     }
 
     /// Feed an input string into the tokenizer.
@@ -419,6 +441,289 @@ impl<Sink: TokenSink> Tokenizer<Sink> {
     // The string must not contain '\0'!
     fn emit_chars(&self, b: StrTendril) {
         self.process_token_and_continue(CharacterTokens(b));
+    }
+
+    /// Byte classes for the whole-tag fast scan. Every set is deliberately
+    /// smaller than what the spec allows: any other byte bails to the state
+    /// machine, which is fully spec-compliant.
+    #[inline]
+    fn fast_is_ascii_letter(b: u8) -> bool {
+        matches!(b, b'a'..=b'z' | b'A'..=b'Z')
+    }
+
+    #[inline]
+    fn fast_is_tag_name_byte(b: u8) -> bool {
+        matches!(b, b'a'..=b'z' | b'A'..=b'Z' | b'0'..=b'9')
+    }
+
+    #[inline]
+    fn fast_is_attr_name_byte(b: u8) -> bool {
+        matches!(b, b'a'..=b'z' | b'A'..=b'Z' | b'0'..=b'9' | b'-' | b'_' | b':' | b'.' | b'@')
+    }
+
+    #[inline]
+    fn fast_is_ws(b: u8) -> bool {
+        matches!(b, b'\t' | b'\n' | 0x0C | b' ')
+    }
+
+    /// An attribute value's quoted byte: everything ASCII except the closing
+    /// quote, NUL, CR (newline normalization), `&` (char refs) and non-ASCII.
+    #[inline]
+    fn fast_is_quoted_value_byte(b: u8, quote: u8) -> bool {
+        b != quote && b != 0 && b != b'&' && b != b'\r' && b < 0x80
+    }
+
+    /// An unquoted value byte: printable ASCII except quote marks, `=`, `<`,
+    /// backtick and `&`; whitespace and `>` terminate it elsewhere.
+    #[inline]
+    fn fast_is_unquoted_value_byte(b: u8) -> bool {
+        matches!(b, 0x21..=0x7E)
+            && !matches!(b, b'"' | b'\'' | b'=' | b'<' | b'`' | b'&')
+    }
+
+    /// Scans a whole well-formed common tag from the front chunk and emits it
+    /// in one step, skipping the per-character state machine for the shapes
+    /// `<name attr="value" ...>` and `</name>` that dominate real markup. A
+    /// leading `/` coming through the TagOpen state is folded in, so end tags
+    /// commit without the machine's EndTagOpen hop. Returns `None` without
+    /// consuming anything whenever anything unusual appears; the state
+    /// machine then handles the byte exactly as before. Parse errors the
+    /// machine would emit are dropped: the document sink never surfaces
+    /// tokenizer errors.
+    fn try_fast_tag(
+        &self,
+        input: &BufferQueue,
+        kind: TagKind,
+    ) -> Option<ProcessResult<Sink::Handle>> {
+        if self.opts.exact_errors || self.reconsume.get() || self.ignore_lf.get() {
+            // Legitimate precondition, not a scan failure.
+            return None;
+        }
+        let mut front = input.peek_front_chunk_mut()?;
+        let bytes: &[u8] = front.as_bytes();
+        // A leading `/` comes through the TagOpen state: switch to an end tag
+        // and scan from the next byte, skipping the machine's EndTagOpen hop.
+        let mut kind = kind;
+        let offset = usize::from(bytes.first() == Some(&b'/') && kind == TagKind::StartTag);
+        if offset == 1 {
+            kind = TagKind::EndTag;
+        }
+        let view: &[u8] = if offset == 1 { &bytes[1..] } else { bytes };
+        let len = view.len();
+        let mut i;
+        let mut newlines = 0u64;
+
+        // First byte: a tag name must start with an ASCII letter here. The
+        // machine's TagOpen/EndTagOpen arms handle `!`, `?` and errors.
+        if !Self::fast_is_ascii_letter(*view.first()?) {
+            return self.fast_bail(bytes);
+        }
+        i = 1;
+        while i < len && Self::fast_is_tag_name_byte(view[i]) {
+            i += 1;
+        }
+        let name_range = (0, i);
+        let mut self_closing = false;
+
+        // Collect attributes as (name, value) byte ranges first; the commit
+        // below only runs when the whole tag parsed, so nothing is mutated
+        // on the bail path.
+        let mut attr_ranges: Vec<((usize, usize), (usize, usize))> = Vec::new();
+
+        // Dispatch on the byte after the name.
+        match view.get(i) {
+            Some(b'>') => i += 1,
+            Some(&b) if Self::fast_is_ws(b) => {
+                'attrs: loop {
+                    while i < len && Self::fast_is_ws(view[i]) {
+                        if view[i] == b'\n' {
+                            newlines += 1;
+                        }
+                        i += 1;
+                    }
+                    match view.get(i) {
+                        None => return self.fast_bail(bytes),
+                        Some(b'>') => {
+                            i += 1;
+                            break 'attrs;
+                        }
+                        Some(b'/') => match view.get(i + 1) {
+                            Some(b'>') => {
+                                i += 2;
+                                self_closing = true;
+                                break 'attrs;
+                            }
+                            _ => return self.fast_bail(bytes),
+                        },
+                        Some(_) => {
+                            // Attribute name.
+                            if view[i] == b'=' {
+                                return self.fast_bail(bytes);
+                            }
+                            let name_start = i;
+                            while i < len && Self::fast_is_attr_name_byte(view[i]) {
+                                i += 1;
+                            }
+                            if i == name_start {
+                                return self.fast_bail(bytes);
+                            }
+                            let name = (name_start, i);
+                            match view.get(i) {
+                                // After the name: whitespace, then a new
+                                // attribute, self-closing or the end.
+                                Some(&b) if Self::fast_is_ws(b) => {
+                                    attr_ranges.push((name, (i, i)));
+                                    continue 'attrs;
+                                }
+                                Some(b'>') => {
+                                    attr_ranges.push((name, (i, i)));
+                                    i += 1;
+                                    break 'attrs;
+                                }
+                                Some(b'=') => {
+                                    i += 1;
+                                    // BeforeAttributeValue.
+                                    while i < len && Self::fast_is_ws(view[i]) {
+                                        if view[i] == b'\n' {
+                                            newlines += 1;
+                                        }
+                                        i += 1;
+                                    }
+                                    let value = match view.get(i) {
+                                        None => return self.fast_bail(bytes),
+                                        Some(&b'"') => {
+                                            i += 1;
+                                            let start = i;
+                                            while i < len
+                                                && Self::fast_is_quoted_value_byte(view[i], b'"')
+                                            {
+                                                if view[i] == b'\n' {
+                                                    newlines += 1;
+                                                }
+                                                i += 1;
+                                            }
+                                            if view.get(i) != Some(&b'"') {
+                                                return self.fast_bail(bytes);
+                                            }
+                                            i += 1;
+                                            (start, i - 1)
+                                        }
+                                        Some(&b'\'') => {
+                                            i += 1;
+                                            let start = i;
+                                            while i < len
+                                                && Self::fast_is_quoted_value_byte(view[i], b'\'')
+                                            {
+                                                if view[i] == b'\n' {
+                                                    newlines += 1;
+                                                }
+                                                i += 1;
+                                            }
+                                            if view.get(i) != Some(&b'\'') {
+                                                return self.fast_bail(bytes);
+                                            }
+                                            i += 1;
+                                            (start, i - 1)
+                                        }
+                                        // `<div foo=>` keeps an empty value.
+                                        Some(b'>') => (i, i),
+                                        Some(_) => {
+                                            let start = i;
+                                            while i < len
+                                                && Self::fast_is_unquoted_value_byte(view[i])
+                                            {
+                                                i += 1;
+                                            }
+                                            if i == start || view.get(i).is_none() {
+                                                return self.fast_bail(bytes);
+                                            }
+                                            match view.get(i) {
+                                                Some(&b) if Self::fast_is_ws(b) => {}
+                                                Some(b'>') => {}
+                                                _ => return self.fast_bail(bytes),
+                                            }
+                                            (start, i)
+                                        }
+                                    };
+                                    attr_ranges.push((name, value));
+                                    continue 'attrs;
+                                }
+                                Some(b'/') => match view.get(i + 1) {
+                                    Some(b'>') => {
+                                        attr_ranges.push((name, (i, i)));
+                                        i += 2;
+                                        self_closing = true;
+                                        break 'attrs;
+                                    }
+                                    _ => return self.fast_bail(bytes),
+                                },
+                                _ => return self.fast_bail(bytes),
+                            }
+                        }
+                    }
+                }
+            }
+            Some(b'/') => match view.get(i + 1) {
+                Some(b'>') => {
+                    i += 2;
+                    self_closing = true;
+                }
+                _ => return self.fast_bail(bytes),
+            },
+            _ => return self.fast_bail(bytes),
+        }
+
+        // Commit: everything below only runs for a fully parsed tag.
+        {
+            #[inline]
+            fn lowered<'a>(view: &[u8], range: (usize, usize), out: &'a mut Vec<u8>) -> &'a str {
+                out.clear();
+                out.extend(view[range.0..range.1].iter().map(|b| b.to_ascii_lowercase()));
+                std::str::from_utf8(out).unwrap_or("")
+            }
+            let scratch = &mut self.fast_scratch.borrow_mut();
+
+            *self.current_tag_name.borrow_mut() =
+                StrTendril::from_slice(lowered(view, name_range, scratch));
+
+            let mut attrs = std::mem::take(&mut *self.current_tag_attrs.borrow_mut());
+            attrs.clear();
+            for &(name, value) in &attr_ranges {
+                let name = lowered(view, name, scratch);
+                // Same first-wins duplicate handling as finish_attribute.
+                if attrs.iter().any(|a| &*a.name.local == name) {
+                    continue;
+                }
+                attrs.push(Attribute {
+                    name: QualName::new(None, ns!(), LocalName::from(name)),
+                    value: StrTendril::from_slice(
+                        std::str::from_utf8(&view[value.0..value.1]).unwrap_or(""),
+                    ),
+                });
+            }
+            *self.current_tag_attrs.borrow_mut() = attrs;
+        }
+
+        self.current_tag_kind.set(kind);
+        self.current_tag_self_closing.set(self_closing);
+        self.current_line.set(self.current_line.get() + newlines);
+
+        // The machine reaches emit_current_tag with the post-tag state set
+        // (`emit_tag Data`); the sink result then overrides it for script,
+        // raw text and plaintext.
+        self.state.set(states::Data);
+
+        // Consume the scanned bytes from the front chunk.
+        let consumed = (i + offset) as u32;
+        let now_empty = consumed as usize >= bytes.len();
+        unsafe {
+            front.unsafe_pop_front(consumed);
+        }
+        drop(front);
+        if now_empty {
+            input.pop_front();
+        }
+        return Some(self.emit_current_tag());
     }
 
     fn emit_current_tag(&self) -> ProcessResult<Sink::Handle> {
@@ -864,6 +1169,10 @@ impl<Sink: TokenSink> Tokenizer<Sink> {
 
             //§ tag-open-state
             states::TagOpen => loop {
+                if let Some(result) = self.try_fast_tag(input, StartTag) {
+                    self.fast_hits.set(self.fast_hits.get() + 1);
+                    return result;
+                }
                 match get_char!(self, input) {
                     '!' => go!(self: to MarkupDeclarationOpen),
                     '/' => go!(self: to EndTagOpen),
@@ -884,6 +1193,10 @@ impl<Sink: TokenSink> Tokenizer<Sink> {
 
             //§ end-tag-open-state
             states::EndTagOpen => loop {
+                if let Some(result) = self.try_fast_tag(input, EndTag) {
+                    self.fast_hits.set(self.fast_hits.get() + 1);
+                    return result;
+                }
                 match get_char!(self, input) {
                     '>' => {
                         self.bad_char_error();

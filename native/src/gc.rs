@@ -61,7 +61,7 @@ pub(crate) fn collect_managed(
         node.name = None;
         node.data = None;
         node.attribs = Default::default();
-        node.children = Vec::new();
+        node.children = smallvec::SmallVec::new();
         node.extras = Default::default();
         node.namespace = None;
         node.attribs_namespace = None;
@@ -106,8 +106,8 @@ mod tests {
     fn fixture() -> DomArena {
         let mut nodes = vec![DomNode::new("root")];
         nodes.extend((0..5).map(|_| DomNode::new("tag")));
-        nodes[0].children = vec![1, 5];
-        nodes[2].children = vec![3, 4];
+        nodes[0].children = smallvec::smallvec![1, 5];
+        nodes[2].children = smallvec::smallvec![3, 4];
         nodes[2].name = Some("detached".into());
         nodes[3].data = Some("payload".repeat(100));
         nodes[3].attribs.insert("key".into(), json!("value"));
@@ -126,7 +126,7 @@ mod tests {
         assert!(stats.free.is_empty());
         assert_eq!(arena.nodes[3].parent, Some(2));
         assert_eq!(arena.nodes[3].next, Some(4));
-        assert_eq!(arena.nodes[2].children, vec![3, 4]);
+        assert_eq!(arena.nodes[2].children.as_slice(), &[3, 4]);
     }
 
     #[test]

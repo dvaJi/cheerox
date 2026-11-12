@@ -18,8 +18,8 @@ pub(crate) struct DomNode {
     pub data: Option<String>,
     #[serde(default)]
     pub attribs: Attributes,
-    #[serde(default)]
-    pub children: Vec<u32>,
+    #[serde(default, with = "child_ids")]
+    pub children: smallvec::SmallVec<[u32; 2]>,
     #[serde(default)]
     pub parent: Option<u32>,
     #[serde(default)]
@@ -44,6 +44,26 @@ pub(crate) struct DomNode {
     pub attribs_prefix: Option<Box<Map<String, Value>>>,
     #[serde(flatten)]
     pub extras: FieldMap,
+}
+
+// Keep the wire representation as an ordinary array without enabling
+// smallvec's serde feature for every transitive dependency.
+mod child_ids {
+    use serde::{Deserialize, Serialize};
+    use smallvec::SmallVec;
+
+    pub fn serialize<S: serde::Serializer>(
+        ids: &SmallVec<[u32; 2]>,
+        serializer: S,
+    ) -> Result<S::Ok, S::Error> {
+        ids.as_slice().serialize(serializer)
+    }
+
+    pub fn deserialize<'de, D: serde::Deserializer<'de>>(
+        deserializer: D,
+    ) -> Result<SmallVec<[u32; 2]>, D::Error> {
+        Vec::<u32>::deserialize(deserializer).map(Into::into)
+    }
 }
 
 /// An element's attributes in insertion order. Elements have few, so a list
@@ -289,7 +309,7 @@ impl DomNode {
             name: None,
             data: None,
             attribs: Attributes::default(),
-            children: Vec::new(),
+            children: smallvec::SmallVec::new(),
             parent: None,
             prev: None,
             next: None,
@@ -552,7 +572,7 @@ impl DomArena {
             .collect();
         children.reverse();
         self.detach_many(&children);
-        self.nodes[parent as usize].children = children;
+        self.nodes[parent as usize].children = children.into();
         self.relink(parent);
     }
     pub(crate) fn text(&self, ids: &[u32]) -> String {
@@ -609,7 +629,8 @@ impl DomArena {
                         .filter(|node| node.kind == "root")
                     {
                         let contents = root.children.clone();
-                        children.splice(index..index + 1, contents);
+                        children.remove(index);
+                        children.insert_many(index, contents);
                     }
                     index += 1;
                 }
@@ -932,9 +953,7 @@ impl DomArena {
                     let is_void = !xml
                         && !has_foreign_content
                         && (if is_parse5 {
-                            node.namespace
-                                .as_deref()
-                                .is_none_or(|namespace| namespace == super::HTML_NS)
+                            node.namespace.as_deref() == Some(super::HTML_NS)
                                 && super::void_name(name)
                         } else {
                             html_parser_void(name)
@@ -1168,7 +1187,7 @@ impl DomArena {
             let offset = offset.min(self.nodes[parent as usize].children.len());
             self.nodes[parent as usize]
                 .children
-                .splice(offset..offset, moved);
+                .insert_many(offset, moved);
             inserted.extend(valid);
             self.relink(parent);
             if position == "replace" && !ids.contains(target) {
@@ -2068,4 +2087,23 @@ pub(crate) fn primitive(arena: &mut DomArena, command: &str, args: &Value) -> Re
             ))
         }
     })
+}
+
+#[cfg(test)]
+mod child_id_tests {
+    use super::DomNode;
+
+    #[test]
+    fn serde_preserves_empty_inline_and_spilled_child_arrays() {
+        for ids in [&[][..], &[1, 2][..], &[1, 2, 3, 4][..]] {
+            let mut node = DomNode::new("root");
+            node.children.extend_from_slice(ids);
+            let encoded = serde_json::to_value(&node).unwrap();
+            assert_eq!(encoded["children"], serde_json::json!(ids));
+            let decoded: DomNode = serde_json::from_value(encoded).unwrap();
+            assert_eq!(decoded.children.as_slice(), ids);
+        }
+        let node: DomNode = serde_json::from_value(serde_json::json!({})).unwrap();
+        assert!(node.children.is_empty());
+    }
 }

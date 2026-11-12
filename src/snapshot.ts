@@ -1,5 +1,6 @@
 import { decodeString } from './codec.js';
 import type { NativeNodeRecord } from './native.js';
+import { defineAttributeKey, type AttributeObject } from './attribute-object.js';
 
 /**
  * The compact record copy returned by `NativeDocument.snapshot()`: the
@@ -172,17 +173,15 @@ export class NodeSnapshot {
   }
 
   /** Copies a node's attributes onto `target`, in order. */
-  copyAttributes(local: number, target: Record<string, string>): void {
+  /** Copies a node's attributes as the shared accessors of `attributes`, in record order. */
+  copyAttributes(local: number, attributes: AttributeObject): void {
     const base = local * STRIDE;
     const count = this.nodes[base + 9];
     const first = this.nodes[base + 8];
-    const attributes = this.attributes;
+    const attributes_ = this.attributes;
     for (let index = 0; index < count; index++) {
       const pair = (first + index) * 2;
-      const name = this.name(attributes[pair]);
-      const value = this.string(attributes[pair + 1]);
-      if (name === '__proto__') Object.defineProperty(target, name, { value, writable: true, enumerable: true, configurable: true });
-      else target[name] = value;
+      defineAttributeKey(attributes, this.name(attributes_[pair]), this.string(attributes_[pair + 1]));
     }
   }
 

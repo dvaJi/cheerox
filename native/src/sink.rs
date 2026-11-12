@@ -35,9 +35,9 @@ impl CompatibleSink {
         Self(HtmlTreeSink::new(html), None, Some(locations))
     }
     fn element(&self, name: QualName, attrs: Vec<Attribute>, flags: ElementFlags) -> NodeId {
-        let local = name.local.to_string();
+        let local = self.2.as_ref().map(|_| name.local.to_string());
         let id = self.0.create_element(name, attrs, flags);
-        if let Some(locations) = &self.2 {
+        if let (Some(locations), Some(local)) = (&self.2, local) {
             locations.created(id, &local);
         }
         id
@@ -107,10 +107,10 @@ impl TreeSink for CompatibleSink {
     }
 
     fn append(&self, parent: &NodeId, child: NodeOrText<NodeId>) {
-        let text = match &child {
+        let text = self.2.as_ref().and_then(|_| match &child {
             NodeOrText::AppendText(text) => Some(text.to_string()),
             _ => None,
-        };
+        });
         self.0.append(parent, child);
         if let (Some(locations), Some(text)) = (&self.2, text) {
             if let Some(id) = self
@@ -192,10 +192,10 @@ impl TreeSink for CompatibleSink {
     }
 
     fn append_before_sibling(&self, sibling: &NodeId, new_node: NodeOrText<NodeId>) {
-        let text = match &new_node {
+        let text = self.2.as_ref().and_then(|_| match &new_node {
             NodeOrText::AppendText(text) => Some(text.to_string()),
             _ => None,
-        };
+        });
         self.0.append_before_sibling(sibling, new_node);
         if let (Some(locations), Some(text)) = (&self.2, text) {
             if let Some(id) = self

@@ -2,21 +2,16 @@ import type { NativeDocument, NativeNodeRecord } from './native.js';
 import { NodeSnapshot } from './snapshot.js';
 import type { AnyNode } from './types.js';
 import { nodePrototype } from './dom.js';
-import { cachedView, cacheView, exposeTo, isLocalState, isRouted, onViewRefresh, plainSnapshot, recordAt, routedFor, stateIn, structureSnapshot, VIEW_ATTRIBUTES, VIEW_CHILD_TARGET, VIEW_LOCAL, VIEW_SELF, VIEW_STATE, type DocumentState } from './router.js';
+import { ATTR_META, attributeAssign, defineAttributeKey, setAttributeMeta, type AttributeMeta, type AttributeObject } from './attribute-object.js';
+import { cachedView, cacheView, exposeTo, isLocalState, isRouted, onViewRefresh, plainSnapshot, prepareWalkSnapshot, recordAt, routedFor, stateIn, structureSnapshot, VIEW_ATTRIBUTES, VIEW_CHILD_TARGET, VIEW_LOCAL, VIEW_SELF, VIEW_STATE, type DocumentState } from './router.js';
 
 export interface NodeBinding { document: NativeDocument; id: number }
 
 /** A node object: its fields read the native record for the node's current location. */
-interface View { [VIEW_STATE]: DocumentState; [VIEW_LOCAL]: number; [VIEW_SELF]: View; [VIEW_ATTRIBUTES]: AttributeView | undefined; [VIEW_CHILDREN]: AnyNode[] | undefined; [VIEW_CHILD_TARGET]: AnyNode[] | undefined; [key: string]: any }
-/** A plain attribute object that mirrors the record; its proxy only intercepts writes. */
-/**
- * The handler of a node's attribute proxy, which also keeps the proxy's plain
- * target and the generation it was copied in, so each attribute object costs
- * one target, one handler and one proxy.
- */
-interface AttributeView extends ProxyHandler<Record<string, string>> { view: View; proxy: Record<string, string>; target: Record<string, string>; generation: number; state: DocumentState }
+interface View { [VIEW_STATE]: DocumentState; [VIEW_LOCAL]: number; [VIEW_SELF]: View; [VIEW_ATTRIBUTES]: AttributeObject | undefined; [VIEW_CHILDREN]: AnyNode[] | undefined; [VIEW_CHILD_TARGET]: AnyNode[] | undefined; [key: string]: any }
 
 const VIEW_CHILDREN = Symbol.for('cheerox.node.children');
+
 const arrayIndex = /^(?:0|[1-9]\d*)$/;
 const emptyRecord = Object.freeze({ id: -1, type: 'released', children: [] }) as unknown as NativeNodeRecord;
 
@@ -284,48 +279,65 @@ function attributesOf(view: View): Record<string, string> {
   const state = view[VIEW_STATE];
   let attributes = view[VIEW_ATTRIBUTES];
   if (!attributes) view[VIEW_ATTRIBUTES] = attributes = createAttributes(view, state.options._useHtmlParser2 === false ? null : Object.prototype);
-  if (attributes.generation !== state.generation || attributes.state !== state) syncAttributes(view, attributes);
-  return attributes.proxy;
+  const meta = attributes[ATTR_META]!;
+  if (meta.generation !== state.generation || meta.state !== state) syncAttributes(view, attributes);
+  return attributes;
 }
 
-function createAttributes(view: View, prototype: object | null): AttributeView {
-  const target: Record<string, string> = Object.create(prototype);
-  // The node lives on the proxy's own handler, so the attribute object stays plain to reflection.
-  const handler: AttributeView = Object.create(attributeWrites);
-  handler.view = view;
-  handler.target = target;
-  handler.generation = -1;
-  handler.state = view[VIEW_STATE];
-  handler.proxy = new Proxy(target, handler);
-  return handler;
+/** Pushes a direct attribute write through to the node's native record (shared; no per-object closure). */
+function writeAttributeThrough(view: unknown, attributes: AttributeObject, key: string, value: unknown): void {
+  const owner = view as View;
+  setField(owner, 'attribs', { ...viewRecord(owner).attribs, [key]: String(value) });
+  (attributes[ATTR_META] as AttributeMeta).values[key] = String(value);
 }
 
-/** Copies the record's attributes into the plain target, preserving key order. */
-function syncAttributes(view: View, attributes: AttributeView): void {
-  const { target } = attributes;
+function createAttributes(view: View, prototype: object | null): AttributeObject {
+  const attributes = Object.create(prototype) as AttributeObject;
+  setAttributeMeta(attributes, {
+    view,
+    generation: -1,
+    state: view[VIEW_STATE],
+    values: {},
+    write: writeAttributeThrough,
+  });
+  return attributes;
+}
+
+/** Copies the record's attributes into the shared accessors, preserving key order. */
+function syncAttributes(view: View, attributes: AttributeObject): void {
+  const meta = attributes[ATTR_META]!;
   const state = view[VIEW_STATE];
   const local = view[VIEW_LOCAL];
-  if (attributes.generation === -1) {
+  if (meta.generation === -1) {
     const snapshot = plainSnapshot(state, local);
     if (snapshot) {
-      snapshot.copyAttributes(local, target);
-      attributes.generation = state.generation;
+      snapshot.copyAttributes(local, attributes);
+      meta.generation = state.generation;
       return;
     }
   }
   const values = viewRecord(view).attribs ?? {};
-  const keys = Object.keys(target);
   const nextKeys = Object.keys(values);
-  let isSameOrder = keys.length === nextKeys.length;
-  for (let index = 0; isSameOrder && index < keys.length; index++) isSameOrder = keys[index] === nextKeys[index];
-  if (!isSameOrder) for (const key of keys) delete target[key];
-  for (const key of nextKeys) {
-    if (isSameOrder && target[key] === values[key]) continue;
-    if (key === '__proto__') Object.defineProperty(target, key, { value: values[key], writable: true, enumerable: true, configurable: true });
-    else target[key] = values[key];
+  const currentKeys = Object.keys(attributes);
+  let isSameOrder = currentKeys.length === nextKeys.length;
+  for (let index = 0; isSameOrder && index < nextKeys.length; index++) isSameOrder = currentKeys[index] === nextKeys[index];
+  const stored = meta.values;
+  if (!isSameOrder) {
+    for (const key of currentKeys) {
+      delete attributes[key];
+      delete stored[key];
+    }
+    for (const key of nextKeys) defineAttributeKey(attributes, key, values[key]);
+  } else {
+    for (const key of nextKeys) {
+      // `__proto__` cannot be assigned through the store object: plain
+      // assignment would mutate the store's prototype.
+      if (key === '__proto__') { defineAttributeKey(attributes, key, values[key]); continue; }
+      if (stored[key] !== values[key]) stored[key] = values[key];
+    }
   }
-  attributes.generation = view[VIEW_STATE].generation;
-  attributes.state = view[VIEW_STATE];
+  meta.generation = state.generation;
+  meta.state = state;
 }
 
 /** Re-reads attributes for a node whose attributes a native command changed. */
@@ -334,33 +346,6 @@ function refreshAttributes(view: object): void {
   if (attributes) syncAttributes(view as View, attributes);
 }
 onViewRefresh(refreshAttributes, fillChildren);
-
-/** Reads go straight to the plain target; writes go to Rust, which then refreshes the target. */
-const attributeWrites: ProxyHandler<Record<string, string>> = {
-  set(this: AttributeView, target, key, value) {
-    if (typeof key === 'symbol') return Reflect.set(target, key, value);
-    const view = this.view;
-    setField(view, 'attribs', { ...viewRecord(view).attribs, [key]: String(value) });
-    syncAttributes(view, view[VIEW_ATTRIBUTES]!);
-    return true;
-  },
-  deleteProperty(this: AttributeView, target, key) {
-    if (typeof key === 'symbol') return Reflect.deleteProperty(target, key);
-    const view = this.view;
-    const values = { ...viewRecord(view).attribs };
-    delete values[key];
-    setField(view, 'attribs', values);
-    syncAttributes(view, view[VIEW_ATTRIBUTES]!);
-    return true;
-  },
-  defineProperty(this: AttributeView, target, key, descriptor) {
-    if (typeof key === 'symbol') return Reflect.defineProperty(target, key, descriptor);
-    const view = this.view;
-    setField(view, 'attribs', { ...viewRecord(view).attribs, [key]: String(descriptor.value) });
-    syncAttributes(view, view[VIEW_ATTRIBUTES]!);
-    return true;
-  },
-};
 
 /** Namespace and prefix maps are rare; they read the record on every access. */
 function attributeMap(view: View, field: 'attribsNamespace' | 'attribsPrefix'): Record<string, string> {
@@ -422,6 +407,7 @@ function childList(view: View): AnyNode[] {
   const existing = view[VIEW_CHILDREN];
   if (existing) return existing;
   const state = view[VIEW_STATE];
+  if (state.baseline > 4096 && state.rootLocal !== undefined && view[VIEW_LOCAL] === state.rootLocal + 1) prepareWalkSnapshot(state);
   if (!state.hasChildLists) { state.hasChildLists = true; state.raw.takeTouched?.(); }
   const list = new ChildArray(view);
   view[VIEW_CHILD_TARGET] = list;
@@ -673,8 +659,8 @@ function viewConstructor(state: DocumentState, type: string, hasLocation: boolea
     view[VIEW_LOCAL] = local;
     view[VIEW_SELF] = view;
     view[VIEW_ATTRIBUTES] = undefined;
-    view[VIEW_CHILDREN] = undefined;
     view[VIEW_CHILD_TARGET] = undefined;
+    view[VIEW_CHILDREN] = undefined;
     return view;
   };
   Object.defineProperty(prototype, inspectSymbol, { configurable: true, writable: true, value: inspectNode });
@@ -733,8 +719,8 @@ function adoptObject(state: DocumentState, local: number, original: any): AnyNod
   view[VIEW_LOCAL] = local;
   view[VIEW_SELF] = view;
   view[VIEW_ATTRIBUTES] = undefined;
-  view[VIEW_CHILDREN] = undefined;
   view[VIEW_CHILD_TARGET] = undefined;
+  view[VIEW_CHILDREN] = undefined;
   let fields = adoptedFields.get(record.type);
   if (!fields) {
     fields = {};

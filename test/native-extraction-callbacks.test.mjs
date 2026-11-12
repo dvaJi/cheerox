@@ -6,6 +6,19 @@ import * as cheerox from '../dist/modern.mjs';
 
 const input = '<article data-id="1"><h2>One</h2><a href="/one">link</a></article><article data-id="2"><h2>Two</h2><a href="/two">link</a></article>';
 
+test('wide pure extraction plans observe map changes between calls', () => {
+  const run = (library) => {
+    const $ = library.load(input);
+    const map = Object.fromEntries(Array.from({ length: 50 }, (_, i) => [`field${i}`, 'h2']));
+    const first = $.extract(map);
+    map.field20 = { selector: 'a', value: 'href' };
+    delete map.field30;
+    map.last = 'article';
+    return [first, $.extract(map)];
+  };
+  assert.deepEqual(run(cheerox), run(reference));
+});
+
 test('compiled extraction prefixes preserve callback mutations, context and field order', () => {
   const run = (library) => {
     const $ = library.load(input);

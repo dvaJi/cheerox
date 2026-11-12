@@ -12,6 +12,7 @@ use html5ever::tendril::TendrilSink;
 use napi::bindgen_prelude::*;
 use napi_derive::napi;
 use scraper::{Html, Node, Selector};
+use serde::Serialize;
 use serde_json::{Map, Value};
 
 use codec::JsText;
@@ -49,6 +50,90 @@ const HTML_NS: &str = "http://www.w3.org/1999/xhtml";
 const XML_NS: &str = "http://www.w3.org/XML/1998/namespace";
 const XMLNS_NS: &str = "http://www.w3.org/2000/xmlns/";
 const XLINK_NS: &str = "http://www.w3.org/1999/xlink";
+
+#[derive(Serialize)]
+struct OffsetNode<'a> {
+    id: u64,
+    #[serde(rename = "type")]
+    kind: &'a Cow<'static, str>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<&'a String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    data: Option<&'a String>,
+    attribs: &'a arena::Attributes,
+    children: OffsetChildren<'a>,
+    parent: Option<u64>,
+    prev: Option<u64>,
+    next: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    namespace: Option<&'a Cow<'static, str>>,
+    #[serde(rename = "attribsNamespace", skip_serializing_if = "Option::is_none")]
+    attribs_namespace: Option<&'a Box<Map<String, Value>>>,
+    #[serde(rename = "attribsPrefix", skip_serializing_if = "Option::is_none")]
+    attribs_prefix: Option<&'a Box<Map<String, Value>>>,
+    #[serde(flatten)]
+    extras: &'a arena::FieldMap,
+}
+
+struct OffsetChildren<'a> {
+    ids: &'a [u32],
+    base: u64,
+}
+
+impl Serialize for OffsetChildren<'_> {
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S,
+    ) -> std::result::Result<S::Ok, S::Error> {
+        use serde::ser::SerializeSeq;
+        let mut seq = serializer.serialize_seq(Some(self.ids.len()))?;
+        for id in self.ids {
+            seq.serialize_element(&(self.base + u64::from(*id)))?;
+        }
+        seq.end()
+    }
+}
+
+struct OffsetRecords<'a> {
+    nodes: Vec<&'a arena::DomNode>,
+    base: u64,
+}
+
+impl Serialize for OffsetRecords<'_> {
+    fn serialize<S: serde::Serializer>(
+        &self,
+        serializer: S,
+    ) -> std::result::Result<S::Ok, S::Error> {
+        use serde::ser::SerializeSeq;
+        let mut seq = serializer.serialize_seq(Some(self.nodes.len()))?;
+        for node in &self.nodes {
+            seq.serialize_element(&offset_node(node, self.base))?;
+        }
+        seq.end()
+    }
+}
+
+fn offset_node(node: &arena::DomNode, base: u64) -> OffsetNode<'_> {
+    let link = |id: Option<u32>| id.map(|id| base + u64::from(id));
+    OffsetNode {
+        id: base + u64::from(node.id),
+        kind: &node.kind,
+        name: node.name.as_ref(),
+        data: node.data.as_ref(),
+        attribs: &node.attribs,
+        children: OffsetChildren {
+            ids: &node.children,
+            base,
+        },
+        parent: link(node.parent),
+        prev: link(node.prev),
+        next: link(node.next),
+        namespace: node.namespace.as_ref(),
+        attribs_namespace: node.attribs_namespace.as_ref(),
+        attribs_prefix: node.attribs_prefix.as_ref(),
+        extras: &node.extras,
+    }
+}
 
 /// Writes an attribute's serialized name. Like parse5, the namespace rather
 /// than the stored prefix selects the qualifier: HTML5 gives foreign `xmlns`
@@ -485,17 +570,16 @@ impl NativeDocument {
             }
         }
 
-        let ids: Vec<_> = html
-            .tree
-            .root()
-            .descendants()
-            .map(|node| node.id())
-            .collect();
-        let reverse = ids
-            .iter()
-            .enumerate()
-            .map(|(index, id)| (*id, index as u32))
-            .collect();
+        let node_count = html.tree.values().len();
+        let mut ids = Vec::with_capacity(node_count);
+        let mut reverse = id_hash::IdMap::with_capacity_and_hasher(node_count, Default::default());
+        let mut content_bytes = 0;
+        for node in html.tree.root().descendants() {
+            let id = node.id();
+            reverse.insert(id, ids.len() as u32);
+            content_bytes += html_node_content_bytes(node.value());
+            ids.push(id);
+        }
         let diagnostics = if parser_options.get("__collectParseErrors") == Some(&Value::Bool(true))
         {
             source
@@ -513,7 +597,6 @@ impl NativeDocument {
                     && value != &&serde_json::json!("")
             })
             .and(source);
-        let content_bytes = html.tree.values().map(html_node_content_bytes).sum();
         if ids.len() > POOL_RELEASE_NODES {
             runtime::start_release_thread();
         }
@@ -869,6 +952,11 @@ impl NativeDocument {
     fn select_ids(&self, source: &str, contexts: Option<&[u32]>) -> Result<Vec<u32>> {
         self.maybe_collect();
         let contexts = contexts.filter(|contexts| *contexts != [0]);
+        let simple_tag = !source.is_empty()
+            && source.as_bytes()[0].is_ascii_lowercase()
+            && source
+                .bytes()
+                .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-');
         if self.arena.borrow().is_some()
             || self.tree_detached.get()
             || contexts.is_some()
@@ -899,9 +987,39 @@ impl NativeDocument {
                 }
             }
         }
-        matched.sort_unstable();
-        matched.dedup();
+        if !simple_tag {
+            matched.sort_unstable();
+            matched.dedup();
+        }
         Ok(matched)
+    }
+
+    /// Return the first match without collecting all matches for an unchanged,
+    /// document-root query with an unambiguous lowercase tag selector.
+    fn select_first_id(&self, source: &str, contexts: Option<&[u32]>) -> Result<Option<u32>> {
+        self.maybe_collect();
+        let simple = !source.is_empty()
+            && source.as_bytes()[0].is_ascii_lowercase()
+            && source
+                .bytes()
+                .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-');
+        if simple
+            && contexts.is_none_or(|ids| ids == [0])
+            && self.arena.borrow().is_none()
+            && !self.tree_detached.get()
+            && self.options.get("__losslessUnicode") != Some(&Value::Bool(true))
+        {
+            if let Some(selector) = parsed_selector(source) {
+                let html = self.html.borrow();
+                if let Some(html) = html.as_ref() {
+                    let reverse = self.reverse.borrow();
+                    return Ok(html
+                        .select(&selector)
+                        .find_map(|element| reverse.get(&element.id()).copied()));
+                }
+            }
+        }
+        Ok(self.select_ids(source, contexts)?.first().copied())
     }
 
     fn text_ids(&self, ids: &[u32]) -> String {
@@ -1484,6 +1602,83 @@ impl NativeDocument {
             .filter_map(|id| self.immutable_dom_node(id as u32))
             .collect();
         serde_json::to_string(&records).map_err(json_error)
+    }
+
+    #[napi(js_name = "exportTreeWithOffset", ts_return_type = "string")]
+    pub fn export_tree_with_offset(&self, env: Env, base: f64) -> Result<JsText> {
+        if !base.is_finite() || base < 0.0 || base.fract() != 0.0 || base > 9_007_199_254_740_991.0
+        {
+            return Err(Error::new(
+                Status::InvalidArg,
+                "base must be a non-negative safe integer",
+            ));
+        }
+        if self.source.borrow().is_some() {
+            self.ensure_arena()?;
+        }
+        let base = base as u64;
+        let arena = self.arena.borrow();
+        if let Some(arena) = arena.as_ref() {
+            let nodes = arena.nodes.iter().collect();
+            let serialized =
+                serde_json::to_string(&OffsetRecords { nodes, base }).map_err(json_error)?;
+            return Ok(JsText(self.reported(env, serialized)));
+        }
+        drop(arena);
+        {
+            // Keep the immutable tree's existing ID mapping and lifetime while
+            // serializing; this path is only used before arena materialization.
+            let records: Vec<_> = (0..self.ids.borrow().len())
+                .filter_map(|id| self.immutable_dom_node(id as u32))
+                .collect();
+            let serialized = serde_json::to_string(
+                &records
+                    .iter()
+                    .map(|node| offset_node(node, base))
+                    .collect::<Vec<_>>(),
+            )
+            .map_err(json_error)?;
+            return Ok(JsText(self.reported(env, serialized)));
+        }
+    }
+
+    /// Root IDs in the same order and with the same parent rules as exportTree.
+    #[napi]
+    pub fn forest_roots(&self, env: Env) -> Result<Vec<u32>> {
+        let roots = self.forest_root_ids()?;
+        self.report_heap_bytes(env);
+        Ok(roots)
+    }
+
+    fn forest_root_ids(&self) -> Result<Vec<u32>> {
+        if self.source.borrow().is_some() {
+            self.ensure_arena()?;
+        }
+        let roots = if let Some(arena) = self.arena.borrow().as_ref() {
+            arena
+                .nodes
+                .iter()
+                .filter(|node| node.parent.is_none())
+                .map(|node| node.id)
+                .collect()
+        } else {
+            let html = self.html.borrow();
+            let ids = self.ids.borrow();
+            let reverse = self.reverse.borrow();
+            match html.as_ref() {
+                Some(html) => ids
+                    .iter()
+                    .enumerate()
+                    .filter_map(|(id, node_id)| {
+                        let node = html.tree.get(*node_id)?;
+                        let parent = node.parent().and_then(|parent| reverse.get(&parent.id()));
+                        parent.is_none().then_some(id as u32)
+                    })
+                    .collect(),
+                None => Vec::new(),
+            }
+        };
+        Ok(roots)
     }
 
     /// Every node record at once, in the compact form `snapshot.rs` describes.
@@ -2632,6 +2827,448 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore = "diagnostic timing; run explicitly in release mode"]
+    fn profile_document_load_phases() {
+        let mut source = String::from("<main>");
+        for i in 0..2000 {
+            source.push_str(&format!("<article class='card' id='n{i}'><h2>Title {i}</h2><a href='/{i}'>link</a><img src='/{i}.png'><p>text <b>bold</b></p></article>"));
+        }
+        source.push_str("</main>");
+        let mut parse_samples = Vec::new();
+        let mut prepare_samples = Vec::new();
+        for iteration in 0..35 {
+            let start = std::time::Instant::now();
+            let html = html5ever::driver::parse_document(
+                sink::CompatibleSink::new(sized_html(&source, true)),
+                html5ever::driver::ParseOpts::default(),
+            )
+            .one(source.as_str());
+            let parsed = start.elapsed();
+            let start = std::time::Instant::now();
+            let document = NativeDocument::from_html(html, true, serde_json::json!({}), None);
+            let prepared = start.elapsed();
+            std::hint::black_box(&document);
+            if iteration >= 5 {
+                parse_samples.push(parsed);
+                prepare_samples.push(prepared);
+            }
+        }
+        parse_samples.sort_unstable();
+        prepare_samples.sort_unstable();
+        println!(
+            "HTML parser median: {:?}; document preparation median: {:?}",
+            parse_samples[15], prepare_samples[15]
+        );
+    }
+
+    #[test]
+    #[ignore = "diagnostic timing; run explicitly in release mode"]
+    fn profile_load_fixture_phases() {
+        // The exact operations.mjs generated-2000 fixture.
+        let card = |i: usize| format!(
+            "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
+            i % 7, i, i, i, i, i, i, i
+        );
+        let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
+        for i in 0..2000 {
+            source.push_str(&card(i));
+        }
+        source.push_str("</main><footer>f</footer></body></html>");
+        println!("fixture bytes: {}", source.len());
+
+        let mut sized_samples = Vec::new();
+        let mut parse_samples = Vec::new();
+        let mut prep_samples = Vec::new();
+        let mut full_samples = Vec::new();
+        let mut arena_samples = Vec::new();
+        for iteration in 0..40 {
+            let start = std::time::Instant::now();
+            let sized = sized_html(&source, true);
+            let sized_t = start.elapsed();
+
+            let start = std::time::Instant::now();
+            let options = html5ever::driver::ParseOpts {
+                tokenizer: html5ever::tokenizer::TokenizerOpts {
+                    discard_bom: false,
+                    cheerox_codec: false,
+                    ..Default::default()
+                },
+                tree_builder: html5ever::tree_builder::TreeBuilderOpts {
+                    scripting_enabled: true,
+                    ..Default::default()
+                },
+            };
+            let html = html5ever::driver::parse_document(
+                sink::CompatibleSink::new(sized),
+                options,
+            )
+            .one(source.as_str());
+            let parse_t = start.elapsed();
+
+            let start = std::time::Instant::now();
+            let document = NativeDocument::from_html(html, true, serde_json::json!({}), None);
+            let prep_t = start.elapsed();
+
+            let start = std::time::Instant::now();
+            let arena = document.ensure_arena().unwrap();
+            let arena_t = start.elapsed();
+            std::hint::black_box(&arena);
+            std::hint::black_box(&document);
+
+            if iteration >= 5 {
+                sized_samples.push(sized_t);
+                parse_samples.push(parse_t);
+                prep_samples.push(prep_t);
+                full_samples.push(sized_t + parse_t + prep_t);
+                arena_samples.push(arena_t);
+            }
+        }
+        let median = |mut v: Vec<std::time::Duration>| {
+            v.sort_unstable();
+            v[v.len() / 2]
+        };
+        println!(
+            "sized: {:?}; parse: {:?}; prep: {:?}; full: {:?}; ensure_arena: {:?}",
+            median(sized_samples),
+            median(parse_samples),
+            median(prep_samples),
+            median(full_samples),
+            median(arena_samples),
+        );
+    }
+
+    #[test]
+    #[ignore = "diagnostic timing; run explicitly in release mode"]
+    fn profile_load_fixture_null_sink() {
+        use html5ever::tendril::StrTendril;
+        use html5ever::tree_builder::{ElementFlags, NodeOrText, QuirksMode, TreeSink};
+        use html5ever::{Attribute, QualName};
+        struct NullSink {
+            next: std::cell::Cell<u32>,
+            names: RefCell<Vec<html5ever::QualName>>,
+        }
+        impl NullSink {
+            fn new() -> Self {
+                Self { next: std::cell::Cell::new(0), names: RefCell::new(Vec::new()) }
+            }
+        }
+        impl TreeSink for NullSink {
+            type Handle = u32;
+            type Output = ();
+            type ElemName<'a> = std::cell::Ref<'a, html5ever::QualName>;
+
+            fn finish(self) -> Self::Output {}
+            fn parse_error(&self, _msg: Cow<'static, str>) {}
+            fn get_document(&self) -> Self::Handle { 0 }
+            fn same_node(&self, x: &Self::Handle, y: &Self::Handle) -> bool { x == y }
+            fn elem_name<'a>(&'a self, target: &'a Self::Handle) -> Self::ElemName<'a> {
+                std::cell::Ref::map(self.names.borrow(), |names| &names[*target as usize])
+            }
+            fn create_element(&self, name: QualName, _attrs: Vec<Attribute>, _flags: ElementFlags) -> Self::Handle {
+                let id = self.next.get();
+                self.next.set(id + 1);
+                self.names.borrow_mut().push(name);
+                id
+            }
+            fn create_comment(&self, _text: StrTendril) -> Self::Handle { u32::MAX - 1 }
+            fn append_doctype_to_document(&self, _: StrTendril, _: StrTendril, _: StrTendril) {}
+            fn append(&self, _parent: &Self::Handle, _child: NodeOrText<Self::Handle>) {}
+            fn append_before_sibling(&self, _: &Self::Handle, _: NodeOrText<Self::Handle>) {}
+            fn append_based_on_parent_node(&self, _: &Self::Handle, _: &Self::Handle, _: NodeOrText<Self::Handle>) {}
+            fn remove_from_parent(&self, _: &Self::Handle) {}
+            fn reparent_children(&self, _: &Self::Handle, _: &Self::Handle) {}
+            fn add_attrs_if_missing(&self, _: &Self::Handle, _: Vec<Attribute>) {}
+            fn get_template_contents(&self, target: &Self::Handle) -> Self::Handle { *target }
+            fn mark_script_already_started(&self, _: &Self::Handle) {}
+            fn pop(&self, _: &Self::Handle) {}
+            fn set_current_line(&self, _: u64) {}
+            fn set_quirks_mode(&self, _: QuirksMode) {}
+            fn create_pi(&self, _: StrTendril, _: StrTendril) -> Self::Handle { u32::MAX - 2 }
+        }
+
+        let card = |i: usize| format!(
+            "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
+            i % 7, i, i, i, i, i, i, i
+        );
+        let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
+        for i in 0..2000 {
+            source.push_str(&card(i));
+        }
+        source.push_str("</main><footer>f</footer></body></html>");
+
+        let mut null_samples = Vec::new();
+        let mut real_samples = Vec::new();
+        for iteration in 0..40 {
+            let start = std::time::Instant::now();
+            let sink = std::rc::Rc::new(NullSink::new());
+            // The tree builder owns the sink; a clone shares the same storage.
+            #[derive(Clone)]
+            struct Shared(std::rc::Rc<NullSink>);
+            impl TreeSink for Shared {
+                type Handle = u32;
+                type Output = ();
+                type ElemName<'a> = std::cell::Ref<'a, html5ever::QualName>;
+                fn finish(self) -> Self::Output {}
+                fn parse_error(&self, msg: Cow<'static, str>) { self.0.parse_error(msg) }
+                fn get_document(&self) -> Self::Handle { self.0.get_document() }
+                fn same_node(&self, x: &Self::Handle, y: &Self::Handle) -> bool { self.0.same_node(x, y) }
+                fn elem_name<'a>(&'a self, target: &'a Self::Handle) -> Self::ElemName<'a> { self.0.elem_name(target) }
+                fn create_element(&self, name: QualName, attrs: Vec<Attribute>, flags: ElementFlags) -> Self::Handle { self.0.create_element(name, attrs, flags) }
+                fn create_comment(&self, text: StrTendril) -> Self::Handle { self.0.create_comment(text) }
+                fn append_doctype_to_document(&self, a: StrTendril, b: StrTendril, c: StrTendril) { self.0.append_doctype_to_document(a, b, c) }
+                fn append(&self, parent: &Self::Handle, child: NodeOrText<Self::Handle>) { self.0.append(parent, child) }
+                fn append_before_sibling(&self, s: &Self::Handle, n: NodeOrText<Self::Handle>) { self.0.append_before_sibling(s, n) }
+                fn append_based_on_parent_node(&self, e: &Self::Handle, p: &Self::Handle, c: NodeOrText<Self::Handle>) { self.0.append_based_on_parent_node(e, p, c) }
+                fn remove_from_parent(&self, t: &Self::Handle) { self.0.remove_from_parent(t) }
+                fn reparent_children(&self, n: &Self::Handle, np: &Self::Handle) { self.0.reparent_children(n, np) }
+                fn add_attrs_if_missing(&self, t: &Self::Handle, a: Vec<Attribute>) { self.0.add_attrs_if_missing(t, a) }
+                fn get_template_contents(&self, t: &Self::Handle) -> Self::Handle { self.0.get_template_contents(t) }
+                fn mark_script_already_started(&self, t: &Self::Handle) { self.0.mark_script_already_started(t) }
+                fn pop(&self, t: &Self::Handle) { self.0.pop(t) }
+                fn set_current_line(&self, n: u64) { self.0.set_current_line(n) }
+                fn set_quirks_mode(&self, m: QuirksMode) { self.0.set_quirks_mode(m) }
+                fn create_pi(&self, a: StrTendril, b: StrTendril) -> Self::Handle { self.0.create_pi(a, b) }
+            }
+            html5ever::driver::parse_document(Shared(sink.clone()), Default::default()).one(source.as_str());
+            let null_t = start.elapsed();
+
+            let start = std::time::Instant::now();
+            let html = html5ever::driver::parse_document(
+                sink::CompatibleSink::new(sized_html(&source, true)),
+                Default::default(),
+            )
+            .one(source.as_str());
+            let real_t = start.elapsed();
+            std::hint::black_box(&html);
+
+            if iteration >= 5 {
+                null_samples.push(null_t);
+                real_samples.push(real_t);
+            }
+        }
+        let median = |mut v: Vec<std::time::Duration>| { v.sort_unstable(); v[v.len() / 2] };
+        println!("null sink parse: {:?}; scraper sink parse: {:?}", median(null_samples), median(real_samples));
+
+        // Tokenizer only, with a token sink that drops everything.
+        use html5ever::tokenizer::{BufferQueue, Token, TokenSink, TokenSinkResult, Tokenizer, TokenizerOpts};
+        struct DropSink;
+        impl TokenSink for DropSink {
+            type Handle = ();
+            fn process_token(&self, _token: Token, _source: u64) -> TokenSinkResult<()> {
+                TokenSinkResult::Continue
+            }
+        }
+        let mut token_samples = Vec::new();
+        let mut last_stats = (0u32, 0u32);
+        for iteration in 0..40 {
+            let start = std::time::Instant::now();
+            let tokenizer = Tokenizer::new(DropSink, TokenizerOpts::default());
+            let buffers = BufferQueue::default();
+            buffers.push_back(html5ever::tendril::StrTendril::from_slice(source.as_str()));
+            let _ = tokenizer.feed(&buffers);
+            tokenizer.end();
+            if iteration >= 5 {
+                token_samples.push(start.elapsed());
+            }
+            last_stats = tokenizer.fast_scan_stats();
+        }
+        println!("tokenizer only: {:?}; fast hits={}, bails={}",
+            median(token_samples), last_stats.0, last_stats.1);
+    }
+
+    #[test]
+    #[ignore = "diagnostic timing; run explicitly in release mode"]
+    #[allow(irrefutable_let_patterns)]
+    fn profile_load_fixture_mid_sink() {
+        use html5ever::tendril::StrTendril;
+        use html5ever::tree_builder::{ElementFlags, NodeOrText, QuirksMode, TreeSink};
+        use html5ever::{Attribute, QualName};
+
+        // A flat-Vec sink: no RefCell, no ego-tree during parse, no IndexMap.
+        // Children and parents are u32 indexes; finish() returns the count.
+        #[allow(dead_code)]
+        enum FlatNode {
+            Element { name: QualName, attrs: Vec<(QualName, StrTendril)>, parent: u32, children: Vec<u32> },
+        }
+        // TreeSink needs &'a QualName from &'a self; use RefCell-free storage
+        // by returning through a raw pointer wrapper is unsafe; instead keep
+        // names in a RefCell<Vec<QualName>> just for elem_name.
+        struct FlatSinkWrap(std::rc::Rc<FlatCore>);
+        struct FlatCore {
+            nodes: RefCell<Vec<FlatNode>>,
+            names: RefCell<Vec<QualName>>,
+        }
+        impl TreeSink for FlatSinkWrap {
+            type Handle = u32;
+            type Output = usize;
+            type ElemName<'a> = std::cell::Ref<'a, QualName>;
+            fn finish(self) -> usize { self.0.nodes.borrow().len() }
+            fn parse_error(&self, _: Cow<'static, str>) {}
+            fn get_document(&self) -> u32 { 0 }
+            fn same_node(&self, x: &u32, y: &u32) -> bool { x == y }
+            fn elem_name<'a>(&'a self, target: &'a u32) -> std::cell::Ref<'a, QualName> {
+                std::cell::Ref::map(self.0.names.borrow(), |names| &names[*target as usize])
+            }
+            fn create_element(&self, name: QualName, attrs: Vec<Attribute>, _f: ElementFlags) -> u32 {
+                let mut nodes = self.0.nodes.borrow_mut();
+                let id = nodes.len() as u32;
+                let converted: Vec<(QualName, StrTendril)> = attrs.into_iter().map(|a| (a.name, a.value)).collect();
+                nodes.push(FlatNode::Element { name: name.clone(), attrs: converted, parent: u32::MAX, children: Vec::new() });
+                self.0.names.borrow_mut().push(name);
+                id
+            }
+            fn create_comment(&self, _: StrTendril) -> u32 { u32::MAX - 1 }
+            fn append_doctype_to_document(&self, _: StrTendril, _: StrTendril, _: StrTendril) {}
+            fn append(&self, parent: &u32, child: NodeOrText<u32>) {
+                let mut nodes = self.0.nodes.borrow_mut();
+                match child {
+                    NodeOrText::AppendNode(id) => {
+                        if let FlatNode::Element { children, .. } = &mut nodes[*parent as usize] { children.push(id); }
+                        if let FlatNode::Element { parent: p, .. } = &mut nodes[id as usize] { *p = *parent; }
+                    }
+                    NodeOrText::AppendText(_) => {
+                        if let FlatNode::Element { children, .. } = &mut nodes[*parent as usize] { children.push(u32::MAX - 1); }
+                    }
+                }
+            }
+            fn append_before_sibling(&self, _: &u32, _: NodeOrText<u32>) {}
+            fn append_based_on_parent_node(&self, _: &u32, _: &u32, _: NodeOrText<u32>) {}
+            fn remove_from_parent(&self, _: &u32) {}
+            fn reparent_children(&self, _: &u32, _: &u32) {}
+            fn add_attrs_if_missing(&self, target: &u32, attrs: Vec<Attribute>) {
+                let mut nodes = self.0.nodes.borrow_mut();
+                if let FlatNode::Element { attrs: stored, .. } = &mut nodes[*target as usize] {
+                    for attr in attrs {
+                        if !stored.iter().any(|(name, _)| *name == attr.name) {
+                            stored.push((attr.name, attr.value));
+                        }
+                    }
+                }
+            }
+            fn get_template_contents(&self, t: &u32) -> u32 { *t }
+            fn mark_script_already_started(&self, _: &u32) {}
+            fn pop(&self, _: &u32) {}
+            fn set_current_line(&self, _: u64) {}
+            fn set_quirks_mode(&self, _: QuirksMode) {}
+            fn create_pi(&self, _: StrTendril, _: StrTendril) -> u32 { u32::MAX - 2 }
+        }
+
+        let card = |i: usize| format!(
+            "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
+            i % 7, i, i, i, i, i, i, i
+        );
+        let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
+        for i in 0..2000 {
+            source.push_str(&card(i));
+        }
+        source.push_str("</main><footer>f</footer></body></html>");
+
+        let mut flat_samples = Vec::new();
+        let mut real_samples = Vec::new();
+        for iteration in 0..40 {
+            let start = std::time::Instant::now();
+            let core = std::rc::Rc::new(FlatCore { nodes: RefCell::new(Vec::new()), names: RefCell::new(Vec::new()) });
+            let out = html5ever::driver::parse_document(FlatSinkWrap(core), Default::default()).one(source.as_str());
+            let flat_t = start.elapsed();
+            std::hint::black_box(&out);
+
+            let start = std::time::Instant::now();
+            let html = html5ever::driver::parse_document(
+                sink::CompatibleSink::new(sized_html(&source, true)),
+                Default::default(),
+            )
+            .one(source.as_str());
+            let real_t = start.elapsed();
+            std::hint::black_box(&html);
+
+            if iteration >= 5 {
+                flat_samples.push(flat_t);
+                real_samples.push(real_t);
+            }
+        }
+        let median = |mut v: Vec<std::time::Duration>| { v.sort_unstable(); v[v.len() / 2] };
+        println!("flat sink parse: {:?}; scraper sink parse: {:?}", median(flat_samples), median(real_samples));
+    }
+
+    #[test]
+    #[ignore = "diagnostic timing; run explicitly in release mode"]
+    fn profile_load_fixture_gum_path() {
+        // The html5gum tokenizer driving html5ever's tree builder — the
+        // bridge already used for locations — versus the html5ever tokenizer.
+        let card = |i: usize| format!(
+            "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
+            i % 7, i, i, i, i, i, i, i
+        );
+        let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
+        for i in 0..2000 {
+            source.push_str(&card(i));
+        }
+        source.push_str("</main><footer>f</footer></body></html>");
+
+        let options = serde_json::json!({});
+        let mut gum_samples = Vec::new();
+        let mut ever_samples = Vec::new();
+        for iteration in 0..40 {
+            let start = std::time::Instant::now();
+            let context = std::rc::Rc::new(diagnostics::DiagnosticContext::new(&source));
+            let html = diagnostics::parse_with_sink(
+                &source,
+                true,
+                &options,
+                sink::CompatibleSink::new(sized_html(&source, true)),
+                context,
+                |_, _| {},
+            );
+            let gum_t = start.elapsed();
+            std::hint::black_box(&html);
+
+            let start = std::time::Instant::now();
+            let html = html5ever::driver::parse_document(
+                sink::CompatibleSink::new(sized_html(&source, true)),
+                Default::default(),
+            )
+            .one(source.as_str());
+            let ever_t = start.elapsed();
+            std::hint::black_box(&html);
+
+            if iteration >= 5 {
+                gum_samples.push(gum_t);
+                ever_samples.push(ever_t);
+            }
+        }
+        let median = |mut v: Vec<std::time::Duration>| { v.sort_unstable(); v[v.len() / 2] };
+        println!("gum+bridge parse: {:?}; html5ever parse: {:?}", median(gum_samples), median(ever_samples));
+    }
+
+    #[test]
+    fn forest_roots_match_export_before_and_after_detach() {
+        for is_document in [false, true] {
+            let document = NativeDocument::parse(
+                "<main><p>A</p><template><b>B</b></template></main>",
+                is_document,
+            );
+            let check = || {
+                let records: Vec<Value> =
+                    serde_json::from_str(&document.export_tree().unwrap()).unwrap();
+                let expected: Vec<u32> = records
+                    .iter()
+                    .filter(|node| node["parent"].is_null())
+                    .map(|node| node["id"].as_u64().unwrap() as u32)
+                    .collect();
+                assert_eq!(document.forest_root_ids().unwrap(), expected);
+            };
+            check();
+            let id = document.select_ids("p", None).unwrap()[0];
+            document
+                .op("remove".into(), serde_json::json!({"ids":[id]}).to_string())
+                .unwrap();
+            check();
+            document.ensure_arena().unwrap();
+            check();
+        }
+    }
+
+    #[test]
     fn attribute_writes_keep_the_parse_tree() {
         let document = NativeDocument::parse(
             "<main><p id='a' class='x'>one</p><svg><use href='#h' xlink:href='#x'/></svg></main>",
@@ -2910,8 +3547,13 @@ mod tests {
             "<table>outside<tr><td>A</table><div><p class='x'>B</p><p>C</p></div>",
             false,
         );
+        let all_paragraphs = document.select_ids("p", None).unwrap();
+        assert_eq!(all_paragraphs.len(), 2);
+        assert!(all_paragraphs.windows(2).all(|pair| pair[0] < pair[1]));
         let div = document.select_ids("div", None).unwrap();
-        assert_eq!(document.select_ids("p", Some(&div)).unwrap().len(), 2);
+        let paragraphs = document.select_ids("p", Some(&div)).unwrap();
+        assert_eq!(paragraphs.len(), 2);
+        assert!(paragraphs.windows(2).all(|pair| pair[0] < pair[1]));
         assert_eq!(document.select_ids("div", Some(&div)).unwrap().len(), 0);
         let nodes = document.select_ids("*", None).unwrap();
         assert!(nodes.windows(2).all(|pair| pair[0] < pair[1]));

@@ -2,6 +2,7 @@ import { packageDirectory, requireNative, type NativeDocument, type NativeNodeRe
 import { hasParserHooks, parseNativeDocument } from './hooks.js';
 import type { CheerioOptions } from './types.js';
 import { NodeSnapshot, plainRecord, type NativeSnapshot } from './snapshot.js';
+import { attributeAssign, type AttributeObject } from './attribute-object.js';
 
 interface NativeMemoryStats { live: number; slots: number; retained: number; reclaimed: number; immutableNodes: number; externalBytes: number }
 interface PinnedCollection extends NativeMemoryStats { free: Uint32Array }
@@ -413,6 +414,40 @@ function takePreparedSnapshot(state: DocumentState, isWanted: boolean): NativeSn
   return state.raw.takePreparedSnapshot?.(isWanted) ?? undefined;
 }
 
+/** Start a full-tree walk from one compact record snapshot instead of a series of individual node reads. */
+export function prepareWalkSnapshot(state: DocumentState): void {
+  if (state.generation !== 0 || state.bulk instanceof NodeSnapshot || !state.raw.snapshot || state.adapterNodes) return;
+  const snapshot = new NodeSnapshot(takePreparedSnapshot(state, true) ?? state.raw.snapshot());
+  state.snapshotSize = snapshot.size;
+  state.bulk = snapshot;
+}
+
+/** Prepare one compact snapshot before materializing a large selection from an unchanged document. */
+export function prepareBulkViews(document: NativeDocument, ids: readonly number[]): void {
+  if (ids.length < 64 || !(document instanceof RoutedDocument)) return;
+  const state = document.state;
+  if (state.generation !== 0 || state.bulk instanceof NodeSnapshot || !state.raw.snapshot || state.adapterNodes) return;
+  // Avoid copying the whole tree for repeated IDs or already materialized
+  // views. Either case can satisfy toArray without many native record reads.
+  let unseen = 0;
+  let previous = -1;
+  for (const id of ids) {
+    const local = id - state.base;
+    if (local < 0 || local >= state.baseline) return;
+    if (unseen < 64 && !state.views[local] && (!state.weakViews.size || !cachedView(state, local))) {
+      // Document-ordered IDs are the common case. Other orders use the
+      // regular lazy path rather than allocating a set for this heuristic.
+      if (local <= previous) return;
+      previous = local;
+      unseen++;
+    }
+  }
+  if (unseen < 64) return;
+  const snapshot = new NodeSnapshot(takePreparedSnapshot(state, true) ?? state.raw.snapshot());
+  state.snapshotSize = snapshot.size;
+  state.bulk = snapshot;
+}
+
 /** The current snapshot when it holds `local` exactly, so its fields can be read without a record. */
 export function plainSnapshot(state: DocumentState, local: number): NodeSnapshot | undefined {
   const bulk = state.bulk;
@@ -610,12 +645,8 @@ export class RoutedDocument implements NativeDocument {
         const local = id - own.base;
         invalidateNodes(own, [local]);
         own.raw.setAttribute([local], name, value);
-        const target = ((cachedView(own, local) as Record<symbol, { target?: Record<string, string> } | undefined> | undefined)?.[VIEW_ATTRIBUTES])?.target;
-        if (target) {
-          if (value === null) delete target[name];
-          else if (name === '__proto__') Object.defineProperty(target, name, { value, writable: true, enumerable: true, configurable: true });
-          else target[name] = value;
-        }
+        const attributes = (cachedView(own, local) as Record<symbol, AttributeObject | undefined> | undefined)?.[VIEW_ATTRIBUTES];
+        if (attributes) attributeAssign(attributes, name, value);
         return;
       }
     }
@@ -625,11 +656,8 @@ export class RoutedDocument implements NativeDocument {
       invalidateNodes(state, locals);
       state.raw.setAttribute(locals, name, value);
       for (const local of locals) {
-        const target = ((cachedView(state, local) as Record<symbol, { target?: Record<string, string> } | undefined> | undefined)?.[VIEW_ATTRIBUTES])?.target;
-        if (!target) continue;
-        if (value === null) delete target[name];
-        else if (name === '__proto__') Object.defineProperty(target, name, { value, writable: true, enumerable: true, configurable: true });
-        else target[name] = value;
+        const attributes = (cachedView(state, local) as Record<symbol, AttributeObject | undefined> | undefined)?.[VIEW_ATTRIBUTES];
+        if (attributes) attributeAssign(attributes, name, value);
       }
     }
   }
@@ -643,12 +671,8 @@ export class RoutedDocument implements NativeDocument {
         const local = id - own.base;
         invalidateNodes(own, [local]);
         own.raw.addClass([local], name);
-        const target = ((cachedView(own, local) as Record<symbol, { target?: Record<string, string> } | undefined> | undefined)?.[VIEW_ATTRIBUTES])?.target;
-        if (target) {
-          const value = own.raw.attr(local, 'class');
-          if (value == null) delete target.class;
-          else target.class = value;
-        }
+        const attributes = (cachedView(own, local) as Record<symbol, AttributeObject | undefined> | undefined)?.[VIEW_ATTRIBUTES];
+        if (attributes) attributeAssign(attributes, 'class', own.raw.attr(local, 'class') ?? null);
         return;
       }
     }
@@ -658,11 +682,8 @@ export class RoutedDocument implements NativeDocument {
       invalidateNodes(state, locals);
       state.raw.addClass(locals, name);
       for (const local of locals) {
-        const target = ((cachedView(state, local) as Record<symbol, { target?: Record<string, string> } | undefined> | undefined)?.[VIEW_ATTRIBUTES])?.target;
-        if (!target) continue;
-        const value = state.raw.attr(local, 'class');
-        if (value == null) delete target.class;
-        else target.class = value;
+        const attributes = (cachedView(state, local) as Record<symbol, AttributeObject | undefined> | undefined)?.[VIEW_ATTRIBUTES];
+        if (attributes) attributeAssign(attributes, 'class', state.raw.attr(local, 'class') ?? null);
       }
     }
   }
@@ -753,8 +774,7 @@ export class RoutedDocument implements NativeDocument {
     const toScratch = new Map<number, number>();
     const fromScratch = new Map<number, number>();
     for (const state of states) {
-      const records: NativeNodeRecord[] = JSON.parse(state.raw.exportTree());
-      const roots = records.filter((record) => record.parent == null).map((record) => record.id);
+      const roots = state.raw.forestRoots?.() ?? (JSON.parse(state.raw.exportTree()) as NativeNodeRecord[]).filter((record) => record.parent == null).map((record) => record.id);
       if (!scratch.adopt) throw new Error('The native addon does not support native document copies.');
       const copied: { mapping: [number, number][] } = JSON.parse(scratch.adopt(state.raw, roots, false));
       for (const [local, copy] of copied.mapping) {
@@ -819,7 +839,10 @@ export class RoutedDocument implements NativeDocument {
   }
   attr(id: number, name: string): string | undefined { const state = this.owner(id); return this.call(state, 'attr', { ids: [id - state.base], name }) ?? undefined; }
   tagName(id: number): string | undefined { const state = this.owner(id); return recordAt(state, id - state.base)?.name; }
-  exportTree(): string { return JSON.stringify((JSON.parse(this.raw.exportTree()) as NativeNodeRecord[]).map((record) => globalRecord(this.state, record))); }
+  exportTree(): string {
+    if (this.raw.exportTreeWithOffset) return this.raw.exportTreeWithOffset(this.state.base);
+    return JSON.stringify((JSON.parse(this.raw.exportTree()) as NativeNodeRecord[]).map((record) => globalRecord(this.state, record)));
+  }
   create(html: string, contextId?: number): number[] { return this.operate('create', { html, contextId }); }
 
   insertHtml(targetIds: number[], html: string, position: string): number[] | undefined {
@@ -948,6 +971,18 @@ export class RoutedDocument implements NativeDocument {
     }
     const ids: number[] = command === 'select' ? args.contexts ?? [this.rootId()] : args.ids ?? [];
     const groups = this.groups(ids);
+    // Nodes owned by different documents compare equal in domutils' sort.
+    if (command === 'uniqueSort' && ids.length === 2 && groups.length === 2 && groups[0].state !== groups[1].state) return ids.slice();
+    // Positional filters operate on the input selection, so they need only the
+    // first or last matching element rather than copies of every source tree.
+    if (command === 'matches' && this.isMixed(groups) && !options.pseudos && !args.pseudoMatches && (args.selector === ':first' || args.selector === ':last')) {
+      const ordered = args.selector === ':first' ? groups : [...groups].reverse();
+      for (const group of ordered) {
+        const matches = this.call<number[]>(group.state, 'matches', { selector: '*', ids: group.locals, options });
+        if (matches.length) return [group.state.base + (args.selector === ':first' ? matches[0] : matches[matches.length - 1])];
+      }
+      return [];
+    }
     if (this.isMixed(groups) && scratchCommands.has(command)) return this.scratch(command, { ...args, options }, ids) ?? null;
     if (command === 'extractPlan') { const group = groups[0]; return this.call(group?.state ?? this.state, command, { ...args, options, ids: group?.locals ?? [] }) ?? null; }
     if (idResultCommands.has(command)) {

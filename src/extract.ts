@@ -25,6 +25,21 @@ function nativePrefix(scope: Cheerio<AnyNode>, map: ExtractMap, keys: string[] |
 
 /** The native plan for the longest run of entries from `key` on that compile to one. */
 function prefixPlan(map: ExtractMap, keys: string[], key: string, options: CheerioOptions): { names: string[]; plan: ExtractPlan } | undefined {
+  // Pure maps are the common case. Compile the complete plan once instead of
+  // recompiling each growing prefix; callbacks and inherited entries keep the
+  // incremental path so they retain their observable order.
+  if (keys[0] === key && keys.every((name) => {
+    const slot = Object.getOwnPropertyDescriptor(map, name);
+    return !!slot && slot.enumerable && 'value' in slot;
+  })) {
+    let count = 0;
+    let sameKeys = true;
+    for (const name in map) { if (name !== keys[count++]) { sameKeys = false; break; } }
+    if (sameKeys && count === keys.length) {
+      const complete = compileExtractPlan(map, options);
+      if (complete) return { names: keys, plan: complete };
+    }
+  }
   const prefix: ExtractMap = Object.create(null);
   let plan: ExtractPlan | undefined;
   for (let position = keys.indexOf(key); position < keys.length; position++) {
