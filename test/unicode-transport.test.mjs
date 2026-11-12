@@ -16,6 +16,15 @@ const fixtures = [
   ['surrogates beside private-use scalars', '\ud800\ue000\udfff\ue7ff\ue800\u{f0000}'],
 ];
 
+test('JSON transport preserves ordinary strings around escaped and private-use values', () => {
+  const $ = cheerox.load('<p></p>');
+  const value = { before: 'ordinary "quoted" text', escaped: String.raw`\ud800`, lone: '\ud800', private: '\ue800', after: 'ordinary end' };
+  $('p').data('mixed', value);
+  assert.deepEqual($('p').data('mixed'), value);
+  $('p').attr('title', value.lone);
+  assert.equal($('p').attr('title'), value.lone);
+});
+
 function loadResult(library, value, options) {
   const $ = library.load(`<main><p title="${value}" data-value='${JSON.stringify(value)}'>${value}</p><a href="${value}">link</a><!--${value}--></main>`, options);
   return {

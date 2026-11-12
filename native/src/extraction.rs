@@ -27,6 +27,7 @@ fn extract(
         return Err(invalid("Extraction plan nesting exceeds 64 levels"));
     }
     let mut result = Map::new();
+    let mut previous_selection: Option<(&str, Vec<u32>, bool)> = None;
     for entry in plan {
         let key = entry
             .get("key")
@@ -40,7 +41,43 @@ fn extract(
         let value = entry
             .get("value")
             .ok_or_else(|| invalid("Extraction entry requires a value"))?;
-        let ids = document.select_ids(selector, contexts)?;
+        let reusable = value.get("kind").and_then(Value::as_str) == Some("property")
+            && value
+                .get("name")
+                .and_then(Value::as_str)
+                .is_some_and(|name| {
+                    matches!(
+                        name,
+                        "textContent"
+                            | "tagName"
+                            | "nodeName"
+                            | "name"
+                            | "type"
+                            | "nodeType"
+                            | "id"
+                            | "class"
+                            | "title"
+                            | "alt"
+                    ) || name.starts_with("data-")
+                        || name.starts_with("aria-")
+                        || matches!(name, "href" | "src")
+                            && document.options.get("baseURI").is_none()
+                });
+        if previous_selection
+            .as_ref()
+            .is_none_or(|(previous, _, complete)| *previous != selector || all && !complete)
+        {
+            let ids = if all {
+                document.select_ids(selector, contexts)?
+            } else {
+                document
+                    .select_first_id(selector, contexts)?
+                    .into_iter()
+                    .collect()
+            };
+            previous_selection = Some((selector, ids, all));
+        }
+        let ids = &previous_selection.as_ref().unwrap().1;
         let read = |id: u32| -> Result<Value> {
             match value.get("kind").and_then(Value::as_str) {
                 Some("map") => extract(document, entries(value)?, Some(&[id]), depth + 1),
@@ -51,6 +88,30 @@ fn extract(
                         .ok_or_else(|| invalid("Extraction property requires a name"))?;
                     if name == "textContent" {
                         return Ok(Value::String(document.text_ids(&[id])));
+                    }
+                    if matches!(name, "tagName" | "nodeName" | "name" | "type" | "nodeType")
+                        && document.arena.borrow().is_none()
+                    {
+                        return Ok(document
+                            .with_node(id, |node, _| {
+                                node.value().as_element().map(|element| match name {
+                                    "tagName" | "nodeName" => {
+                                        Value::String(element.name().to_uppercase())
+                                    }
+                                    "name" => Value::String(element.name().to_owned()),
+                                    "type" => Value::String(
+                                        match element.name() {
+                                            "script" => "script",
+                                            "style" => "style",
+                                            _ => "tag",
+                                        }
+                                        .to_owned(),
+                                    ),
+                                    _ => json!(1),
+                                })
+                            })
+                            .flatten()
+                            .unwrap_or(Value::Null));
                     }
                     if matches!(name, "id" | "class" | "title" | "alt")
                         || name.starts_with("data-")
@@ -90,7 +151,7 @@ fn extract(
         };
         if all {
             let mut values = Vec::new();
-            for id in ids {
+            for &id in ids {
                 match read(id)? {
                     Value::Null => {}
                     Value::Array(items) => values.extend(items),
@@ -103,6 +164,9 @@ fn extract(
             if !item.is_null() {
                 result.insert(key.into(), item);
             }
+        }
+        if !reusable {
+            previous_selection = None;
         }
     }
     Ok(Value::Object(result))
@@ -210,6 +274,25 @@ pub(crate) fn execute_arena(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn tag_names_do_not_materialize_the_arena() {
+        let document = NativeDocument::parse_options(
+            "<main><img src='/x'><svg><linearGradient id='g'/></svg></main>",
+            true,
+            json!({}),
+            None,
+        );
+        let plan = json!({"version":1,"entries":[
+            {"key":"images","selector":"img","all":true,"value":{"kind":"property","name":"tagName"}},
+            {"key":"gradients","selector":"svg","all":true,"value":{"kind":"property","name":"nodeName"}}
+        ]});
+        assert_eq!(
+            execute(&document, &plan).unwrap(),
+            json!({"images":["IMG"],"gradients":["SVG"]})
+        );
+        assert!(document.arena.borrow().is_none());
+    }
 
     #[test]
     fn nested_maps_preserve_native_property_and_missing_value_semantics() {

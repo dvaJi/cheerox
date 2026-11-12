@@ -94,7 +94,11 @@ const staticMethods = {
     if (dom && typeof dom === 'object' && !('length' in dom) && !('type' in dom)) { renderOptions = dom; dom = undefined; }
     const nodes = dom === undefined ? [this._root] : this(dom).toArray();
     const binding = nodeBinding(this._root)!;
-    return operation(binding.document, 'render', { ids: importNodes(binding.document, nodes), options: flattenOptions(renderOptions, this._options) });
+    const base = this._options;
+    const unchanged = !renderOptions && ((!base._useHtmlParser2 && !base.xml && !base.xmlMode)
+      || (base.xml === true && base.xmlMode === true && base._useHtmlParser2 === true));
+    const options = unchanged ? base : flattenOptions({ ...base, ...flattenOptions(renderOptions) }, base);
+    return operation(binding.document, 'render', { ids: importNodes(binding.document, nodes), options });
   },
   xml(this: CheerioAPI, dom?: any): string {
     const binding = nodeBinding(this._root)!;

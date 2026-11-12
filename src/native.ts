@@ -41,6 +41,8 @@ export interface NativeDocument {
   attr(id: number, name: string): string | undefined | null;
   tagName(id: number): string | undefined | null;
   exportTree(): string;
+  exportTreeWithOffset?(base: number): string;
+  forestRoots?(): number[];
   rootId(): number;
   takePreparedPlans?(): (string | null)[] | null;
   takePreparedSnapshot?(isWanted: boolean): NativeSnapshot | null;

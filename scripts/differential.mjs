@@ -103,6 +103,21 @@ addCase('wrap', fixtures.fruits, ($0) => { $0('.apple').wrap('<div class="wrappe
 addCase('replaceWith', fixtures.fruits, ($0) => { $0('.orange').replaceWith('<li class="kiwi">Kiwi</li>'); return $0.html(); });
 addCase('remove/empty', fixtures.fruits, ($0) => { $0('.pear').remove(); $0('.orange').empty(); return $0.html(); });
 addCase('before/after', fixtures.fruits, ($0) => { $0('.apple').before('<li class="pre">P</li>').after('<li class="post">Q</li>'); return $0.html(); });
+addCase('before/after multiple targets and roots', '<main><section><p class="x">A</p></section><section><p class="x">B</p></section></main>', ($0) => {
+  $0('.x').before('<em>before</em>text<!--b-->').after('<span>after</span>tail<!--a-->');
+  return $0.html();
+});
+addCase('before/after materialized children', '<main><section><p class="x">A</p></section><section><p class="x">B</p></section></main>', ($0) => {
+  const children = $0('section').first()[0].children;
+  $0('.x').after('<span>after</span>');
+  return { html: $0.html(), preserved: children === $0('section').first()[0].children };
+});
+addCase('remove nested and duplicate selections', '<main><div id="a"><p id="b"><span>x</span></p></div><div><p>y</p></div></main>', ($0) => {
+  const a = $0('#a')[0];
+  const b = $0('#b')[0];
+  $0([a, b, b]).remove();
+  return $0.html();
+});
 addCase('html getter/setter', fixtures.mixed, ($0) => { const before = $0('div').html(); $0('p').html('<em>replaced</em>'); return { before, after: $0('div').html() }; });
 addCase('text setter', fixtures.mixed, ($0) => { $0('p').text('plain <b>text</b>'); return $0.html(); });
 

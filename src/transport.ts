@@ -9,7 +9,7 @@ const globals = globalThis as typeof globalThis & { [key: symbol]: TransportRegi
 const registry = globals[registryKey] ??= { userErrors: new WeakSet() };
 const transportedKey = Symbol.for('cheerox.native-transport.prototype');
 
-const jsonMethods = new Set(['op', 'node', 'exportTree', 'parserDiagnostics', 'adopt']);
+const jsonMethods = new Set(['op', 'node', 'exportTree', 'exportTreeWithOffset', 'parserDiagnostics', 'adopt']);
 /** String arguments each document method takes, by position, and how to encode them. */
 const argumentEncoders: Record<string, (args: any[]) => void> = {
   op: (args) => { args[1] = encodeJson(args[1]); },

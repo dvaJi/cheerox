@@ -55,11 +55,11 @@ const decodeJsonCandidate = /[\ue000-\ue800]|\\ue[0-8][\da-f]{2}/i;
 export function encodeJson(value: string): string {
   if (!encodeJsonCandidate.test(value)) return value;
   if (isWellFormed?.call(value) && !encoded.test(value) && !escapedJsonCandidate.test(value)) return value;
-  return mapJsonStrings(value, encodeString);
+  return mapJsonStrings(value, encodeString, encodeJsonCandidate);
 }
 
 export function decodeJson(value: string): string {
-  return decodeJsonCandidate.test(value) ? mapJsonStrings(value, decodeString) : value;
+  return decodeJsonCandidate.test(value) ? mapJsonStrings(value, decodeString, decodeJsonCandidate) : value;
 }
 
 /**
@@ -67,7 +67,7 @@ export function decodeJson(value: string): string {
  * value, in one left-to-right pass. A regular expression scanning for tokens
  * retries from every quote of an unterminated token, which is quadratic.
  */
-function mapJsonStrings(json: string, transform: (value: string) => string): string {
+function mapJsonStrings(json: string, transform: (value: string) => string, candidate: RegExp): string {
   const parts: string[] = [];
   let copied = 0;
   let quote = json.indexOf('"');
@@ -75,9 +75,12 @@ function mapJsonStrings(json: string, transform: (value: string) => string): str
     let end = quote + 1;
     while (end < json.length && json.charCodeAt(end) !== 0x22) end += json.charCodeAt(end) === 0x5c ? 2 : 1;
     if (end >= json.length) break;
-    parts.push(json.slice(copied, quote), JSON.stringify(transform(JSON.parse(json.slice(quote, end + 1)))));
-    copied = end + 1;
-    quote = json.indexOf('"', copied);
+    const token = json.slice(quote, end + 1);
+    if (candidate.test(token)) {
+      parts.push(json.slice(copied, quote), JSON.stringify(transform(JSON.parse(token))));
+      copied = end + 1;
+    }
+    quote = json.indexOf('"', end + 1);
   }
   return copied === 0 ? json : parts.join('') + json.slice(copied);
 }

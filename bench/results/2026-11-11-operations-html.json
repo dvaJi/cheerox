@@ -1,0 +1,418 @@
+{
+  "samples": 21,
+  "node": "v24.18.0",
+  "rows": [
+    {
+      "page": "generated-200",
+      "operation": "load",
+      "cheerio": 2.1684,
+      "cheerox": 2.0437
+    },
+    {
+      "page": "generated-200",
+      "operation": "select by tag",
+      "cheerio": 0.4638,
+      "cheerox": 0.0752,
+      "cheerioWithLoad": 2.6322,
+      "cheeroxWithLoad": 2.1189
+    },
+    {
+      "page": "generated-200",
+      "operation": "select compound",
+      "cheerio": 0.2709,
+      "cheerox": 0.0809,
+      "cheerioWithLoad": 2.4393000000000002,
+      "cheeroxWithLoad": 2.1246
+    },
+    {
+      "page": "generated-200",
+      "operation": "text of selection",
+      "cheerio": 0.4612,
+      "cheerox": 0.1014,
+      "cheerioWithLoad": 2.6296,
+      "cheeroxWithLoad": 2.1451
+    },
+    {
+      "page": "generated-200",
+      "operation": "html of selection",
+      "cheerio": 0.3626,
+      "cheerox": 0.0787,
+      "cheerioWithLoad": 2.531,
+      "cheeroxWithLoad": 2.1224
+    },
+    {
+      "page": "generated-200",
+      "operation": "serialize document",
+      "cheerio": 0.6917,
+      "cheerox": 0.0904,
+      "cheerioWithLoad": 2.8601,
+      "cheeroxWithLoad": 2.1340999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "attr via each",
+      "cheerio": 0.4708,
+      "cheerox": 0.5921,
+      "cheerioWithLoad": 2.6392,
+      "cheeroxWithLoad": 2.6357999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "attribs property",
+      "cheerio": 0.4038,
+      "cheerox": 0.2954,
+      "cheerioWithLoad": 2.5722,
+      "cheeroxWithLoad": 2.3390999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "map and get",
+      "cheerio": 0.4434,
+      "cheerox": 0.3607,
+      "cheerioWithLoad": 2.6118,
+      "cheeroxWithLoad": 2.4044
+    },
+    {
+      "page": "generated-200",
+      "operation": "closest from elements",
+      "cheerio": 1.1486,
+      "cheerox": 0.6198,
+      "cheerioWithLoad": 3.317,
+      "cheeroxWithLoad": 2.6635
+    },
+    {
+      "page": "generated-200",
+      "operation": "parents count",
+      "cheerio": 0.6816,
+      "cheerox": 0.7129,
+      "cheerioWithLoad": 2.85,
+      "cheeroxWithLoad": 2.7565999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "parent and siblings",
+      "cheerio": 0.5712,
+      "cheerox": 0.563,
+      "cheerioWithLoad": 2.7396000000000003,
+      "cheeroxWithLoad": 2.6067
+    },
+    {
+      "page": "generated-200",
+      "operation": "children and next",
+      "cheerio": 0.4427,
+      "cheerox": 0.7335,
+      "cheerioWithLoad": 2.6111,
+      "cheeroxWithLoad": 2.7771999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "find from each element",
+      "cheerio": 1.3663,
+      "cheerox": 0.5942,
+      "cheerioWithLoad": 3.5347,
+      "cheeroxWithLoad": 2.6378999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "is and filter",
+      "cheerio": 0.9623,
+      "cheerox": 0.6255,
+      "cheerioWithLoad": 3.1307,
+      "cheeroxWithLoad": 2.6692
+    },
+    {
+      "page": "generated-200",
+      "operation": "walk children",
+      "cheerio": 0.1678,
+      "cheerox": 0.7282,
+      "cheerioWithLoad": 2.3362000000000003,
+      "cheeroxWithLoad": 2.7718999999999996
+    },
+    {
+      "page": "generated-200",
+      "operation": "walk with fields",
+      "cheerio": 0.3897,
+      "cheerox": 1.7406,
+      "cheerioWithLoad": 2.5581,
+      "cheeroxWithLoad": 3.7843
+    },
+    {
+      "page": "generated-200",
+      "operation": "contents and text nodes",
+      "cheerio": 0.6086,
+      "cheerox": 0.4842,
+      "cheerioWithLoad": 2.777,
+      "cheeroxWithLoad": 2.5279
+    },
+    {
+      "page": "generated-200",
+      "operation": "set attributes",
+      "cheerio": 0.6107,
+      "cheerox": 0.5797,
+      "cheerioWithLoad": 2.7791,
+      "cheeroxWithLoad": 2.6233999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "remove elements",
+      "cheerio": 0.7992,
+      "cheerox": 0.3846,
+      "cheerioWithLoad": 2.9676,
+      "cheeroxWithLoad": 2.4282999999999997
+    },
+    {
+      "page": "generated-200",
+      "operation": "append and prepend",
+      "cheerio": 1.5819,
+      "cheerox": 1.4148,
+      "cheerioWithLoad": 3.7503,
+      "cheeroxWithLoad": 3.4585
+    },
+    {
+      "page": "generated-200",
+      "operation": "replace text and html",
+      "cheerio": 1.3728,
+      "cheerox": 1.3904,
+      "cheerioWithLoad": 3.5412,
+      "cheeroxWithLoad": 3.4341
+    },
+    {
+      "page": "generated-200",
+      "operation": "mutate then serialize",
+      "cheerio": 1.5624,
+      "cheerox": 0.927,
+      "cheerioWithLoad": 3.7308000000000003,
+      "cheeroxWithLoad": 2.9707
+    },
+    {
+      "page": "generated-200",
+      "operation": "per-element attribute rewrite",
+      "cheerio": 0.6494,
+      "cheerox": 1.0576,
+      "cheerioWithLoad": 2.8178,
+      "cheeroxWithLoad": 3.1013
+    },
+    {
+      "page": "generated-200",
+      "operation": "clone and insert",
+      "cheerio": 0.843,
+      "cheerox": 1.1019,
+      "cheerioWithLoad": 3.0114,
+      "cheeroxWithLoad": 3.1456
+    },
+    {
+      "page": "generated-200",
+      "operation": "extract map",
+      "cheerio": 0.6186,
+      "cheerox": 0.128,
+      "cheerioWithLoad": 2.787,
+      "cheeroxWithLoad": 2.1717
+    },
+    {
+      "page": "generated-2000",
+      "operation": "load",
+      "cheerio": 26.2005,
+      "cheerox": 26.5683
+    },
+    {
+      "page": "generated-2000",
+      "operation": "select by tag",
+      "cheerio": 5.2494,
+      "cheerox": 0.6001,
+      "cheerioWithLoad": 31.4499,
+      "cheeroxWithLoad": 27.168400000000002
+    },
+    {
+      "page": "generated-2000",
+      "operation": "select compound",
+      "cheerio": 5.8093,
+      "cheerox": 1.0205,
+      "cheerioWithLoad": 32.0098,
+      "cheeroxWithLoad": 27.5888
+    },
+    {
+      "page": "generated-2000",
+      "operation": "text of selection",
+      "cheerio": 6.071,
+      "cheerox": 0.9303,
+      "cheerioWithLoad": 32.2715,
+      "cheeroxWithLoad": 27.4986
+    },
+    {
+      "page": "generated-2000",
+      "operation": "html of selection",
+      "cheerio": 5.4633,
+      "cheerox": 0.5454,
+      "cheerioWithLoad": 31.663800000000002,
+      "cheeroxWithLoad": 27.1137
+    },
+    {
+      "page": "generated-2000",
+      "operation": "serialize document",
+      "cheerio": 12.8794,
+      "cheerox": 1.1439,
+      "cheerioWithLoad": 39.0799,
+      "cheeroxWithLoad": 27.7122
+    },
+    {
+      "page": "generated-2000",
+      "operation": "attr via each",
+      "cheerio": 5.9168,
+      "cheerox": 4.8561,
+      "cheerioWithLoad": 32.1173,
+      "cheeroxWithLoad": 31.4244
+    },
+    {
+      "page": "generated-2000",
+      "operation": "attribs property",
+      "cheerio": 6.5888,
+      "cheerox": 5.1398,
+      "cheerioWithLoad": 32.789300000000004,
+      "cheeroxWithLoad": 31.7081
+    },
+    {
+      "page": "generated-2000",
+      "operation": "map and get",
+      "cheerio": 17.4692,
+      "cheerox": 5.2077,
+      "cheerioWithLoad": 43.669700000000006,
+      "cheeroxWithLoad": 31.776
+    },
+    {
+      "page": "generated-2000",
+      "operation": "closest from elements",
+      "cheerio": 23.5801,
+      "cheerox": 9.5432,
+      "cheerioWithLoad": 49.78060000000001,
+      "cheeroxWithLoad": 36.1115
+    },
+    {
+      "page": "generated-2000",
+      "operation": "parents count",
+      "cheerio": 8.9414,
+      "cheerox": 8.9371,
+      "cheerioWithLoad": 35.1419,
+      "cheeroxWithLoad": 35.5054
+    },
+    {
+      "page": "generated-2000",
+      "operation": "parent and siblings",
+      "cheerio": 7.2979,
+      "cheerox": 9.2145,
+      "cheerioWithLoad": 33.498400000000004,
+      "cheeroxWithLoad": 35.7828
+    },
+    {
+      "page": "generated-2000",
+      "operation": "children and next",
+      "cheerio": 8.2331,
+      "cheerox": 7.6033,
+      "cheerioWithLoad": 34.4336,
+      "cheeroxWithLoad": 34.1716
+    },
+    {
+      "page": "generated-2000",
+      "operation": "find from each element",
+      "cheerio": 17.2399,
+      "cheerox": 8.1141,
+      "cheerioWithLoad": 43.4404,
+      "cheeroxWithLoad": 34.6824
+    },
+    {
+      "page": "generated-2000",
+      "operation": "is and filter",
+      "cheerio": 12.5682,
+      "cheerox": 5.0936,
+      "cheerioWithLoad": 38.7687,
+      "cheeroxWithLoad": 31.661900000000003
+    },
+    {
+      "page": "generated-2000",
+      "operation": "walk children",
+      "cheerio": 2.2204,
+      "cheerox": 9.0184,
+      "cheerioWithLoad": 28.420900000000003,
+      "cheeroxWithLoad": 35.5867
+    },
+    {
+      "page": "generated-2000",
+      "operation": "walk with fields",
+      "cheerio": 4.5832,
+      "cheerox": 23.6715,
+      "cheerioWithLoad": 30.783700000000003,
+      "cheeroxWithLoad": 50.2398
+    },
+    {
+      "page": "generated-2000",
+      "operation": "contents and text nodes",
+      "cheerio": 11.4739,
+      "cheerox": 5.4335,
+      "cheerioWithLoad": 37.674400000000006,
+      "cheeroxWithLoad": 32.0018
+    },
+    {
+      "page": "generated-2000",
+      "operation": "set attributes",
+      "cheerio": 7.5078,
+      "cheerox": 8.0448,
+      "cheerioWithLoad": 33.7083,
+      "cheeroxWithLoad": 34.6131
+    },
+    {
+      "page": "generated-2000",
+      "operation": "remove elements",
+      "cheerio": 7.1032,
+      "cheerox": 3.5493,
+      "cheerioWithLoad": 33.3037,
+      "cheeroxWithLoad": 30.1176
+    },
+    {
+      "page": "generated-2000",
+      "operation": "append and prepend",
+      "cheerio": 18.8375,
+      "cheerox": 8.402,
+      "cheerioWithLoad": 45.038,
+      "cheeroxWithLoad": 34.9703
+    },
+    {
+      "page": "generated-2000",
+      "operation": "replace text and html",
+      "cheerio": 14.4079,
+      "cheerox": 9.3711,
+      "cheerioWithLoad": 40.6084,
+      "cheeroxWithLoad": 35.9394
+    },
+    {
+      "page": "generated-2000",
+      "operation": "mutate then serialize",
+      "cheerio": 15.7383,
+      "cheerox": 8.2888,
+      "cheerioWithLoad": 41.9388,
+      "cheeroxWithLoad": 34.8571
+    },
+    {
+      "page": "generated-2000",
+      "operation": "per-element attribute rewrite",
+      "cheerio": 7.7167,
+      "cheerox": 7.7633,
+      "cheerioWithLoad": 33.9172,
+      "cheeroxWithLoad": 34.3316
+    },
+    {
+      "page": "generated-2000",
+      "operation": "clone and insert",
+      "cheerio": 8.8156,
+      "cheerox": 6.159,
+      "cheerioWithLoad": 35.0161,
+      "cheeroxWithLoad": 32.7273
+    },
+    {
+      "page": "generated-2000",
+      "operation": "extract map",
+      "cheerio": 14.4485,
+      "cheerox": 0.9107,
+      "cheerioWithLoad": 40.649,
+      "cheeroxWithLoad": 27.479
+    }
+  ]
+}

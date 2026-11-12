@@ -2,21 +2,16 @@ import type { NativeDocument, NativeNodeRecord } from './native.js';
 import { NodeSnapshot } from './snapshot.js';
 import type { AnyNode } from './types.js';
 import { nodePrototype } from './dom.js';
-import { cachedView, cacheView, exposeTo, isLocalState, isRouted, onViewRefresh, plainSnapshot, recordAt, routedFor, stateIn, structureSnapshot, VIEW_ATTRIBUTES, VIEW_CHILD_TARGET, VIEW_LOCAL, VIEW_SELF, VIEW_STATE, type DocumentState } from './router.js';
+import { ATTR_META, attributeAssign, defineAttributeKey, setAttributeMeta, type AttributeMeta, type AttributeObject } from './attribute-object.js';
+import { cachedView, cacheView, exposeTo, isLocalState, isRouted, onViewRefresh, plainSnapshot, prepareWalkSnapshot, recordAt, routedFor, stateIn, structureSnapshot, VIEW_ATTRIBUTES, VIEW_CHILD_TARGET, VIEW_LOCAL, VIEW_SELF, VIEW_STATE, type DocumentState } from './router.js';
 
 export interface NodeBinding { document: NativeDocument; id: number }
 
 /** A node object: its fields read the native record for the node's current location. */
-interface View { [VIEW_STATE]: DocumentState; [VIEW_LOCAL]: number; [VIEW_SELF]: View; [VIEW_ATTRIBUTES]: AttributeView | undefined; [VIEW_CHILDREN]: AnyNode[] | undefined; [VIEW_CHILD_TARGET]: AnyNode[] | undefined; [key: string]: any }
-/** A plain attribute object that mirrors the record; its proxy only intercepts writes. */
-/**
- * The handler of a node's attribute proxy, which also keeps the proxy's plain
- * target and the generation it was copied in, so each attribute object costs
- * one target, one handler and one proxy.
- */
-interface AttributeView extends ProxyHandler<Record<string, string>> { view: View; proxy: Record<string, string>; target: Record<string, string>; generation: number; state: DocumentState }
+interface View { [VIEW_STATE]: DocumentState; [VIEW_LOCAL]: number; [VIEW_SELF]: View; [VIEW_ATTRIBUTES]: AttributeObject | undefined; [VIEW_CHILDREN]: AnyNode[] | undefined; [VIEW_CHILD_TARGET]: AnyNode[] | undefined; [key: string]: any }
 
 const VIEW_CHILDREN = Symbol.for('cheerox.node.children');
+
 const arrayIndex = /^(?:0|[1-9]\d*)$/;
 const emptyRecord = Object.freeze({ id: -1, type: 'released', children: [] }) as unknown as NativeNodeRecord;
 
@@ -50,6 +45,14 @@ export function viewIdIn(document: NativeDocument, node: unknown): number | unde
 export function nodeBinding(node: unknown): NodeBinding | undefined {
   const id = node && typeof node === 'object' ? viewId(node) : undefined;
   return id === undefined ? undefined : { document: routedFor((node as View)[VIEW_STATE]), id };
+}
+
+export function hasMaterializedChildren(node: unknown): boolean {
+  return !!(node as View | null | undefined)?.[VIEW_CHILD_TARGET];
+}
+
+export function hasMaterializedAttributes(node: unknown): boolean {
+  return !!(node as View | null | undefined)?.[VIEW_ATTRIBUTES];
 }
 
 export function nodeId(node: unknown, document?: NativeDocument): number | undefined {
@@ -178,21 +181,28 @@ function traverseSnapshot(snapshot: NodeSnapshot, base: number, local: number, k
 }
 
 /** The node object for an arena slot, created on first use and then shared. */
-export function viewAt(state: DocumentState, local: number): AnyNode | undefined {
+export function viewAt(state: DocumentState, local: number, knownType?: string): AnyNode | undefined {
   const existing = state.views[local] ?? cachedView(state, local);
-  if (existing) return existing as AnyNode;
+  if (existing) { applyPendingRoot(state, local, existing); return existing as AnyNode; }
   const parsed = state.adapterNodes?.[local];
-  if (parsed) { state.adapterNodes![local] = undefined; return adoptObject(state, local, parsed); }
-  const snapshot = structureSnapshot(state, local);
+  if (parsed) {
+    state.adapterNodes![local] = undefined;
+    const view = adoptObject(state, local, parsed);
+    applyPendingRoot(state, local, view);
+    return view;
+  }
+  const snapshot = knownType ? undefined : structureSnapshot(state, local);
   let constructor: ViewConstructor;
-  if (snapshot && !snapshot.hasExtraFields(local)) constructor = viewConstructor(state, snapshot.typeOf(local), false);
+  if (knownType && !state.options.sourceCodeLocationInfo) constructor = viewConstructor(state, knownType, false);
+  else if (snapshot && !snapshot.hasExtraFields(local)) constructor = viewConstructor(state, snapshot.typeOf(local), false);
   else {
     const record = recordAt(state, local);
     if (!record) return undefined;
     constructor = viewConstructor(state, record.type, record.sourceCodeLocation !== undefined);
   }
-  const view = new constructor(state, local);
+  const view = constructor(state, local);
   cacheView(state, local, view);
+  applyPendingRoot(state, local, view);
   return view as unknown as AnyNode;
 }
 
@@ -202,20 +212,48 @@ export function rootNode(document: NativeDocument, id: number): AnyNode {
   const state = stateIn(document, id);
   const local = id - state.base;
   const existing = cachedView(state, local);
-  if (existing) return existing as AnyNode;
+  if (existing) { applyPendingRoot(state, local, existing); return existing as AnyNode; }
   if (state.adapterNodes?.[local] || state.options.sourceCodeLocationInfo) return viewAt(state, local) as AnyNode;
-  const view = new (viewConstructor(state, 'root', false))(state, local);
+  const view = (viewConstructor(state, 'root', false))(state, local);
   cacheView(state, local, view);
+  applyPendingRoot(state, local, view);
   return view as unknown as AnyNode;
 }
 
 /** Stable DOM node identities; each property reads or updates the Rust arena. */
-export function getNode(document: NativeDocument, id: number, original?: any): AnyNode {
+export function getNode(document: NativeDocument, id: number, original?: any, knownType?: string): AnyNode {
   if (!isRouted(document)) throw new TypeError('Native nodes require a routed document');
   const state = stateIn(document, id);
   const local = id - state.base;
-  if (original === undefined) return viewAt(state, local) as AnyNode;
-  return adoptObject(state, local, original);
+  if (original === undefined) return viewAt(state, local, knownType) as AnyNode;
+  const view = adoptObject(state, local, original);
+  applyPendingRoot(state, local, view);
+  return view;
+}
+
+export function getNodesOfType(document: NativeDocument, ids: number[], type: string): AnyNode[] {
+  if (!ids.length) return [];
+  const state = stateIn(document, ids[0]);
+  if (state.options.sourceCodeLocationInfo || state.adapterNodes) return ids.map((id) => getNode(document, id));
+  const constructor = viewConstructor(state, type, false);
+  const result = new Array<AnyNode>(ids.length);
+  for (let index = 0; index < ids.length; index++) {
+    const id = ids[index];
+    if (stateIn(document, id) !== state) {
+      result[index] = getNode(document, id);
+      continue;
+    }
+    const local = id - state.base;
+    let view = state.views[local] as AnyNode | undefined;
+    if (!view && (local >= state.baseline || state.weakViews.size)) view = cachedView(state, local) as AnyNode | undefined;
+    if (!view) {
+      view = constructor(state, local) as unknown as AnyNode;
+      cacheView(state, local, view);
+    }
+    if ((state as any)._pendingRoots) applyPendingRoot(state, local, view);
+    result[index] = view;
+  }
+  return result;
 }
 
 function viewRecord(view: View): NativeNodeRecord {
@@ -241,48 +279,65 @@ function attributesOf(view: View): Record<string, string> {
   const state = view[VIEW_STATE];
   let attributes = view[VIEW_ATTRIBUTES];
   if (!attributes) view[VIEW_ATTRIBUTES] = attributes = createAttributes(view, state.options._useHtmlParser2 === false ? null : Object.prototype);
-  if (attributes.generation !== state.generation || attributes.state !== state) syncAttributes(view, attributes);
-  return attributes.proxy;
+  const meta = attributes[ATTR_META]!;
+  if (meta.generation !== state.generation || meta.state !== state) syncAttributes(view, attributes);
+  return attributes;
 }
 
-function createAttributes(view: View, prototype: object | null): AttributeView {
-  const target: Record<string, string> = Object.create(prototype);
-  // The node lives on the proxy's own handler, so the attribute object stays plain to reflection.
-  const handler: AttributeView = Object.create(attributeWrites);
-  handler.view = view;
-  handler.target = target;
-  handler.generation = -1;
-  handler.state = view[VIEW_STATE];
-  handler.proxy = new Proxy(target, handler);
-  return handler;
+/** Pushes a direct attribute write through to the node's native record (shared; no per-object closure). */
+function writeAttributeThrough(view: unknown, attributes: AttributeObject, key: string, value: unknown): void {
+  const owner = view as View;
+  setField(owner, 'attribs', { ...viewRecord(owner).attribs, [key]: String(value) });
+  (attributes[ATTR_META] as AttributeMeta).values[key] = String(value);
 }
 
-/** Copies the record's attributes into the plain target, preserving key order. */
-function syncAttributes(view: View, attributes: AttributeView): void {
-  const { target } = attributes;
+function createAttributes(view: View, prototype: object | null): AttributeObject {
+  const attributes = Object.create(prototype) as AttributeObject;
+  setAttributeMeta(attributes, {
+    view,
+    generation: -1,
+    state: view[VIEW_STATE],
+    values: {},
+    write: writeAttributeThrough,
+  });
+  return attributes;
+}
+
+/** Copies the record's attributes into the shared accessors, preserving key order. */
+function syncAttributes(view: View, attributes: AttributeObject): void {
+  const meta = attributes[ATTR_META]!;
   const state = view[VIEW_STATE];
   const local = view[VIEW_LOCAL];
-  if (attributes.generation === -1) {
+  if (meta.generation === -1) {
     const snapshot = plainSnapshot(state, local);
     if (snapshot) {
-      snapshot.copyAttributes(local, target);
-      attributes.generation = state.generation;
+      snapshot.copyAttributes(local, attributes);
+      meta.generation = state.generation;
       return;
     }
   }
   const values = viewRecord(view).attribs ?? {};
-  const keys = Object.keys(target);
   const nextKeys = Object.keys(values);
-  let isSameOrder = keys.length === nextKeys.length;
-  for (let index = 0; isSameOrder && index < keys.length; index++) isSameOrder = keys[index] === nextKeys[index];
-  if (!isSameOrder) for (const key of keys) delete target[key];
-  for (const key of nextKeys) {
-    if (isSameOrder && target[key] === values[key]) continue;
-    if (key === '__proto__') Object.defineProperty(target, key, { value: values[key], writable: true, enumerable: true, configurable: true });
-    else target[key] = values[key];
+  const currentKeys = Object.keys(attributes);
+  let isSameOrder = currentKeys.length === nextKeys.length;
+  for (let index = 0; isSameOrder && index < nextKeys.length; index++) isSameOrder = currentKeys[index] === nextKeys[index];
+  const stored = meta.values;
+  if (!isSameOrder) {
+    for (const key of currentKeys) {
+      delete attributes[key];
+      delete stored[key];
+    }
+    for (const key of nextKeys) defineAttributeKey(attributes, key, values[key]);
+  } else {
+    for (const key of nextKeys) {
+      // `__proto__` cannot be assigned through the store object: plain
+      // assignment would mutate the store's prototype.
+      if (key === '__proto__') { defineAttributeKey(attributes, key, values[key]); continue; }
+      if (stored[key] !== values[key]) stored[key] = values[key];
+    }
   }
-  attributes.generation = view[VIEW_STATE].generation;
-  attributes.state = view[VIEW_STATE];
+  meta.generation = state.generation;
+  meta.state = state;
 }
 
 /** Re-reads attributes for a node whose attributes a native command changed. */
@@ -291,33 +346,6 @@ function refreshAttributes(view: object): void {
   if (attributes) syncAttributes(view as View, attributes);
 }
 onViewRefresh(refreshAttributes, fillChildren);
-
-/** Reads go straight to the plain target; writes go to Rust, which then refreshes the target. */
-const attributeWrites: ProxyHandler<Record<string, string>> = {
-  set(this: AttributeView, target, key, value) {
-    if (typeof key === 'symbol') return Reflect.set(target, key, value);
-    const view = this.view;
-    setField(view, 'attribs', { ...viewRecord(view).attribs, [key]: String(value) });
-    syncAttributes(view, view[VIEW_ATTRIBUTES]!);
-    return true;
-  },
-  deleteProperty(this: AttributeView, target, key) {
-    if (typeof key === 'symbol') return Reflect.deleteProperty(target, key);
-    const view = this.view;
-    const values = { ...viewRecord(view).attribs };
-    delete values[key];
-    setField(view, 'attribs', values);
-    syncAttributes(view, view[VIEW_ATTRIBUTES]!);
-    return true;
-  },
-  defineProperty(this: AttributeView, target, key, descriptor) {
-    if (typeof key === 'symbol') return Reflect.defineProperty(target, key, descriptor);
-    const view = this.view;
-    setField(view, 'attribs', { ...viewRecord(view).attribs, [key]: String(descriptor.value) });
-    syncAttributes(view, view[VIEW_ATTRIBUTES]!);
-    return true;
-  },
-};
 
 /** Namespace and prefix maps are rare; they read the record on every access. */
 function attributeMap(view: View, field: 'attribsNamespace' | 'attribsPrefix'): Record<string, string> {
@@ -379,6 +407,7 @@ function childList(view: View): AnyNode[] {
   const existing = view[VIEW_CHILDREN];
   if (existing) return existing;
   const state = view[VIEW_STATE];
+  if (state.baseline > 4096 && state.rootLocal !== undefined && view[VIEW_LOCAL] === state.rootLocal + 1) prepareWalkSnapshot(state);
   if (!state.hasChildLists) { state.hasChildLists = true; state.raw.takeTouched?.(); }
   const list = new ChildArray(view);
   view[VIEW_CHILD_TARGET] = list;
@@ -423,15 +452,18 @@ function fillFromSnapshot(state: DocumentState, snapshot: NodeSnapshot, local: n
   const childIds = snapshot.childIds;
   const views = state.views;
   const isStrong = !state.adapterNodes;
+  const hasWeakViews = state.weakViews.size > 0;
+  const hasPendingRoots = !!(state as any)._pendingRoots;
   const constructors = snapshotConstructors(state, snapshot);
   for (let index = 0; index < count; index++) {
     const child = childIds[first + index];
-    let node = (views[child] ?? (state.weakViews.size ? cachedView(state, child) : undefined)) as AnyNode | undefined;
+    let node = (views[child] ?? (hasWeakViews ? cachedView(state, child) : undefined)) as AnyNode | undefined;
     if (node === undefined) {
-      const constructor = isStrong && child < state.baseline && snapshot.isPresent(child) && !snapshot.hasExtraFields(child) ? constructors(snapshot.typeReference(child)) : undefined;
-      if (constructor) views[child] = node = new constructor(state, child) as unknown as AnyNode;
+      const constructor = isStrong && child < state.baseline && snapshot.isPlain(child) ? constructors(snapshot.typeReference(child)) : undefined;
+      if (constructor) views[child] = node = constructor(state, child) as unknown as AnyNode;
       else node = viewAt(state, child)!;
     }
+    if (hasPendingRoots) applyPendingRoot(state, child, node);
     target[index] = node;
   }
   truncate(target, count);
@@ -509,7 +541,7 @@ function accessorsFor(type: string): Record<string, Accessor> {
   }
 }
 
-type ViewConstructor = new (state: DocumentState, local: number) => View;
+type ViewConstructor = (state: DocumentState, local: number) => View;
 const viewConstructors = new Map<string, ViewConstructor>();
 const plainConstructors: Record<string, ViewConstructor | undefined> = Object.create(null);
 
@@ -523,6 +555,32 @@ const plainConstructors: Record<string, ViewConstructor | undefined> = Object.cr
  * - the synthetic root keeps its `name` of "root" and an `attribs` object.
  */
 const rootReferences = new WeakMap<object, unknown>();
+function applyPendingRoot(state: DocumentState, local: number, view: unknown): void {
+  const pending = (state as any)._pendingRoots as Map<number, unknown> | undefined;
+  if (pending === undefined) return;
+  if (pending.has(local)) {
+    rootReferences.set(view as object, pending.get(local));
+    pending.delete(local);
+    if (pending.size === 0) (state as any)._pendingRoots = undefined;
+  }
+}
+export function setRootIfCached(document: NativeDocument, id: number, root: unknown): void {
+  const state = stateIn(document, id);
+  const local = id - state.base;
+  const view = cachedView(state, local);
+  if (view) { rootReferences.set(view, root); return; }
+  let pending = (state as any)._pendingRoots as Map<number, unknown> | undefined;
+  if (!pending) (state as any)._pendingRoots = pending = new Map();
+  pending.set(local, root);
+}
+/** Fast path for callers that already resolved state+local (e.g. static adjacent insert). */
+export function setRootIfCachedLocal(state: DocumentState, local: number, root: unknown): void {
+  const view = cachedView(state, local);
+  if (view) { rootReferences.set(view, root); return; }
+  let pending = (state as any)._pendingRoots as Map<number, unknown> | undefined;
+  if (!pending) (state as any)._pendingRoots = pending = new Map();
+  pending.set(local, root);
+}
 const legacyParentAccessor: Accessor = {
   get() {
     const state = this[VIEW_STATE];
@@ -579,28 +637,32 @@ function viewConstructor(state: DocumentState, type: string, hasLocation: boolea
   if (legacy) accessors = { ...accessors, ...legacyAccessors(type), ...(type === 'root' ? { attribs: elementAccessors.attribs } : {}) };
   const childrenDescriptor = 'children' in accessors ? { ...childAccessors.children, configurable: true, enumerable: true } : undefined;
   for (const [field, accessor] of Object.entries(accessors)) Object.defineProperty(prototype, field, { ...accessor, configurable: true, enumerable: false });
-  constructor = function (this: View, state: DocumentState, local: number) {
-    this[VIEW_STATE] = state;
-    this[VIEW_LOCAL] = local;
-    this[VIEW_SELF] = this;
-    this[VIEW_ATTRIBUTES] = undefined;
-    this[VIEW_CHILDREN] = undefined;
-    this[VIEW_CHILD_TARGET] = undefined;
-    if (childrenDescriptor) Object.defineProperty(this, 'children', childrenDescriptor);
-    if (legacy) {
-      // Own enumerable fields for the 0.22.0 node shape, reading and writing
-      // through the live accessors.
-      const fields = legacyOwnFields[type];
-      if (fields) {
-        for (const field of fields) {
-          const descriptor = Object.getOwnPropertyDescriptor(prototype, field);
-          if (descriptor && (descriptor.get || descriptor.set)) {
-            Object.defineProperty(this, field, { get: descriptor.get, set: descriptor.set, configurable: true, enumerable: true });
-          }
-        }
+  const ownDescriptors: PropertyDescriptorMap = {};
+  if (childrenDescriptor) ownDescriptors.children = childrenDescriptor;
+  if (legacy) {
+    const fields = legacyOwnFields[type];
+    if (fields) {
+      for (const field of fields) {
+        const descriptor = Object.getOwnPropertyDescriptor(prototype, field);
+        if (descriptor && (descriptor.get || descriptor.set)) ownDescriptors[field] = { get: descriptor.get, set: descriptor.set, configurable: true, enumerable: true };
       }
     }
-  } as unknown as ViewConstructor;
+  }
+  const createView = legacy
+    ? () => Object.create(prototype, ownDescriptors) as View
+    : childrenDescriptor
+      ? () => Object.defineProperty(Object.create(prototype), 'children', childrenDescriptor) as View
+      : () => Object.create(prototype) as View;
+  constructor = function (state: DocumentState, local: number): View {
+    const view = createView();
+    view[VIEW_STATE] = state;
+    view[VIEW_LOCAL] = local;
+    view[VIEW_SELF] = view;
+    view[VIEW_ATTRIBUTES] = undefined;
+    view[VIEW_CHILD_TARGET] = undefined;
+    view[VIEW_CHILDREN] = undefined;
+    return view;
+  };
   Object.defineProperty(prototype, inspectSymbol, { configurable: true, writable: true, value: inspectNode });
   constructor.prototype = prototype;
   viewConstructors.set(key, constructor);
@@ -657,8 +719,8 @@ function adoptObject(state: DocumentState, local: number, original: any): AnyNod
   view[VIEW_LOCAL] = local;
   view[VIEW_SELF] = view;
   view[VIEW_ATTRIBUTES] = undefined;
-  view[VIEW_CHILDREN] = undefined;
   view[VIEW_CHILD_TARGET] = undefined;
+  view[VIEW_CHILDREN] = undefined;
   let fields = adoptedFields.get(record.type);
   if (!fields) {
     fields = {};

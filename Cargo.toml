@@ -21,6 +21,7 @@ rayon = "1.10"
 scraper = { version = "0.24", default-features = false, features = ["atomic", "deterministic"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
+smallvec = "1"
 
 # Parsing and tree writes allocate many small objects, which glibc's and musl's
 # allocators serve slowly. The addon is loaded with dlopen, so mimalloc uses the
@@ -35,6 +36,7 @@ napi-build = "2"
 [profile.release]
 lto = "thin"
 codegen-units = 1
+strip = "symbols"
 
 # Observer hooks retain the upstream HTML5 algorithm while exposing the actual
 # open-element stack to user-supplied parse5-compatible tree adapters.

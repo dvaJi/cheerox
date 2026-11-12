@@ -7,6 +7,7 @@ use crate::arena::{
 };
 use crate::markup_tokenizer::Token;
 use serde_json::{json, Value};
+use std::borrow::Cow;
 
 struct Pending {
     name: String,
@@ -293,18 +294,30 @@ impl<'a> Source<'a> {
             codec,
         }
     }
-    fn slice(&self, start: usize, end: usize) -> String {
+    fn borrowed_slice(&self, start: usize, end: usize) -> Option<&str> {
         let start = start.min(self.units.len());
         let end = end.clamp(start, self.units.len());
-        let Some(offsets) = self.offsets.as_ref() else {
-            return self.text[start..end].to_owned();
-        };
-        match (offsets[start], offsets[end]) {
-            (from, to) if from != u32::MAX && to != u32::MAX => {
-                self.text[from as usize..to as usize].to_owned()
+        match self
+            .offsets
+            .as_ref()
+            .map(|offsets| (offsets[start], offsets[end]))
+        {
+            None => Some(&self.text[start..end]),
+            Some((from, to)) if from != u32::MAX && to != u32::MAX => {
+                Some(&self.text[from as usize..to as usize])
             }
-            _ if self.codec => crate::codec::from_units(&self.units[start..end]),
-            _ => String::from_utf16_lossy(&self.units[start..end]),
+            _ => None,
+        }
+    }
+    fn slice(&self, start: usize, end: usize) -> String {
+        if let Some(value) = self.borrowed_slice(start, end) {
+            return value.to_owned();
+        }
+        let start = start.min(self.units.len());
+        let end = end.clamp(start, self.units.len());
+        match self.codec {
+            true => crate::codec::from_units(&self.units[start..end]),
+            false => String::from_utf16_lossy(&self.units[start..end]),
         }
     }
 }
@@ -463,10 +476,19 @@ impl Builder<'_> {
     }
     fn on_close_tag(&mut self, start: usize, end: usize) {
         self.end = end;
-        let name = self.name(start, end);
+        let source = self.source;
+        let name: Cow<'_, str> = match source.borrowed_slice(start, end) {
+            Some(name)
+                if !self.lower_tags
+                    || (name.is_ascii() && !name.bytes().any(|byte| byte.is_ascii_uppercase())) =>
+            {
+                Cow::Borrowed(name)
+            }
+            _ => Cow::Owned(self.name(start, end)),
+        };
         if !self.xml
             && matches!(
-                name.as_str(),
+                name.as_ref(),
                 "svg"
                     | "math"
                     | "mi"
@@ -484,17 +506,17 @@ impl Builder<'_> {
         }
         if !(!self.xml && html_parser_void(&name)) {
             if let Some(position) = self.parents.iter().rposition(|id| {
-                self.arena.node(*id).and_then(|node| node.name.as_deref()) == Some(name.as_str())
+                self.arena.node(*id).and_then(|node| node.name.as_deref()) == Some(name.as_ref())
             }) {
                 while self.parents.len() > position {
                     self.close();
                 }
             } else if !self.xml && name == "p" {
-                self.open(name);
+                self.open(name.into_owned());
                 self.end_open(true);
             }
         } else if !self.xml && name == "br" {
-            self.open(name);
+            self.open(name.into_owned());
             self.end_open(true);
         }
         self.start = end + 1;

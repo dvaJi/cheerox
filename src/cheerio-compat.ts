@@ -15,13 +15,15 @@
  * own invariants.
  */
 import { requireNative, type NativeDocument } from './native.js';
-import { getNode, importNodes, nodeBinding, operation, rootNode, viewId, viewIdIn } from './nodes.js';
+import { getCss, setCss } from './cheerio-compat/css.js';
+import { validateLegacySelector } from './cheerio-compat/selectors.js';
+import { renderWith } from './cheerio-compat/render.js';
+import { getNode, getNodesOfType, hasMaterializedAttributes, hasMaterializedChildren, importNodes, nodeBinding, operation, rootNode, setRootIfCached, viewId, viewIdIn } from './nodes.js';
 import { routeDocument } from './router.js';
-import { cleanParserOptions } from './hooks.js';
-import type { CheerioOptions } from './types.js';
+import { cleanParserOptions, hasParserHooks } from './hooks.js';
+import type { LegacyOptions, LegacyNode, CheerioInstance, CheerioConstructor, CheerioPrototype, CheerioStatic } from './cheerio-compat/types.js';
+export type { CheerioStatic } from './cheerio-compat/types.js';
 import { version as packageVersion } from '../package.json';
-
-type LegacyOptions = CheerioOptions & { withDomLvl1?: boolean; normalizeWhitespace?: boolean };
 
 /** Cheerio.prototype.options — the exact 0.22.0 defaults. */
 const defaultOpts: LegacyOptions = {
@@ -45,54 +47,11 @@ function defaults<T extends object>(target: T, ...sources: (object | undefined |
   return target;
 }
 
-/** A node under the 0.22.0 object model: plain, mutable fields on the views. */
-type LegacyNode = {
-  type: string;
-  name?: string;
-  data?: string;
-  attribs?: Record<string, string>;
-  children?: LegacyNode[];
-  parent?: LegacyNode | null;
-  prev?: LegacyNode | null;
-  next?: LegacyNode | null;
-  root?: LegacyNode | null;
-  [key: string]: any;
-};
-
-interface CheerioInstance {
-  options: LegacyOptions;
-  _root?: CheerioInstance;
-  length: number;
-  prevObject?: CheerioInstance;
-  [index: number]: LegacyNode;
-  [key: string]: any;
-}
-
-type CheerioConstructor = {
-  (selector?: any, context?: any, root?: any, options?: LegacyOptions): CheerioInstance;
-  new (selector?: any, context?: any, root?: any, options?: LegacyOptions): CheerioInstance;
-  prototype: CheerioPrototype;
-};
-
-type CheerioPrototype = Record<string, any>;
-
-/**
- * A loaded `$`: the callable initialize function with the static methods,
- * the stored root and options, and `fn` for plugins — as in 0.22.0.
- */
-export type CheerioStatic = CheerioConstructor & {
-  load(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): CheerioStatic;
-  html(dom?: any, options?: LegacyOptions): string;
-  xml(dom?: any): string;
-  text(elems?: ArrayLike<LegacyNode>): string;
-  parseHTML(data?: string | null, context?: unknown, keepScripts?: boolean): LegacyNode[] | null;
-  root(): CheerioInstance;
-  contains(container?: LegacyNode, contained?: LegacyNode): boolean;
-  version: string;
-  _root: LegacyNode;
-  _options: LegacyOptions;
-  fn: CheerioPrototype;
-  prototype: CheerioPrototype;
+type AttributeDocument = NativeDocument & {
+  setAttribute?: (ids: number[], name: string, value: string | null) => void;
+  addClass?: (ids: number[], name: string) => void;
+  insertHtml?: (targetIds: number[], html: string, position: string) => number[] | undefined;
+  remove?: (ids: number[]) => void;
 };
 
 const isTag = (elem: unknown): boolean => {
@@ -117,6 +76,10 @@ function cloneDom(dom: LegacyNode[], options: LegacyOptions): LegacyNode[] {
 }
 
 const quickExpr = /^(?:[^#<]*(<[\w\W]+>)[^>]*$|#([\w\-]*)$)/;
+const simpleTagExpr = /^\s*([A-Za-z][\w-]*)\s*$/;
+// These selectors can only return elements of their final explicit tag.
+const finalTagExpr = /^\s*(?:[A-Za-z][\w-]*\s+)*([A-Za-z][\w-]*)(?:\[[\w-]+\])?\s*$/;
+const specialTagExpr = /^(?:script|style)$/i;
 
 const isHtml = (str: string): boolean => {
   if (str.charAt(0) === '<' && str.charAt(str.length - 1) === '>' && str.length >= 3) return true;
@@ -138,7 +101,8 @@ function newDocument(options: LegacyOptions): NativeDocument {
 }
 
 /** As nodes under the legacy model: views that read like plain objects. */
-function asNodes(document: NativeDocument, ids: number[]): LegacyNode[] {
+function asNodes(document: NativeDocument, ids: number[], knownType?: string): LegacyNode[] {
+  if (knownType) return getNodesOfType(document, ids, knownType) as LegacyNode[];
   return ids.map((id) => getNode(document, id) as LegacyNode);
 }
 
@@ -219,130 +183,33 @@ export function update(arrInput: unknown, parent: LegacyNode | null): LegacyNode
 /** lib/parse.js: parse into a fresh document and return its `<root>` node. */
 export function parse(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): LegacyNode {
   const opts = legacyOptions(options);
+  let document: NativeDocument;
   let root: LegacyNode;
   if (typeof content === 'string' || Buffer.isBuffer(content)) {
-    const document = routeDocument(
+    document = routeDocument(
       new (requireNative().NativeDocument)(Buffer.isBuffer(content) ? content.toString() : content, false, JSON.stringify(cleanParserOptions(opts))),
       opts,
     );
     root = rootNode(document, document.rootId()) as LegacyNode;
   } else {
     // A pre-parsed DOM: 0.22.0 wraps it in the synthetic root via update().
-    const document = newDocument(opts);
+    document = newDocument(opts);
     const nodes = Array.isArray(content) || (content && typeof content === 'object' && 'length' in (content as object))
       ? Array.from(content as ArrayLike<LegacyNode>)
       : [content as LegacyNode];
     root = rootNode(document, document.rootId()) as LegacyNode;
     writeChildren(root, nodes);
   }
-  const children = Array.from(root.children ?? []) as LegacyNode[];
-  if (opts.normalizeWhitespace) normalizeWhitespace(children);
-  for (const child of children) {
-    (child as LegacyNode).root = root;
-  }
-  return root;
-}
-
-/*
- * dom-serializer 0.1.0, over node views.
- */
-
-const unencodedElements: Record<string, boolean | undefined> = { style: true, script: true, xmp: true, iframe: true, noembed: true, noframes: true, plaintext: true, noscript: true };
-
-const singleTag: Record<string, boolean | undefined> = {
-  area: true, base: true, basefont: true, br: true, col: true, command: true, embed: true, frame: true,
-  hr: true, img: true, input: true, isindex: true, keygen: true, link: true, meta: true, param: true,
-  source: true, track: true, wbr: true,
-};
-
-const xmlReplacements: Record<string, string> = { '&': '&amp;', "'": '&apos;', '>': '&gt;', '<': '&lt;', '"': '&quot;' };
-const encodeXmlRegex = /[&'><"]/g;
-const nonAsciiRegex = /[^\0-\x7F]/g;
-const astralRegex = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g;
-
-function codePointReplacement(c: string): string {
-  return `&#x${c.codePointAt(0)!.toString(16).toUpperCase()};`;
-}
-
-/** entities 1.1 `encodeXML`: the five XML characters plus every non-ASCII rune. */
-function encodeXML(data: string): string {
-  return data
-    .replace(encodeXmlRegex, (c) => xmlReplacements[c])
-    .replace(astralRegex, codePointReplacement)
-    .replace(nonAsciiRegex, codePointReplacement);
-}
-
-function formatAttrs(attribs: Record<string, string> | undefined, opts: LegacyOptions): string {
-  if (!attribs) return '';
-  let output = '';
-  for (const key of Object.keys(attribs)) {
-    const value = attribs[key];
-    if (output) output += ' ';
-    output += key;
-    if ((value !== null && value !== '') || opts.xmlMode) {
-      output += `="${opts.decodeEntities ? encodeXML(value) : value}"`;
-    }
-  }
-  return output;
-}
-
-/**
- * dom-serializer 0.1.x rules run natively (one call per document); nodes
- * outside the engine, or spanning several documents, fall back to the port.
- */
-function renderWith(opts: LegacyOptions, dom: unknown, parentName?: string): string {
-  const nodes = Array.isArray(dom) || (dom && typeof dom === 'object' && 'length' in (dom as object))
-    ? Array.from(dom as ArrayLike<LegacyNode>)
-    : [dom as LegacyNode];
-  void parentName;
-  if (nodes.length) {
-    const bindings = nodes.map((node) => bindingOf(node));
-    const document = bindings[0]?.document;
-    if (document && bindings.every((binding) => binding?.document === document)) {
-      return operation<string>(document, 'render', {
-        ids: bindings.map((binding) => binding!.id),
-        // The options go through exactly as 0.22.0's render received them:
-        // defaults already applied by the static, `decodeEntities` possibly
-        // absent (bare-module `cheerio.xml()` leaves text raw).
-        options: { ...opts, _useHtmlParser2: true, legacySerializer: true },
-      }) as string;
-    }
-  }
-  let output = '';
-  for (const elem of nodes) {
-    if (!elem || !elem.type) continue;
-    if (elem.type === 'root') output += renderWith(opts, elem.children);
-    else if (isTag(elem)) output += renderTag(elem, opts);
-    else if (elem.type === 'directive') output += `<${elem.data}>`;
-    else if (elem.type === 'comment') output += `<!--${elem.data}-->`;
-    else if (elem.type === 'cdata') output += `<![CDATA[${elem.children && elem.children[0] ? elem.children[0].data : ''}]]>`;
-    else output += renderText(elem, opts, parentName);
-  }
-  return output;
-}
-
-function renderTag(elem: LegacyNode, opts: LegacyOptions): string {
-  // Handle SVG as in 0.22.0: it renders like XML.
-  const effective = elem.name === 'svg' ? ({ decodeEntities: opts.decodeEntities, xmlMode: true } as LegacyOptions) : opts;
-  let tag = `<${elem.name}`;
-  const attribs = formatAttrs(elem.attribs, effective);
-  if (attribs) tag += ` ${attribs}`;
-  if (effective.xmlMode && (!elem.children || elem.children.length === 0)) {
-    tag += '/>';
+  let children: LegacyNode[];
+  if (opts.normalizeWhitespace) {
+    children = Array.from(root.children ?? []) as LegacyNode[];
+    normalizeWhitespace(children);
   } else {
-    tag += '>';
-    if (elem.children) tag += renderWith(effective, elem.children, elem.name);
-    if (!singleTag[elem.name as string] || effective.xmlMode) tag += `</${elem.name}>`;
+    const record = operation<{ children?: number[] }>(document, 'node', { id: viewId(root)! });
+    children = asNodes(document, record.children ?? []);
   }
-  return tag;
-}
-
-function renderText(elem: LegacyNode, opts: LegacyOptions, parentName?: string): string {
-  let data = elem.data || '';
-  if (opts.decodeEntities && !(parentName !== undefined && parentName in unencodedElements)) {
-    data = encodeXML(data);
-  }
-  return data;
+  for (const child of children) child.root = root;
+  return root;
 }
 
 /*
@@ -354,7 +221,15 @@ function bindingOf(node: unknown): { document: NativeDocument; id: number } | un
 }
 
 function idsOf(document: NativeDocument, nodes: ArrayLike<unknown>): number[] {
-  return importNodes(document, nodes as unknown[]);
+  const len = (nodes as any).length;
+  if (typeof len !== 'number' || len < 0) return importNodes(document, nodes as unknown[]);
+  const out = new Array<number>(len);
+  for (let i = 0; i < len; i++) {
+    const id = viewIdIn(document, (nodes as any)[i]);
+    if (id === undefined) return importNodes(document, nodes as unknown[]);
+    out[i] = id;
+  }
+  return out;
 }
 
 /**
@@ -426,58 +301,6 @@ function combinatorAnchored(node: LegacyNode, combinator: string, contextIds: Se
   return false;
 }
 
-/**
- * The pseudo-classes css-select 1.2.0 (Cheerio 0.22.0's selector engine)
- * understands; anything else throws, exactly as the original library did.
- */
-const legacyPseudos = new Set([
-  // filters
-  'nth-child', 'nth-last-child', 'nth-of-type', 'nth-last-of-type',
-  'first-child', 'last-child', 'first-of-type', 'last-of-type',
-  'only-of-type', 'only-child',
-  // pseudos and jQuery extensions of the time
-  'empty', 'link', 'visited', 'selected', 'disabled', 'enabled', 'checked',
-  'required', 'optional', 'parent', 'header', 'button', 'input', 'text',
-  'contains', 'icontains', 'checkbox', 'file', 'password', 'radio', 'reset',
-  'image', 'submit', 'root', 'not', 'has', 'matches', 'scope',
-]);
-
-/** Reject pseudo-classes that only exist in later Cheerio lines. */
-function validateLegacySelector(selector: string): void {
-  let depth = 0;
-  let quote = '';
-  let escape = false;
-  for (let i = 0; i < selector.length; i++) {
-    const character = selector[i];
-    if (escape) { escape = false; continue; }
-    if (character === '\\') { escape = true; continue; }
-    if (quote) { if (character === quote) quote = ''; continue; }
-    if (character === '"' || character === "'") { quote = character; continue; }
-    if (character === '[') { depth++; continue; }
-    if (character === ']') { depth = Math.max(0, depth - 1); continue; }
-    if (depth || character !== ':') continue;
-    const match = /^:([a-zA-Z][a-zA-Z0-9-]*)/.exec(selector.slice(i));
-    if (!match) continue;
-    if (!legacyPseudos.has(match[1])) {
-      throw new SyntaxError(`unmatched pseudo-class ${match[0]}`);
-    }
-    // Skip a balanced argument so nested selectors are not scanned twice.
-    if (selector[i + match[0].length] === '(') {
-      let parens = 0;
-      let innerQuote = '';
-      for (let j = i + match[0].length; j < selector.length; j++) {
-        const inner = selector[j];
-        if (innerQuote) { if (inner === innerQuote) innerQuote = ''; continue; }
-        if (inner === '"' || inner === "'") { innerQuote = inner; continue; }
-        if (inner === '(') parens++;
-        else if (inner === ')') { parens--; if (!parens) { i = j; break; } }
-      }
-    } else {
-      i += match[0].length;
-    }
-  }
-}
-
 /** Native matching for a batch of ids, with 0.22.0's SyntaxError behavior. */
 function matchesSelector(document: NativeDocument, ids: number[], selector: string, options: LegacyOptions): number[] {
   validateLegacySelector(selector);
@@ -539,6 +362,7 @@ function uniqueSort(nodes: LegacyNode[]): LegacyNode[] {
  */
 
 const isNode = (obj: unknown): boolean => {
+  if (viewId(obj) !== undefined) return true;
   const node = obj as LegacyNode;
   return !!(obj && typeof obj === 'object' && (node.name || node.type === 'text' || node.type === 'comment'));
 };
@@ -663,14 +487,27 @@ function getAttr(elem: LegacyNode | undefined, name?: string): unknown {
 function setAttr(el: LegacyNode, name: string, value: unknown): void {
   if (value === null) {
     removeAttribute(el, name);
+    return;
+  }
+  const stringValue = value + '';
+  const binding = bindingOf(el);
+  const document = binding?.document as AttributeDocument | undefined;
+  if (binding && document?.setAttribute) {
+    document.setAttribute([binding.id], name, stringValue);
   } else {
-    el.attribs![name] = value + '';
+    el.attribs![name] = stringValue;
   }
 }
 
 function removeAttribute(elem: LegacyNode, name: string): void {
   if (!elem.attribs || !hasOwn.call(elem.attribs, name)) return;
-  delete elem.attribs[name];
+  const binding = bindingOf(elem);
+  const document = binding?.document as AttributeDocument | undefined;
+  if (binding && document?.setAttribute) {
+    document.setAttribute([binding.id], name, null);
+  } else {
+    delete elem.attribs[name];
+  }
 }
 
 const splitClass = (className?: string): string[] => (className ? className.trim().split(rspace) : []);
@@ -740,6 +577,10 @@ const attributesApi: CheerioPrototype = {
         });
       }
       if (typeof name === 'string') {
+        if (this.length === 1 && isTag(this[0])) {
+          setAttr(this[0], name, value);
+          return this;
+        }
         // Batch the plain set across the selection: one native call instead
         // of one per element. `null` removes, as in setAttr.
         const groups = new Map<NativeDocument, Array<{ id: number; name: string; value: string | null }>>();
@@ -756,7 +597,13 @@ const attributesApi: CheerioPrototype = {
         }
         if (usable) {
           for (const [document, writes] of groups) {
-            operation(document, 'setAttrs', { writes });
+            const attributeDocument = document as AttributeDocument;
+            const firstValue = writes[0]?.value;
+            if (attributeDocument.setAttribute && writes.every((write) => write.value === firstValue)) {
+              attributeDocument.setAttribute(writes.map((write) => write.id), name, firstValue ?? null);
+            } else {
+              operation(document, 'setAttrs', { writes });
+            }
           }
           return this;
         }
@@ -931,9 +778,32 @@ const attributesApi: CheerioPrototype = {
     // Return if no value or not a string or function
     if (!value || typeof value !== 'string') return this;
 
-    const classNames = value.split(rspace);
     const numElements = this.length;
+    if (numElements === 1 && isTag(this[0]) && !hasMaterializedAttributes(this[0])) {
+      const binding = bindingOf(this[0]);
+      const document = binding?.document as AttributeDocument | undefined;
+      if (binding && document?.addClass) {
+        document.addClass([binding.id], value);
+        return this;
+      }
+    }
+    const groups = new Map<AttributeDocument, number[]>();
+    let native = true;
+    for (let i = 0; i < numElements; i++) {
+      if (!isTag(this[i])) continue;
+      const binding = bindingOf(this[i]);
+      const document = binding?.document as AttributeDocument | undefined;
+      if (!binding || !document?.addClass || hasMaterializedAttributes(this[i])) { native = false; break; }
+      const ids = groups.get(document);
+      if (ids) ids.push(binding.id);
+      else groups.set(document, [binding.id]);
+    }
+    if (native) {
+      for (const [document, ids] of groups) document.addClass!(ids, value);
+      return this;
+    }
 
+    const classNames = value.split(rspace);
     for (let i = 0; i < numElements; i++) {
       // If selected element isn't a tag, move on
       if (!isTag(this[i])) continue;
@@ -1071,14 +941,18 @@ const traversingApi: CheerioPrototype = {
 
     // The native within-select covers the 0.22.0 candidate set (every
     // descendant of the matched elements) in one call, at any document size.
-    const document = bindingOf(this[0])?.document;
+    const binding = bindingOf(this[0]);
+    const document = binding?.document;
     if (document && selectorOrHaystack) {
-      const contexts = idsOf(document, this.toArray());
+      const contexts = this.length === 1 && binding ? [binding.id] : idsOf(document, this.toArray());
       if (contexts.length) {
         try {
-          validateLegacySelector(selectorOrHaystack);
-          const found = operation<number[]>(document, 'select', { selector: selectorOrHaystack, contexts });
-          if (found) return this._make(asNodes(document, found) as LegacyNode[]);
+          const simpleTag = simpleTagExpr.exec(selectorOrHaystack);
+          if (!simpleTag) validateLegacySelector(selectorOrHaystack);
+          const finalTag = simpleTag ?? finalTagExpr.exec(selectorOrHaystack);
+          const knownType = finalTag && !specialTagExpr.test(finalTag[1]) ? 'tag' : undefined;
+          const found = document.select(selectorOrHaystack, contexts);
+          if (found) return this._make(asNodes(document, found, knownType) as LegacyNode[]);
         } catch (error) {
           throw error instanceof SyntaxError ? error : new SyntaxError((error as Error)?.message ?? String(error));
         }
@@ -1493,6 +1367,61 @@ function traverseParents(self: CheerioInstance, elem: LegacyNode | null | undefi
   return elems;
 }
 
+function insertAdjacentStatic(this: CheerioInstance, elems: any[], position: 'before' | 'after'): boolean {
+  if (elems.length !== 1 || typeof elems[0] !== 'string') return false;
+  const options = legacyOptions(this.options);
+  if (options.normalizeWhitespace || hasParserHooks(options)) return false;
+
+  let document: NativeDocument | undefined;
+  const targetIds: number[] = [];
+  for (let i = 0; i < this.length; i++) {
+    const el = this[i];
+    if (!isTag(el)) return false;
+    const binding = bindingOf(el);
+    if (!binding || (document && binding.document !== document)) return false;
+    document ??= binding.document;
+    const parent = el.parent || el.root;
+    if (!parent || bindingOf(parent)?.document !== document || hasMaterializedChildren(parent)) return false;
+    targetIds.push(binding.id);
+  }
+  if (!document) return false;
+
+  const fused = (document as AttributeDocument).insertHtml?.(targetIds, elems[0], position);
+  if (fused) {
+    for (let i = 0; i < fused.length; i++) setRootIfCached(document, fused[i], null);
+    return true;
+  }
+
+  const nodeIds = operation<number[]>(document, 'create', { html: elems[0], options });
+  if (!nodeIds.length) return true;
+  const inserted = operation<number[]>(document, 'insert', { targetIds, nodeIds, position });
+  for (let i = 0; i < inserted.length; i++) setRootIfCached(document, inserted[i], null);
+  return true;
+}
+
+function removeNative(elems: CheerioInstance): boolean {
+  const groups = new Map<NativeDocument, { ids: number[]; nodes: LegacyNode[] }>();
+  for (let i = 0; i < elems.length; i++) {
+    const el = elems[i];
+    const binding = bindingOf(el);
+    if (!binding) return false;
+    const parent = el.parent || el.root;
+    if (!parent) continue;
+    if (bindingOf(parent)?.document !== binding.document || hasMaterializedChildren(parent)) return false;
+    let group = groups.get(binding.document);
+    if (!group) groups.set(binding.document, group = { ids: [], nodes: [] });
+    group.ids.push(binding.id);
+    group.nodes.push(el);
+  }
+  for (const [document, group] of groups) {
+    const nativeDocument = document as AttributeDocument;
+    if (nativeDocument.remove) nativeDocument.remove(group.ids);
+    else operation(document, 'remove', { ids: group.ids });
+    for (const node of group.nodes) node.root = null;
+  }
+  return true;
+}
+
 /*
  * api/manipulation.js
  */
@@ -1577,6 +1506,7 @@ const manipulationApi: CheerioPrototype = {
   },
 
   after(this: CheerioInstance, ...elems: any[]) {
+    if (insertAdjacentStatic.call(this, elems, 'after')) return this;
     const lastIdx = this.length - 1;
 
     domEach(this, function (this: CheerioInstance, i, el) {
@@ -1636,6 +1566,7 @@ const manipulationApi: CheerioPrototype = {
   },
 
   before(this: CheerioInstance, ...elems: any[]) {
+    if (insertAdjacentStatic.call(this, elems, 'before')) return this;
     const lastIdx = this.length - 1;
 
     domEach(this, function (this: CheerioInstance, i, el) {
@@ -1697,6 +1628,7 @@ const manipulationApi: CheerioPrototype = {
 
   remove(this: CheerioInstance, selector?: any) {
     const elems: CheerioInstance = selector ? this.filter(selector) : this;
+    if (removeNative(elems)) return this;
 
     domEach(elems, function (_i, el) {
       const parent = el.parent || el.root;
@@ -1865,62 +1797,6 @@ const cssApi: CheerioPrototype = {
   },
 };
 
-function setCss(el: LegacyNode, prop: any, val: any, idx: number): void {
-  if (typeof prop === 'string') {
-    const styles = parseStyles(el.attribs?.style);
-    if (typeof val === 'function') {
-      val = val.call(el, idx, styles[prop]);
-    }
-
-    if (val === '') {
-      delete styles[prop];
-    } else if (val != null) {
-      styles[prop] = val;
-    }
-
-    el.attribs!.style = stringifyStyles(styles);
-  } else if (typeof prop === 'object') {
-    for (const key of Object.keys(prop)) {
-      setCss(el, key, prop[key], idx);
-    }
-  }
-}
-
-function getCss(el: LegacyNode | undefined, prop?: any): any {
-  const styles = parseStyles(el?.attribs?.style);
-  if (typeof prop === 'string') {
-    return styles[prop];
-  } else if (Array.isArray(prop)) {
-    return pick(styles, prop);
-  } else {
-    return styles;
-  }
-}
-
-function pick(obj: Record<string, string>, props: string[]): Record<string, string> {
-  const result: Record<string, string> = {};
-  for (const prop of props) if (prop in obj) result[prop] = obj[prop];
-  return result;
-}
-
-function stringifyStyles(obj: Record<string, string>): string {
-  return Object.keys(obj).reduce((str, prop) => `${str}${str ? ' ' : ''}${prop}: ${obj[prop]};`, '');
-}
-
-function parseStyles(styles: string | undefined): Record<string, string> {
-  styles = (styles || '').trim();
-
-  if (!styles) return {};
-
-  return styles.split(';').reduce<Record<string, string>>((obj, str) => {
-    const n = str.indexOf(':');
-    // skip if there is no :, or if it is the first/last character
-    if (n < 1 || n === str.length - 1) return obj;
-    obj[str.slice(0, n).trim()] = str.slice(n + 1).trim();
-    return obj;
-  }, {});
-}
-
 /*
  * api/forms.js
  */
@@ -2033,22 +1909,28 @@ function staticText(this: any, elems?: ArrayLike<LegacyNode>): string {
   if (!elems) {
     elems = staticRoot.call(this) as unknown as ArrayLike<LegacyNode>;
   }
-  const list = Array.from(elems ?? []) as LegacyNode[];
-  if (list.length) {
-    // The native text extraction is the same traversal, one call deep.
-    const document = bindingOf(list[0])?.document;
+  const src = (elems ?? []) as ArrayLike<LegacyNode>;
+  const len = (src as any).length >>> 0;
+  if (len > 0) {
+    const first = (src as any)[0] as LegacyNode | undefined;
+    const document = bindingOf(first)?.document;
     if (document) {
-      const ids = idsOf(document, list);
-      if (ids.length) {
+      const ids = new Array<number>(len);
+      let ok = true;
+      for (let i = 0; i < len; i++) {
+        const id = viewIdIn(document, (src as any)[i]);
+        if (id === undefined) { ok = false; break; }
+        ids[i] = id;
+      }
+      if (ok) {
         const text = document.text(ids);
         if (typeof text === 'string') return text;
       }
     }
   }
   let ret = '';
-  const len = list.length;
   for (let i = 0; i < len; i++) {
-    const elem = list[i];
+    const elem = (src as any)[i] as LegacyNode;
     if (elem.type === 'text') ret += elem.data;
     else if (elem.children && elem.type !== 'comment') {
       ret += staticText(elem.children);

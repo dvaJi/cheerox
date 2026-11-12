@@ -1,8 +1,78 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { hasChildren, isText } from 'domhandler';
+import { Element, hasChildren, isText } from 'domhandler';
 import * as cheerio from 'cheerio';
 import * as cheerox from '../dist/modern.mjs';
+
+test('static HTML rendering uses Cheerio option merging for htmlparser2 trees', () => {
+  const html = '<div>Ω<br><span title="">text</span></div>';
+  for (const options of [{ _useHtmlParser2: true }, { xml: { xmlMode: false } }, { xml: true }, {}]) {
+    const actual = cheerox.load(html, options);
+    const expected = cheerio.load(html, options);
+    for (const override of [undefined, {}, { decodeEntities: false }, { xmlMode: true }, { _useHtmlParser2: true }]) {
+      assert.equal(actual.html(override), expected.html(override), JSON.stringify({ options, override }));
+    }
+    assert.equal(actual('div').html(), expected('div').html());
+  }
+  const node = new Element('br', {});
+  assert.equal(cheerox.load('').html(node), cheerio.load('').html(node));
+});
+
+test('closing names preserve XML case, Unicode and unpaired UTF-16', () => {
+  const html = '<Root><X>1</x><Ω>2</Ω><\ud800>3</\ud800><n>4</n></Root>';
+  for (const options of [{ xml: true }, { xml: { lowerCaseTags: true } }]) {
+    assert.equal(cheerox.load(html, options).html(), cheerio.load(html, options).html());
+  }
+  const ascii = '<DIV><P>one</p><span>two</SPAN></DIV>';
+  const options = { xml: { xmlMode: false } };
+  assert.equal(cheerox.load(ascii, options).html(), cheerio.load(ascii, options).html());
+});
+
+test('XML child lists preserve order and node identity across growth and mutation', () => {
+  const actual = cheerox.load('<root><a/><b/></root>', { xml: true });
+  const expected = cheerio.load('<root><a/><b/></root>', { xml: true });
+  const held = actual('a')[0];
+  for (const $ of [actual, expected]) {
+    $('root').append('<c/><d/>');
+    $('b').replaceWith('<x/><y/>');
+    $('d').remove();
+    $('root').prepend('<first/>');
+    $('c').before('<z/>');
+  }
+  assert.equal(actual.xml(), expected.xml());
+  assert.deepEqual(actual('root').children().toArray().map(node => node.name), ['first', 'a', 'x', 'y', 'z', 'c']);
+  assert.strictEqual(actual('a')[0], held);
+});
+
+test('large materialized selections preserve live attributes, identity and mutations', () => {
+  for (const options of [{}, { xml: true }]) {
+    const html = '<main>' + Array.from({ length: 100 }, (_, i) => `<a data-n="${i}">x</a>`).join('') + '</main>';
+    const actual = cheerox.load(html, options);
+    const nodes = actual('a').toArray();
+    const attrs = nodes[50].attribs;
+    assert.strictEqual(nodes[50], actual('a').eq(50)[0]);
+    actual(nodes[50]).attr('data-n', 'changed');
+    assert.strictEqual(nodes[50].attribs, attrs);
+    assert.equal(attrs['data-n'], 'changed');
+    actual(nodes[50]).remove();
+    assert.equal(actual('a').length, 99);
+    assert.equal(nodes[50].attribs['data-n'], 'changed');
+  }
+});
+
+test('materializing repeated node references preserves identity and live changes', () => {
+  const $ = cheerox.load('<main>' + '<a href="/x">x</a>'.repeat(100) + '</main>');
+  const original = $('a').first()[0];
+  const repeated = $(Array(64).fill(original)).toArray();
+  assert.equal(repeated.length, 64);
+  assert.ok(repeated.every(node => node === original));
+  $(original).attr('href', '/changed');
+  assert.ok(repeated.every(node => node.attribs.href === '/changed'));
+  const reversed = $('a').toArray().reverse();
+  const selection = $(reversed).toArray();
+  assert.deepEqual(selection, reversed);
+  assert.strictEqual(selection[selection.length - 1], original);
+});
 
 test('domhandler recognizes native parent nodes during a text-node walk', async () => {
   const input = '<main><a href="/about">About <strong>the team</strong></a><!--note--><p>Contact hello@example.test</p><script>hidden</script></main>';

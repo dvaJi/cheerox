@@ -3,7 +3,7 @@ import { requireNative, type NativeDocument } from './native.js';
 import { getNode, importNodes, nodeBinding, nodeId, nodeRecord, operation, isTag, traverseRecords, viewId } from './nodes.js';
 import { installAttributes, type AttributeMethods } from './attributes.js';
 import { extract } from './extract.js';
-import { API, DOCUMENT, exposeDocumentTo, IDS, IS_PLAIN, LEASE, leaseNodes, routeDocument, sameNodeSpace, updateLease, VALUES, type Lease } from './router.js';
+import { API, DOCUMENT, exposeDocumentTo, IDS, IS_PLAIN, LEASE, leaseNodes, prepareBulkViews, routeDocument, sameNodeSpace, updateLease, VALUES, type Lease } from './router.js';
 import { parse } from './parse.js';
 import { matchSimpleSelector, selectSimpleWithin } from './match.js';
 const numeric = /^(?:0|[1-9]\d*)$/;
@@ -82,7 +82,7 @@ const isIndex = (property: string | symbol): boolean => {
     return first >= 48 && first <= 57 && numeric.test(property);
 };
 /** Results up to this size are plain objects holding their nodes, like Cheerio's own selections. */
-const plainSelectionLimit = 16;
+const plainSelectionLimit = 5;
 const lengthOf = (target: Cheerio<any>): number => target[VALUES]?.length ?? target[IDS].length;
 function nodeAt(target: Cheerio<any>, index: number): any {
     if (target[VALUES]) return target[VALUES][index];
@@ -453,6 +453,7 @@ export class Cheerio<T = AnyNode> implements ArrayLike<T>, Iterable<T> {
             return items;
         }
         const values = this[VALUES], ids = this[IDS], document = this[DOCUMENT];
+        if (!values) prepareBulkViews(document, ids);
         return values ? values.slice() : ids.map((id) => getNode(document, id) as T);
     }
     /** @internal */ _itemAt(index: number): T | undefined {
