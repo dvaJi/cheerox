@@ -96,6 +96,14 @@ Remaining additions:
 
 **Platform packaging.**
 
+- Loader groundwork done: the native loader tries the platform-specific
+  companion package (`@dvaji/cheerox-<platform>`) first, then the bundled
+  binaries (tested in `test/native-loading.test.mjs`). Publishing the
+  companion packages still requires npm-side trusted-publisher setup for
+  each of the eight packages, and the release workflow must assemble and
+  publish them alongside the main tarball.
+
+
 - Move to NAPI-RS's platform-specific optional packages
   (`@dvaji/cheerox-<platform>-<arch>`) so consumers download one binary
   instead of the universal tarball (~14 MB with eight binaries); keep the

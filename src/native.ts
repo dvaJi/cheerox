@@ -1,5 +1,4 @@
 import { createRequire } from 'node:module';
-import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { wrapNativeBinding } from './transport.js';
@@ -104,6 +103,28 @@ export function packageDirectory(): string {
   return typeof __dirname === 'string' ? __dirname : dirname(fileURLToPath(import.meta.url));
 }
 
+/** The platform directory component used by binary names and companion packages. */
+export function platformComponent(): string {
+  const libc = process.platform === 'linux'
+    ? ((process.report?.getReport() as { header?: { glibcVersionRuntime?: string } })?.header?.glibcVersionRuntime ? 'gnu' : 'musl')
+    : undefined;
+  return `${process.platform}-${process.arch}${libc ? `-${libc}` : process.platform === 'win32' ? '-msvc' : ''}`;
+}
+
+/**
+ * Where the native addon may be found, most preferred first: the
+ * platform-specific companion package published alongside the main package
+ * (`@dvaji/cheerox-<platform>`), then the binaries bundled with the package
+ * (or present in a parent directory for source checkouts).
+ */
+export function nativeBindingCandidates(platform: string, directories: string[]): string[] {
+  const names = [`cheerox.${platform}.node`, 'cheerox.node'];
+  return [
+    `@dvaji/cheerox-${platform}`,
+    ...new Set(directories.flatMap((directory) => names.map((name) => join(directory, name)))),
+  ];
+}
+
 /** Resolve the native addon bundled with the npm package. */
 export function nativeBinding(): NativeBinding | undefined {
   if (attempted) return cached;
@@ -114,15 +135,8 @@ export function nativeBinding(): NativeBinding | undefined {
   const moduleDirectory = packageDirectory();
   const require = createRequire(join(moduleDirectory, 'cheerox-loader.cjs'));
   const directories = [moduleDirectory, dirname(moduleDirectory)];
-  const libc = process.platform === 'linux'
-    ? ((process.report?.getReport() as { header?: { glibcVersionRuntime?: string } })?.header?.glibcVersionRuntime ? 'gnu' : 'musl')
-    : undefined;
-  const platform = `${process.platform}-${process.arch}${libc ? `-${libc}` : process.platform === 'win32' ? '-msvc' : ''}`;
-  const names = [`cheerox.${platform}.node`, 'cheerox.node'];
-  const candidates = [...new Set(directories.flatMap((directory) => names.map((name) => join(directory, name))))];
 
-  for (const candidate of candidates) {
-    if (!existsSync(candidate)) continue;
+  for (const candidate of nativeBindingCandidates(platformComponent(), directories)) {
     try {
       const loaded: NativeBinding = require(candidate);
       if (typeof loaded.NativeDocument === 'function') {
