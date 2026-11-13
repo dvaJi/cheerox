@@ -21,8 +21,8 @@ moves a benchmark but breaks a gate is rejected.
 - **The API is frozen.** `cheerio.load()`, callable module, selector
   signatures, node shapes, chaining — no redesign, no async `load()`.
 - **Compatibility gates run on every change:**
-  `npm run test:legacy` (576 passing; 1 pre-existing empty-attribute XML
-  render failure that reproduces at HEAD — see
+  `npm run test:legacy` (577 passing, 0 failing — the suite's
+  empty-attribute expectation was corrected toward the pinned oracle, see
   `bench/PERFORMANCE-INVESTIGATION.md`),
   `npm run test:differential` (58/58), `npm test` (532),
   `npm run test:upstream` (777), `cargo test` (60), `npm run test:types`,

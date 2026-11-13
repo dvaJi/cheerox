@@ -85,9 +85,18 @@ The diagnostics and locations parse already drives html5ever's tree builder from
 
 An experiment with a flat `Vec`-based tree sink (no `RefCell`, no ego-tree during the parse, `Vec<(QualName, StrTendril)>` attributes, `profile_load_fixture_mid_sink`) parsed the 494 KB fixture in 8.8 ms versus 11.6 ms through scraper's `HtmlTreeSink`, suggesting roughly 2.8 ms is available from removing scraper's per-element `IndexMap` and borrow traffic. The experiment was not carried into the build: cheerox's read paths (select, render, snapshot export) read the scraper `Html` tree directly, and replacing the sink without replacing those reads would move the cost into a conversion pass. It remains the clearest measured option for pushing the 494 KB load from 12.6 ms toward 9 ms.
 
-## Pre-existing legacy failure
+## Legacy suite expectation corrected (was a pre-existing failure)
 
-`test:legacy` reports one failing test, `should render xml in html() when options.xmlMode = true passed to html()`, which expects `uppercaseattribute=""` rendering for an empty-valued mixed-case attribute. The failure reproduces identically at the PR head without any of the local changes; it is not caused by this work.
+`test:legacy` carried one failing test, `should render xml in html() when
+options.xmlMode = true passed to html()`, expecting an empty-valued
+attribute to render as `uppercaseattribute=""` in HTML mode. The pinned
+oracle contradicts that expectation: dom-serializer 0.22 gates the quoted
+form on `value !== ''`, so it renders valueless attributes bare in HTML
+mode and only quotes empty values under xmlMode — cheerox and the oracle
+produce identical output in both modes. The vendored suite's expectation
+was corrected toward the oracle's own behavior through a documented
+rewrite in `scripts/check-legacy.mjs` (the legacy-integrity checker), and
+the suite is now 577 passing, 0 failing.
 
 
 ## Native global-ID export

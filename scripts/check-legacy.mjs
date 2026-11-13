@@ -37,6 +37,15 @@ const rewrites = [
   [/require\('\.\.'\)/g, "require('../../')"],
   // Our legacy parse module is exposed from the built package.
   [/require\('\.\.\/lib\/parse'\)/g, "require('../../dist/legacy-parse.cjs')"],
+  // dom-serializer 0.22 renders valueless attributes bare in HTML mode
+  // (`value !== ''` gates the quoted form) and only quotes empty values
+  // under xmlMode. The pinned oracle renders this expectation's markup
+  // exactly that way, so the upstream expectation is corrected toward
+  // the oracle's own output.
+  [
+    /'<mixedcasetag uppercaseattribute=""><\/mixedcasetag>'/g,
+    "'<mixedcasetag uppercaseattribute></mixedcasetag>'",
+  ],
 ];
 
 const update = process.argv.includes('--update');
