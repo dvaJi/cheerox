@@ -41,8 +41,10 @@ module.exports = real;
     stubbed = true;
 
     const probe = `
-const cheerox = require('@dvaji/cheerox');
-cheerox.load('<p>x</p>');
+const modern = require('@dvaji/cheerox/modern');
+console.log('STATUS=' + JSON.stringify(modern.nativeStatus()));
+console.log('PLATFORM=' + process.platform + '-' + process.arch);
+modern.load('<p>x</p>');
 console.log('STUB_LOADS=' + (globalThis.__cheeroxPlatformStubLoaded || 0));
 console.log('LOAD_OK=1');
 `;
