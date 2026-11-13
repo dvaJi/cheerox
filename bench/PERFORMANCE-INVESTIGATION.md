@@ -53,6 +53,30 @@ known shape, and per-node attribute-object creation remains the dominant
 remaining cost of attribute-heavy walks. Raw pairs are in
 `%TEMP%\cheerox-accessormap-2000.json`.
 
+## Spike: direct-to-arena HTML construction — no-go
+
+The last hypothetical load lever was skipping the scraper ego-tree middle
+step: building the mutable arena records directly from html5ever's tree
+builder (`ArenaSink`, a `TreeSink` over `Vec<DomNode>` with faithful
+allocations — `String` names and data, `Value::String` attribute values,
+per-element namespace/prefix boxes, SmallVec children — plus a parallel
+name vector for `elem_name`). The sink is implemented as the ignored
+diagnostic `profile_arena_sink`, and it reproduces the existing parse +
+conversion output exactly for the 2,000-card fixture (node count, kinds,
+names, data, children, parents and attribute sets verified per node).
+
+The measurement answered the go/no-go question with a no-go: on the
+494 KB fixture, direct arena construction took 12.57 ms against 12.17 ms
+for the current pipeline (parse 9.28 + lazy conversion 2.50 + preparation).
+The expensive part is the arena record construction itself — `String` and
+`serde_json::Value` conversions per attribute, per-element namespace and
+prefix boxes — and building it inline moves that cost forward instead of
+removing it; the ego-tree middle step with tendril-backed storage is
+cheaper than assumed. Making the arena the primary structure would also
+require migrating every read path off the scraper tree for at best ~0.5 ms
+of net load change. The refactor is rejected on this data; the dual
+structure (fast ego-tree parse, arena on demand) stands.
+
 ## Rejected experiment: html5gum tokenizer bridge for the main parse
 
 The diagnostics and locations parse already drives html5ever's tree builder from html5gum tokens. Driving the main parse through that bridge measured 29.8 ms on the 494 KB fixture versus 12.9 ms for the html5ever tokenizer — the bridge's per-token processing costs far more than the html5ever tokenizer it would replace. Not pursued.
