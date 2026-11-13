@@ -1,11 +1,18 @@
 # cheerox — Performance & Optimization Roadmap
 
 **Goal:** make cheerox the fastest and most memory-efficient implementation
-of the Cheerio 0.22.0 API, without requiring any change to existing user
+of the Cheerio-compatible API, without requiring any change to existing user
 code.
 
-This roadmap is grounded in the current measured profile
-([docs/BENCHMARK.md](docs/BENCHMARK.md)) and in the actual implementation.
+There are now two tracked performance surfaces:
+
+- **Legacy facade vs cheerio@0.22.0** — measured by `bench/legacy.mjs`
+  (verified-output timings). The baseline table below is its live record.
+- **Modern API vs cheerio@1.2.0** — tracked in
+  [bench/PERFORMANCE-PLAN.md](bench/PERFORMANCE-PLAN.md) (paired A/B harness
+  in `bench/compare-builds.mjs`, investigation history in
+  [bench/PERFORMANCE-INVESTIGATION.md](bench/PERFORMANCE-INVESTIGATION.md)).
+
 Every milestone is gated by the compatibility suites — an optimization that
 moves a benchmark but breaks a gate is rejected.
 
@@ -14,38 +21,48 @@ moves a benchmark but breaks a gate is rejected.
 - **The API is frozen.** `cheerio.load()`, callable module, selector
   signatures, node shapes, chaining — no redesign, no async `load()`.
 - **Compatibility gates run on every change:**
-  `npm run test:legacy` (576/577, oracle parity with `npm:cheerio@0.22.0`),
-  `npm run test:differential` (55/55), `npm test`, `npm run test:upstream`
-  (777), `cargo test` (57), `npm run test:types`, `npm run test:package`.
-- **Benchmarks verify outputs before timing** (`bench/legacy.mjs`); a run
-  with divergent output fails instead of reporting a speedup.
+  `npm run test:legacy` (576 passing; 1 pre-existing empty-attribute XML
+  render failure that reproduces at HEAD — see
+  `bench/PERFORMANCE-INVESTIGATION.md`),
+  `npm run test:differential` (58/58), `npm test` (532),
+  `npm run test:upstream` (777), `cargo test` (60), `npm run test:types`,
+  `npm run test:package`, plus the performance gate `npm run bench:gate`
+  (parity floors per operation, HTML + XML).
+- **Benchmarks verify outputs before timing**; a run with divergent output
+  fails instead of reporting a speedup.
+- **Significant perf decisions require paired comparisons** (30+ alternating
+  rounds with bootstrap intervals, `bench/COMPARE.md`) — single medians are
+  diagnostic only.
 - Optimize the implementation, not the public API. Per-method tree shaking
   of a native addon is not a realistic goal for a fully compatible drop-in
   replacement.
 
-## Current measured baseline (2026-10-30)
+## Current measured baseline (2026-11-13, legacy facade vs cheerio@0.22.0)
+
+`node --expose-gc bench/legacy.mjs`, median of 5, outputs verified, Windows
+x64, Node 24.18.0.
 
 | Workload (vs cheerio@0.22.0) | Ratio | State |
 | --- | ---: | --- |
-| Parse only (small / large) | 1.94x / 2.16x | ahead |
-| Parse + queries (large) | 1.28x | ahead |
-| Attribute extraction (real-world) | 1.33x | ahead |
-| Text extraction (large) | 1.56x | ahead |
-| Serialization (large) | 2.71x | ahead |
-| DOM mutations (small / large) | 0.24x / 0.28x | **behind** |
-| Cold start + parse + query | 0.79x | behind |
+| Parse only (small / large) | 2.08x / 1.97x | ahead |
+| Parse + queries (large) | 1.30x | ahead |
+| Attribute extraction (real-world) | 1.40x | ahead |
+| Text extraction (large) | 1.54x | ahead |
+| Serialization (large) | 2.49x | ahead |
+| DOM mutations (small / large) | 1.07x / 1.36x | ahead (was 0.24x / 0.28x) |
+| Warm re-require + parse + query | 0.97x | parity |
 
-Known structural cost: the legacy facade drives the engine through the
-generic JSON `op()` interface, and every operation crosses the JS↔Rust
-boundary once per selection/element. Callback-heavy mutation loops (several
-tiny ops per element) cannot amortize that boundary; whole-tree workloads
-(parsing, queries, serialization) can and do.
+On the modern API vs cheerio@1.2.0 (21-sample run, 2,000-card fixture,
+2026-11-12): load 1.79x, 17 of 25 operations above 1.5x total; the rows
+still below target are bound by per-node JavaScript materialization
+(walk with fields 0.79x, walk children 1.32x, selection chains
+1.42–1.46x) — see `bench/PERFORMANCE-PLAN.md`.
 
-## M0 — Compatibility & profiling (mostly done, keep live)
+## M0 — Compatibility & profiling (keep live)
 
 **Status: exists.** `bench/legacy.mjs` (verified-output timings),
-`test/differential/` (55 oracle-compared operations), the legacy suite at
-oracle parity, and the full battery are wired into CI.
+`test/differential/` (58 oracle-compared operations), the legacy suite,
+the upstream suite, and the performance gate are wired into CI.
 
 Remaining additions:
 
@@ -55,20 +72,17 @@ Remaining additions:
   `.node` size, `require()` time, ESM import time.
 - Add a **memory scaling** case (load 10,000 documents in a loop; track RSS
   growth and GC behavior).
-- Keep `docs/BENCHMARK.md` as the checked-in record per optimization round.
-
-**Exit criteria:** complete 0.22.0 suite at oracle parity + reproducible
-benchmark record on controlled hardware. *(Met; re-verified per PR.)*
+- Keep `docs/BENCHMARK.md` and the paired-run JSON reports as the checked-in
+  record per optimization round.
 
 ## M1 — Lean packaging (P1, low risk)
 
 **Rust build profile.** Current `[profile.release]`: `lto = "thin"`,
-`codegen-units = 1`, no `strip`, default `opt-level = 3`.
+`codegen-units = 1`, `strip = "symbols"` (done).
 
-- Measure `strip = "symbols"` first (largest size win, zero runtime risk).
-- Experiment with an `opt-level = "s"` + `lto = "fat"` release-size profile;
-  benchmark `.node` size AND runtime before adopting (size-optimized code
-  can regress hot loops).
+- Remaining experiment: an `opt-level = "s"` + `lto = "fat"` release-size
+  profile; benchmark `.node` size AND runtime before adopting (size-optimized
+  code can regress hot loops).
 - Avoid `panic = "abort"`: an unexpected Rust panic must not kill the Node
   process.
 
@@ -76,15 +90,16 @@ benchmark record on controlled hardware. *(Met; re-verified per PR.)*
 
 - Audit ESM exports for `sideEffects` accuracy; verify with esbuild/Rollup
   fixtures that bundlers can drop unused internal modules while
-  `require('cheerox')` behaves identically.
+  `require('@dvaji/cheerox')` behaves identically.
 - Keep I/O, streaming, and worker modules out of the synchronous startup
   path where lazily loading them preserves behavior.
 
 **Platform packaging.**
 
 - Move to NAPI-RS's platform-specific optional packages
-  (`@cheerox/<platform>-<arch>`) so consumers download one binary instead of
-  the universal tarball; keep the current single-tarball flow as fallback.
+  (`@dvaji/cheerox-<platform>-<arch>`) so consumers download one binary
+  instead of the universal tarball (~14 MB with eight binaries); keep the
+  current single-tarball flow as fallback.
 - Track: tarball size, install-time download, cold-import time.
 
 **Targets (provisional, measure before/after):** −20% native binary size,
@@ -92,19 +107,15 @@ no runtime regression beyond noise on `bench/legacy.mjs`.
 
 ## M2 — Selector engine (P1–P2)
 
-Facts today: parsed selectors are cached in a **thread-local
-`HashMap<String, Rc<Vec<Complex>>>` capped at 512 entries that is cleared
-entirely when full**; matching is right-to-left with a memo table and
-document-order results.
-
-- **A. Bounded eviction.** Replace clear-on-full with cheap bounded eviction
-  (generational LRU or two-generation FIFO) so a scraper cycling >512
-  selectors does not throw away its hot set. Low complexity.
-- **B. Query planning.** Profile before extending: id/class/tag candidate
-  indexes only pay off above document-size thresholds. Priority order:
-  `#id` direct lookup, tag scan for the last compound, attribute filtering
-  over tag candidates.
-- **C. Compiled-program reuse across documents.** The parse cache is
+- **A. Bounded eviction — done.** The parsed-selector caches now use a
+  two-generation scheme (`PARSED_CURRENT`/`PARSED_PREVIOUS`) instead of
+  clear-on-full, so a scraper cycling more selectors than the cap keeps its
+  hot set.
+- **B. Query planning — first step done.** The immutable parse tree carries a
+  tag-name candidate index (`TreeIndex.name_index`). Before extending
+  further, profile: id/class candidate indexes only pay off above
+  document-size thresholds.
+- **C. Compiled-program reuse across documents — open.** The parse cache is
   thread-local; batch workloads (`extractAll` on rayon threads) rebuild
   programs per thread. Consider a shared concurrent cache or seeded caches.
 - **Constraints:** DOM mutations, XML case sensitivity, custom pseudos,
@@ -112,28 +123,30 @@ document-order results.
   (the legacy pseudo-allowlist and 0.22.0 scoped semantics are enforced in
   the facade and must keep applying).
 
-## M3 — JS↔Rust bridge overhead (P2, targets the mutations gap)
+## M3 — JS↔Rust bridge overhead (P2)
 
-The generic path is `document.op(command, JSON.stringify(args))` →
-`serde_json` parse → `primitive()` dispatch → JSON result. Typed direct
-methods already exist for `select`, `text`, `attr`, `innerHtml`,
-`outerHtml`, `render`, `parseAsync`; the legacy facade's hot paths
-(`setAttrs`, `traverse`, `create`, `setNode`) still go through JSON.
+Typed direct NAPI methods exist for `select`, `text`, `attr`/`setAttribute`/
+`addClass`, `innerHtml`, `outerHtml`, `render`, `parseAsync`, and batched
+`attr(name, fn)` writes cross a selection via one `setAttrs` call.
 
-- **Typed NAPI bindings** for the highest-frequency generic ops, starting
-  with `setAttrs` (it is the mutations-bottleneck write path).
+- **Remaining generic JSON paths:** `setNode` field writes and `traverse`/
+  `create` still cross the boundary as JSON. Typed bindings for the
+  highest-frequency of these are the next candidate.
 - **Return primitives/native arrays directly** instead of JSON strings for
-  id lists and attribute reads.
-- **Fuse operations** whose intermediates are not observable from JS (e.g.
-  parse→query inside one call for `load`+`$()` patterns) — only where no
-  callback can interleave.
+  id lists and attribute reads where not already done.
+- **Fuse operations** whose intermediates are not observable from JS — only
+  where no callback can interleave.
 - **Do not batch across observable side effects:** callbacks in
   `.each()`/`.map()` may mutate the DOM; execution order is part of the
-  0.22.0 contract. This is why per-element mutation loops on tiny trees stay
-  behind 0.22.0 today — the fix is cheaper ops, not reordering.
-- **Reduce lazy-view materialization:** `toArray()`/`find` results already
-  avoid full materialization above thresholds; extend the pattern to
-  `map()`/`each()` iteration.
+  0.22.0 contract.
+- **Per-node view materialization cost** is now the dominant remaining gap on
+  the modern API (`walk with fields` 0.79x vs cheerio@1.2 total): the first
+  walk materializes a view object plus a live child array per node. Micro
+  variants (constructor shapes, cached-getter inlining, object literals,
+  omitted symbols) were measured and rejected — see
+  `bench/PERFORMANCE-INVESTIGATION.md`. Next candidates: batched
+  materialization during load for large documents, or a cheaper attribute
+  object, both with full identity/mutation controls.
 
 ## M4 — Memory & DOM (P3)
 
@@ -146,6 +159,8 @@ methods already exist for `select`, `text`, `attr`, `innerHtml`,
   if** profiling shows the first-write transition is a real bottleneck —
   node identity is observable through the legacy API, so this is the
   highest-risk item here.
+- Independent **memory profiling** (heap snapshots, per-object retained
+  sizes) to replace the coarse process-RSS observations recorded so far.
 
 ## M5 — Parallelism, runtime & deployment (P3–P4)
 
@@ -170,35 +185,33 @@ methods already exist for `select`, `text`, `attr`, `innerHtml`,
 | Auto-parallelizing every query | Coordination overhead + possible semantic changes |
 | Eagerly materializing all nodes as JS objects | Defeats the native memory design |
 | Result caching across mutations | Invalidation is unprovable after arbitrary writes |
-| Parser rewrite | High risk, zero user-visible gain |
+| Parser rewrite | Rejected — the html5ever pipeline is now 2.5x faster than at the time this was written (fast whole-tag tokenization, vector-backed attribute storage, vendored crates) |
+| mimalloc allocator switch | Measured and rejected: Windows gains were offset by sustained-RSS and serialization regressions (`bench/PERFORMANCE-INVESTIGATION.md`) |
 
 ## Priority & sequencing
 
 | Priority | Item | Impact | Complexity | Status |
 | --- | --- | --- | --- | --- |
 | P0 | Baseline + compatibility gates | Critical | Medium | **done**, kept live |
-| P1 | Binary size (strip/profiles) | Medium | Low | todo |
+| P0 | Load pipeline (fast tokenizer, vendored scraper) | Critical | High | **done** (2026-11-12) |
+| P0 | Per-node materialization cost | High | High | **open** — dominant modern-API gap |
 | P1 | Platform-specific packages | Medium | Low | todo |
+| P1 | Binary size (opt-level experiment) | Medium | Low | todo (strip done) |
 | P1 | JS loading / bundler fixtures | Medium | Medium | todo |
-| P1 | Selector cache eviction | Medium–High | Low | todo |
-| P2 | Typed NAPI for hot ops | High | Medium | todo (`setAttrs` first) |
-| P2 | Query planning | High | High | todo |
-| P2 | Reduced view materialization | High | High | todo |
+| P1 | Selector cache eviction | Medium | Low | **done** |
+| P2 | Typed NAPI for remaining hot ops | Medium | Medium | partial (`setAttrs`/attr done; `setNode`/`traverse` open) |
+| P2 | Query planning beyond the tag index | Medium | High | open |
+| P2 | Reduced view materialization | High | High | open (merged with P0 materialization) |
 | P3 | Memory / first-write costs | High | High | todo |
 | P3 | Batch extraction scaling | High (batch) | High | todo |
+| P3 | Real-page corpus beyond the 10-page sample | Medium | Low | todo |
 | P4 | WASM experiment | Medium | Very high | deferred |
 
-**Release sequence.** First optimization release: packaging + hot paths
-(M1 + selector eviction + typed `setAttrs`). Second: query planning,
-allocations, memory. Third: deployment portability + extraction scaling.
-
-**Provisional targets for the first cycle** (measure on controlled hardware;
-targets are planning inputs, not achievements): native binary −20%, repeated
-hot-selector latency −15%, peak RSS −15% on large-document and batch
-workloads, compatibility stays 100% with no unexplained skips.
+**Release sequence.** Shipped: packaging strip + selector eviction + batched
+attributes (0.1.1 baseline work), load pipeline + attribute storage
+(0.1.2). Next: per-node materialization cost, then platform-specific
+packages + binary sizing, then query planning and memory.
 
 Track the three workload profiles separately — small single-page scrapes,
 large mutable documents, high-concurrency extraction — the fastest
-implementation for one is not the fastest for all three. That is exactly
-what today's numbers show: whole-tree workloads lead, tiny-tree mutation
-loops trail.
+implementation for one is not the fastest for all three.
