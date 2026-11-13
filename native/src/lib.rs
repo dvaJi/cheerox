@@ -4126,7 +4126,7 @@ mod tests {
         use html5ever::{Attribute, QualName};
 
         /// Detaches `id` from its parent and siblings.
-        fn arena_detach(nodes: &mut Vec<arena::DomNode>, id: u32) {
+        fn arena_detach(nodes: &mut [arena::DomNode], id: u32) {
             let (parent, previous, next) = match (
                 nodes[id as usize].parent,
                 nodes[id as usize].prev,
@@ -4152,7 +4152,7 @@ mod tests {
         }
 
         /// Links `id` as the last child of `parent`.
-        fn arena_link_last_child(nodes: &mut Vec<arena::DomNode>, parent: u32, id: u32) {
+        fn arena_link_last_child(nodes: &mut [arena::DomNode], parent: u32, id: u32) {
             let previous = nodes[parent as usize].children.last().copied();
             let record = &mut nodes[id as usize];
             record.parent = Some(parent);
@@ -4177,14 +4177,14 @@ mod tests {
                         .data
                         .as_mut()
                         .expect("text node without data")
-                        .push_str(&text);
+                        .push_str(text);
                     return;
                 }
             }
             let id = nodes.len() as u32;
             let mut record = arena::DomNode::new("text");
             record.id = id;
-            record.data = Some(String::from(&**text));
+            record.data = Some(String::from(text));
             nodes.push(record);
             names.push(placeholder_name());
             arena_link_last_child(nodes, parent, id);
@@ -4208,14 +4208,14 @@ mod tests {
                         .data
                         .as_mut()
                         .expect("text node without data")
-                        .push_str(&text);
+                        .push_str(text);
                     return;
                 }
             }
             let id = nodes.len() as u32;
             let mut record = arena::DomNode::new("text");
             record.id = id;
-            record.data = Some(String::from(&**text));
+            record.data = Some(String::from(text));
             record.parent = Some(parent);
             record.prev = previous;
             record.next = Some(sibling);
@@ -4285,10 +4285,9 @@ mod tests {
                     QuirksMode::NoQuirks => "no-quirks",
                 };
                 let mut nodes = self.nodes.into_inner();
-                nodes[0].extras.insert(
-                    "x-mode".into(),
-                    serde_json::Value::String(mode.into()),
-                );
+                nodes[0]
+                    .extras
+                    .insert("x-mode".into(), serde_json::Value::String(mode.into()));
                 nodes
             }
             fn parse_error(&self, _message: std::borrow::Cow<'static, str>) {}
@@ -4336,10 +4335,7 @@ mod tests {
                             serde_json::Value::String(String::from(&**prefix)),
                         );
                     }
-                    attribs.insert(
-                        key,
-                        serde_json::Value::String(String::from(&*attr.value)),
-                    );
+                    attribs.insert(key, serde_json::Value::String(String::from(&*attr.value)));
                 }
                 record.attribs = attribs;
                 record.attribs_namespace = Some(Box::new(namespaces));
@@ -4424,7 +4420,9 @@ mod tests {
                         arena_detach(&mut nodes, id);
                         arena_link_last_child(&mut nodes, *parent, id);
                     }
-                    NodeOrText::AppendText(text) => arena_push_text(&mut nodes, &mut self.names.borrow_mut(), *parent, &text),
+                    NodeOrText::AppendText(text) => {
+                        arena_push_text(&mut nodes, &mut self.names.borrow_mut(), *parent, &text)
+                    }
                 }
             }
             fn append_before_sibling(&self, sibling: &u32, new_node: NodeOrText<u32>) {
@@ -4454,7 +4452,12 @@ mod tests {
                             .expect("detached node not found under parent");
                         siblings.insert(position, id);
                     }
-                    NodeOrText::AppendText(text) => arena_insert_text_before(&mut nodes, &mut self.names.borrow_mut(), *sibling, &text),
+                    NodeOrText::AppendText(text) => arena_insert_text_before(
+                        &mut nodes,
+                        &mut self.names.borrow_mut(),
+                        *sibling,
+                        &text,
+                    ),
                 }
             }
             fn append_based_on_parent_node(
@@ -4482,7 +4485,9 @@ mod tests {
                     return;
                 }
                 let first = children[0];
-                let last = children[count - 1];
+                // The moved run keeps its internal sibling links; only the
+                // edges touching the old and new parents are relinked below.
+                let _last = children[count - 1];
                 for child in &children {
                     nodes[*child as usize].parent = Some(*new_parent);
                 }
@@ -4528,10 +4533,12 @@ mod tests {
             }
         }
 
-        let card = |i: usize| format!(
+        let card = |i: usize| {
+            format!(
             "<div class=\"card c{}\" id=\"d{}\" data-index=\"{}\"><header><a href=\"/p/{}\" title=\"Item {}\"><img src=\"/i/{}.png\" alt=\"x{}\" width=\"10\"></a></header><p>Lorem ipsum {} <b>bold</b> &amp; <i>more</i></p><ul><li>a</li><li class=\"x\">b</li></ul></div>",
             i % 7, i, i, i, i, i, i, i
-        );
+        )
+        };
         let mut source = String::from("<!doctype html><html><head><title>Page</title><meta name=\"description\" content=\"d\"><script>var x = 1 < 2;</script></head><body><nav><a href=\"/\">Home</a></nav><main>");
         for i in 0..2000 {
             source.push_str(&card(i));
@@ -4551,7 +4558,11 @@ mod tests {
             let arena = html5ever::driver::parse_document(ArenaSink::new(), Default::default())
                 .one(source.as_str());
             let direct_build = start.elapsed();
-            println!("arena sink built {} nodes in {:?}", arena.len(), direct_build);
+            println!(
+                "arena sink built {} nodes in {:?}",
+                arena.len(),
+                direct_build
+            );
             assert_eq!(arena.len(), reference.nodes.len(), "node count differs");
             for (index, (candidate, expected)) in
                 arena.iter().zip(reference.nodes.iter()).enumerate()
