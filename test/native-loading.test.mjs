@@ -9,7 +9,7 @@ import { createRequire } from 'node:module';
 const root = fileURLToPath(new URL('..', import.meta.url));
 
 const platform = process.platform === 'linux'
-  ? (process.report?.getReport()?.header?.glibcVersionRuntime ? 'linux-x64-gnu' : 'linux-x64-musl')
+  ? (process.report?.getReport()?.header?.glibcVersionRuntime ? `linux-${process.arch}-gnu` : `linux-${process.arch}-musl`)
   : process.platform === 'win32' ? `win32-${process.arch}-msvc` : `${process.platform}-${process.arch}`;
 const binaryName = `cheerox.${platform}.node`;
 
