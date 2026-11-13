@@ -30,6 +30,29 @@ On the 494 KB phase diagnostic the parse fell from 14.0 to 9.28 ms and document 
 
 Measured against cheerio@1.2.0 (21-sample operations run): load 1.79x and 17 of 25 operations exceed 1.5x total at 2,000 cards — `children and next` (1.51x) and `set attributes` (1.52x) crossed with this change. The remaining rows below target (parents count 1.42x, parent and siblings 1.46x, walk children 1.32x, walk with fields 0.79x, per-element attribute rewrite 1.42x) are bound by per-node JavaScript materialization, not load.
 
+## Rejected experiment: cached descriptor-map attribute materialization
+
+Trying to cut the attribute-object creation cost (the walk fields operation
+spends most of its time materializing one attribute object per element), the
+fresh materialization path was switched from one `defineProperty` per key to
+a single `Object.create(proto, cachedDescriptorMap)` per attribute-name set,
+with the descriptor maps cached per name set in `attribute-object.ts` and a
+new `snapshot.attributeEntries` feeding them. A creation micro-benchmark
+suggested plain data props at 0.94 ms per 16,000 objects against 8.57 ms for
+the accessor shape, and an `Object.defineProperties` map variant already
+measured worse (12.83 ms), but the map-based `Object.create` variant was
+implemented anyway to test the different call path.
+
+The paired result was negative: against HEAD (30 rounds, 2,000 cards),
+attributes 0.918x (0.847–0.929), walk fields 0.925x (0.885–0.970), select
+tag 0.964x, walk children 0.977x, with the rest at or under parity. V8
+handles the repeated single-key accessor `defineProperty` calls with a
+shared descriptor object on a faster path than the bulk descriptor-map
+forms. The change was reverted; the accessor-pair design stands as the best
+known shape, and per-node attribute-object creation remains the dominant
+remaining cost of attribute-heavy walks. Raw pairs are in
+`%TEMP%\cheerox-accessormap-2000.json`.
+
 ## Rejected experiment: html5gum tokenizer bridge for the main parse
 
 The diagnostics and locations parse already drives html5ever's tree builder from html5gum tokens. Driving the main parse through that bridge measured 29.8 ms on the 494 KB fixture versus 12.9 ms for the html5ever tokenizer — the bridge's per-token processing costs far more than the html5ever tokenizer it would replace. Not pursued.
