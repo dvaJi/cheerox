@@ -83,9 +83,10 @@ Remaining additions:
 **Rust build profile.** Current `[profile.release]`: `lto = "thin"`,
 `codegen-units = 1`, `strip = "symbols"` (done).
 
-- Remaining experiment: an `opt-level = "s"` + `lto = "fat"` release-size
-  profile; benchmark `.node` size AND runtime before adopting (size-optimized
-  code can regress hot loops).
+- Remaining experiment — done, rejected (2026-11-15): `opt-level = "s"` +
+  `lto = "fat"` cut the win32 binary 3.98 → 3.38 MB but regressed every
+  operation 26–37% in a paired run; the baseline profile (thin LTO,
+  opt-level 3, strip) stands.
 - Avoid `panic = "abort"`: an unexpected Rust panic must not kill the Node
   process.
 

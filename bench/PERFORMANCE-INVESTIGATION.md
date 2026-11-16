@@ -30,6 +30,20 @@ On the 494 KB phase diagnostic the parse fell from 14.0 to 9.28 ms and document 
 
 Measured against cheerio@1.2.0 (21-sample operations run): load 1.79x and 17 of 25 operations exceed 1.5x total at 2,000 cards — `children and next` (1.51x) and `set attributes` (1.52x) crossed with this change. The remaining rows below target (parents count 1.42x, parent and siblings 1.46x, walk children 1.32x, walk with fields 0.79x, per-element attribute rewrite 1.42x) are bound by per-node JavaScript materialization, not load.
 
+## Rejected experiment: size-optimized release profile
+
+The M1 binary-size experiment swapped the release profile from
+`lto = "thin"` + default `opt-level` (3) to `opt-level = "s"` +
+`lto = "fat"` (strip kept). The win32-x64 binary fell 3.98 → 3.38 MB
+(−15%), but the paired comparison against the standard build (20 rounds,
+2,000-card HTML, six operations) regressed every operation: serialize
+document 0.635x (0.623–0.671), select tag 0.672x, extract short 0.706x,
+walk children 0.733x, mixed documents 0.711x, walk fields 0.819x.
+Rejected — the roadmap's warning that size-optimized code can regress
+hot loops held, with the regression far exceeding the 15% size saving.
+The baseline profile (thin LTO, opt-level 3, strip symbols) stands.
+Raw pairs are in `%TEMP%\cheerox-sizeprofile.json`.
+
 ## Rejected experiment: cached descriptor-map attribute materialization
 
 Trying to cut the attribute-object creation cost (the walk fields operation
