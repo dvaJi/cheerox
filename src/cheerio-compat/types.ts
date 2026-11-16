@@ -22,6 +22,7 @@ export interface CheerioInstance {
   length: number;
   prevObject?: CheerioInstance;
   [index: number]: LegacyNode;
+  [Symbol.iterator](): Iterator<LegacyNode>;
   [key: string]: any;
 }
 
@@ -32,6 +33,17 @@ export type CheerioConstructor = {
 };
 
 export type CheerioPrototype = Record<string, any>;
+
+/**
+ * cheerio 1.x-compatible type aliases, so code written against rc.12
+ * type-imports (`CheerioAPI`, `Cheerio<Element>`, `Element`) keeps
+ * compiling against the 0.22 facade unchanged.
+ */
+export type CheerioAPI = CheerioStatic;
+export type Cheerio<T = LegacyNode> = CheerioInstance;
+export type Element = LegacyNode;
+export type AnyNode = LegacyNode;
+export type Document = LegacyNode;
 /**
  * A loaded `$`: the callable initialize function with the static methods,
  * the stored root and options, and `fn` for plugins — as in 0.22.0.

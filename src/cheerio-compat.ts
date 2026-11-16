@@ -22,7 +22,7 @@ import { getNode, getNodesOfType, hasMaterializedAttributes, hasMaterializedChil
 import { routeDocument } from './router.js';
 import { cleanParserOptions, hasParserHooks } from './hooks.js';
 import type { LegacyOptions, LegacyNode, CheerioInstance, CheerioConstructor, CheerioPrototype, CheerioStatic } from './cheerio-compat/types.js';
-export type { CheerioStatic } from './cheerio-compat/types.js';
+export type { CheerioStatic, CheerioAPI, Cheerio, Element, AnyNode, Document } from './cheerio-compat/types.js';
 import { version as packageVersion } from '../package.json';
 
 /** Cheerio.prototype.options — the exact 0.22.0 defaults. */

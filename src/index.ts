@@ -27,6 +27,7 @@ export {
   parse,
 } from './cheerio-compat.js';
 export type { CheerioInstance, CheerioConstructor, LegacyNode, LegacyOptions } from './cheerio-compat.js';
+export type { CheerioAPI, Cheerio, Element, AnyNode, Document } from './cheerio-compat.js';
 
 export {
   loadAsync,
