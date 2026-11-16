@@ -1,6 +1,6 @@
 [package]
 name = "cheerox"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "Rust HTML5 parser and CSS selector engine for the cheerox Node.js package"
 license = "MIT"

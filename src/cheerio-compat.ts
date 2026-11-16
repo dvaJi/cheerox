@@ -181,13 +181,13 @@ export function update(arrInput: unknown, parent: LegacyNode | null): LegacyNode
 }
 
 /** lib/parse.js: parse into a fresh document and return its `<root>` node. */
-export function parse(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): LegacyNode {
+export function parse(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null, isDocument?: boolean): LegacyNode {
   const opts = legacyOptions(options);
   let document: NativeDocument;
   let root: LegacyNode;
   if (typeof content === 'string' || Buffer.isBuffer(content)) {
     document = routeDocument(
-      new (requireNative().NativeDocument)(Buffer.isBuffer(content) ? content.toString() : content, false, JSON.stringify(cleanParserOptions(opts))),
+      new (requireNative().NativeDocument)(Buffer.isBuffer(content) ? content.toString() : content, isDocument ?? false, JSON.stringify(cleanParserOptions(opts))),
       opts,
     );
     root = rootNode(document, document.rootId()) as LegacyNode;
@@ -636,6 +636,16 @@ const attributesApi: CheerioPrototype = {
         case 'tagName':
         case 'nodeName':
           return this[0].name!.toUpperCase();
+        // As in cheerio 1.x: these render through the facade's serializer so
+        // the current render options apply.
+        case 'innerHTML':
+          return this[0] && isTag(this[0])
+            ? staticHtml.call(this, (this[0] as LegacyNode).children, this.options)
+            : null;
+        case 'outerHTML':
+          return this[0] && isTag(this[0])
+            ? staticHtml.call(this, [this[0] as LegacyNode], this.options)
+            : null;
         default:
           return getProp(this[0], name);
       }
@@ -1989,12 +1999,12 @@ function staticContains(container?: LegacyNode, contained?: LegacyNode): boolean
 }
 
 /** $.load(str) */
-function load(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null): CheerioStatic {
+function load(content: string | Buffer | ArrayLike<LegacyNode> | LegacyNode, options?: LegacyOptions | null, isDocument?: boolean): CheerioStatic {
   const Cheerio = moduleCheerio;
 
   options = defaults({ ...(options ?? {}) }, Cheerio.prototype.options) as LegacyOptions;
 
-  const root = parse(content as string | Buffer, options);
+  const root = parse(content as string | Buffer, options, isDocument ?? true);
 
   const initialize = function (this: CheerioInstance, selector?: any, context?: any, r?: any, opts?: LegacyOptions) {
     if (!(this instanceof initialize)) {
