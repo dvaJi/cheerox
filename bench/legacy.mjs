@@ -151,13 +151,21 @@ const cases = [
   },
 ];
 
-const targetSamples = 5;
+const targetSamples = 21;
 const warmup = 3;
 
 function median(values) {
   const sorted = [...values].sort((x, y) => x - y);
   return sorted[Math.floor(sorted.length / 2)];
 }
+
+function percentile(values, p) {
+  const sorted = [...values].sort((x, y) => x - y);
+  const index = Math.min(sorted.length - 1, Math.ceil((p / 100) * sorted.length) - 1);
+  return sorted[Math.max(0, index)];
+}
+
+const gc = typeof globalThis.gc === 'function' ? () => globalThis.gc() : null;
 
 const results = [];
 for (const testCase of cases) {
@@ -168,6 +176,9 @@ for (const testCase of cases) {
       testCase.run(engine === 'legacy' ? legacy : oracle, testCase.input);
     }
   }
+  gc?.();
+  const rssBefore = process.memoryUsage.rss();
+  const heapBefore = process.memoryUsage().heapUsed;
   for (let i = 0; i < targetSamples; i++) {
     for (const engine of i % 2 ? ['oracle', 'legacy'] : ['legacy', 'oracle']) {
       const mod = engine === 'legacy' ? legacy : oracle;
@@ -179,6 +190,8 @@ for (const testCase of cases) {
   const legacyOutput = testCase.run(legacy, testCase.input);
   const oracleOutput = testCase.run(oracle, testCase.input);
   verified = testCase.verify(legacyOutput, oracleOutput);
+  const rssAfter = process.memoryUsage.rss();
+  const heapAfter = process.memoryUsage().heapUsed;
   const legacyMedian = median(times.legacy);
   const oracleMedian = median(times.oracle);
   results.push({
@@ -186,13 +199,17 @@ for (const testCase of cases) {
     verified,
     legacyMedianMs: +legacyMedian.toFixed(3),
     oracleMedianMs: +oracleMedian.toFixed(3),
+    legacyP95Ms: +percentile(times.legacy, 95).toFixed(3),
+    oracleP95Ms: +percentile(times.oracle, 95).toFixed(3),
+    rssDeltaMb: +((rssAfter - rssBefore) / 1048576).toFixed(1),
+    heapDeltaMb: +((heapAfter - heapBefore) / 1048576).toFixed(1),
     legacyOpsPerSec: +(1000 / legacyMedian).toFixed(1),
     oracleOpsPerSec: +(1000 / oracleMedian).toFixed(1),
     ratio: +(oracleMedian / legacyMedian).toFixed(2),
   });
 }
 
-console.log(`Legacy benchmark — cheerox legacy facade vs cheerio@0.22.0 (median of ${targetSamples}, outputs verified)`);
+console.log(`Legacy benchmark — cheerox legacy facade vs cheerio@0.22.0 (median and p95 of ${targetSamples}, outputs verified${gc ? ', gc between cases' : ''})`);
 console.log('='.repeat(100));
 for (const row of results) {
   const flag = row.verified ? ' ' : '!';
@@ -200,6 +217,10 @@ for (const row of results) {
     `${flag} ${row.name.padEnd(32)} cheerox ${String(row.legacyMedianMs).padStart(9)} ms  ` +
     `oracle ${String(row.oracleMedianMs).padStart(9)} ms  ratio ${row.ratio.toFixed(2)}x ` +
     `(cheerox ${row.legacyOpsPerSec}/s, oracle ${row.oracleOpsPerSec}/s)`,
+  );
+  console.log(
+    `  ${''.padEnd(32)} p95 cheerox ${String(row.legacyP95Ms).padStart(9)} ms  ` +
+    `oracle ${String(row.oracleP95Ms).padStart(9)} ms  rss Δ ${row.rssDeltaMb.toFixed(1)} MB  heap Δ ${row.heapDeltaMb.toFixed(1)} MB`,
   );
 }
 const failed = results.filter((row) => !row.verified);

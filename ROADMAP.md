@@ -37,20 +37,23 @@ moves a benchmark but breaks a gate is rejected.
   of a native addon is not a realistic goal for a fully compatible drop-in
   replacement.
 
-## Current measured baseline (2026-11-13, legacy facade vs cheerio@0.22.0)
+## Current measured baseline (2026-11-15, legacy facade vs cheerio@0.22.0)
 
-`node --expose-gc bench/legacy.mjs`, median of 5, outputs verified, Windows
-x64, Node 24.18.0.
+`node --expose-gc bench/legacy.mjs`, median and p95 of 21 with GC between
+cases, outputs verified per run, Windows x64, Node 24.18.0.
 
-| Workload (vs cheerio@0.22.0) | Ratio | State |
-| --- | ---: | --- |
-| Parse only (small / large) | 2.08x / 1.97x | ahead |
-| Parse + queries (large) | 1.30x | ahead |
-| Attribute extraction (real-world) | 1.40x | ahead |
-| Text extraction (large) | 1.54x | ahead |
-| Serialization (large) | 2.49x | ahead |
-| DOM mutations (small / large) | 1.07x / 1.36x | ahead (was 0.24x / 0.28x) |
-| Warm re-require + parse + query | 0.97x | parity |
+| Workload (vs cheerio@0.22.0) | Median | p95 | State |
+| --- | ---: | ---: | --- |
+| Parse only (small / large) | 1.52x / 2.23x | 0.45 / 20.6 ms | ahead |
+| Parse + queries (large) | 1.23x | 63.4 ms | ahead |
+| Attribute extraction (real-world) | 1.43x | 5.9 ms | ahead |
+| Text extraction (large) | 2.04x | 22.6 ms | ahead |
+| Serialization (large) | 3.03x | 20.0 ms | ahead |
+| DOM mutations (small / large) | 1.64x / 1.49x | 1.9 / 60.7 ms | ahead (was 0.24x / 0.28x) |
+| Warm re-require + parse + query | 1.80x | 0.6 ms | ahead |
+
+Per-case RSS and heap deltas are now reported by the benchmark (M0);
+the largest observed case growth is ~78 MB RSS on the large parse.
 
 On the modern API vs cheerio@1.2.0 (21-sample run, 2,000-card fixture,
 2026-11-12): load 1.79x, 17 of 25 operations above 1.5x total; the rows
@@ -102,6 +105,11 @@ Remaining additions:
   companion packages still requires npm-side trusted-publisher setup for
   each of the eight packages, and the release workflow must assemble and
   publish them alongside the main tarball.
+- **Postponed (2026-11-15):** shipping the companion packages is deferred
+  until the install-size win justifies configuring eight npm packages
+  (trusted publisher + first-publish bootstrap each). The single-tarball
+  flow remains the distribution channel; the loader support is inert until
+  companions are published.
 
 
 - Move to NAPI-RS's platform-specific optional packages
@@ -203,7 +211,7 @@ Typed direct NAPI methods exist for `select`, `text`, `attr`/`setAttribute`/
 | P0 | Baseline + compatibility gates | Critical | Medium | **done**, kept live |
 | P0 | Load pipeline (fast tokenizer, vendored scraper) | Critical | High | **done** (2026-11-12) |
 | P0 | Per-node materialization cost | High | High | **open** — dominant modern-API gap |
-| P1 | Platform-specific packages | Medium | Low | todo |
+| P1 | Platform-specific packages | Medium | Low | **postponed** (2026-11-15) — loader support shipped; publishing the eight companion packages requires npm-side trusted-publisher setup per package, deferred until the install-size win justifies it |
 | P1 | Binary size (opt-level experiment) | Medium | Low | todo (strip done) |
 | P1 | JS loading / bundler fixtures | Medium | Medium | todo |
 | P1 | Selector cache eviction | Medium | Low | **done** |
