@@ -350,7 +350,12 @@ pub(crate) fn normalize_table_bodies(arena: &mut DomArena) {
     let mut stack = vec![0u32];
     while let Some(id) = stack.pop() {
         let Some(node) = arena.node(id) else { continue };
-        if node.is_element() && node.name.as_deref().is_some_and(|name| name.eq_ignore_ascii_case("table")) {
+        if node.is_element()
+            && node
+                .name
+                .as_deref()
+                .is_some_and(|name| name.eq_ignore_ascii_case("table"))
+        {
             tables.push(id);
         }
         stack.extend(node.children.iter().copied().rev());
@@ -362,9 +367,9 @@ pub(crate) fn normalize_table_bodies(arena: &mut DomArena) {
                 .iter()
                 .copied()
                 .filter(|id| {
-                    arena
-                        .node(*id)
-                        .is_some_and(|child| child.kind == "tag" && child.name.as_deref() == Some("tr"))
+                    arena.node(*id).is_some_and(|child| {
+                        child.kind == "tag" && child.name.as_deref() == Some("tr")
+                    })
                 })
                 .collect(),
             None => continue,
