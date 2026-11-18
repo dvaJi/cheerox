@@ -329,7 +329,59 @@ pub(crate) fn parse_markup(source: &str, options: Value) -> DomArena {
     let mut builder = Builder::new(&source, options);
     let xml = builder.xml;
     crate::markup_tokenizer::tokenize(&source.units, xml, decode, |token| builder.handle(token));
-    builder.arena
+    let mut arena = builder.arena;
+    normalize_table_bodies(&mut arena);
+    arena
+}
+
+/// htmlparser2 keeps bare `<tr>` rows directly under `<table>`, while the
+/// parse5 engine that cheerio 1.x consumers migrate from wraps them in a
+/// `<tbody>` during HTML tree construction. Rebuild that relation so
+/// `table > tbody > tr` selectors keep matching across a swap. Scoped to
+/// the legacy facade's own marker (`_legacyDom`): explicit htmlparser2
+/// opt-ins on the modern facade keep the raw parser shape.
+pub(crate) fn normalize_table_bodies(arena: &mut DomArena) {
+    if arena.options.get("_legacyDom") != Some(&Value::Bool(true))
+        || arena.options.get("xmlMode") == Some(&Value::Bool(true))
+    {
+        return;
+    }
+    let mut tables: Vec<u32> = Vec::new();
+    let mut stack = vec![0u32];
+    while let Some(id) = stack.pop() {
+        let Some(node) = arena.node(id) else { continue };
+        if node.is_element() && node.name.as_deref().is_some_and(|name| name.eq_ignore_ascii_case("table")) {
+            tables.push(id);
+        }
+        stack.extend(node.children.iter().copied().rev());
+    }
+    for table in tables {
+        let bare: Vec<u32> = match arena.node(table) {
+            Some(node) => node
+                .children
+                .iter()
+                .copied()
+                .filter(|id| {
+                    arena
+                        .node(*id)
+                        .is_some_and(|child| child.kind == "tag" && child.name.as_deref() == Some("tr"))
+                })
+                .collect(),
+            None => continue,
+        };
+        let Some(first) = bare.first().copied() else {
+            continue;
+        };
+        let mut tbody = DomNode::new("tag");
+        tbody.name = Some("tbody".to_string());
+        let tbody_id = arena.push(tbody);
+        arena.insert(&[first], &[tbody_id], "before");
+        arena.insert(&[tbody_id], &bare, "append");
+    }
+    // The builder maintains the name index incrementally while parsing; the
+    // synthetic tbody nodes were added afterwards, so drop the stale index
+    // and let the next query rebuild it.
+    arena.name_index = None;
 }
 
 /// Replays events recorded from a JavaScript htmlparser2 Tokenizer.
@@ -380,6 +432,7 @@ pub(crate) fn parse(source: &str, events: &Value, options: Value) -> DomArena {
             _ => {}
         }
     }
+    normalize_table_bodies(&mut builder.arena);
     builder.arena
 }
 

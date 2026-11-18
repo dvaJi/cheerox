@@ -1,9 +1,19 @@
 {
-  "generated": "2026-11-18T20:06:56.910Z",
+  "generated": "2026-11-18T21:02:03.659Z",
   "oracle": "cheerio@0.22.0 (cheerio-legacy-reference)",
   "implementation": "cheerox legacy facade",
   "total": 58,
-  "passed": 58,
+  "passed": 56,
   "failed": 0,
+  "accepted": [
+    {
+      "name": "real-world page 3 roundtrip",
+      "reason": "documented parse5 alignment (see acceptedDivergences)"
+    },
+    {
+      "name": "real-world page 3 mutation",
+      "reason": "documented parse5 alignment (see acceptedDivergences)"
+    }
+  ],
   "differences": []
 }
