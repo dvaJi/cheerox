@@ -23,6 +23,16 @@ export interface CheerioInstance {
   prevObject?: CheerioInstance;
   [index: number]: LegacyNode;
   [Symbol.iterator](): Iterator<LegacyNode>;
+  /**
+   * Iteration callbacks are declared so consumers with noImplicitAny keep
+   * contextual parameter types, as with cheerio 1.x. The rest of the 0.22
+   * dynamic surface (plugins, ad-hoc fields) stays available through the
+   * index signature below.
+   */
+  each(callback: (index: number, element: LegacyNode) => void | boolean): CheerioInstance;
+  map(callback: (index: number, element: LegacyNode) => unknown): CheerioInstance;
+  filter(selector: string): CheerioInstance;
+  filter(callback: (index: number, element: LegacyNode) => boolean): CheerioInstance;
   [key: string]: any;
 }
 
