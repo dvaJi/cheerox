@@ -11,3 +11,5 @@ bench/corpus/pages/
 target/
 
 release/
+
+*.tmp.cjs
