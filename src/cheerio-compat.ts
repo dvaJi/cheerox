@@ -431,6 +431,21 @@ function makeCheerio(): CheerioConstructor {
   Cheerio.prototype.options = defaultOpts;
   Cheerio.prototype.length = 0;
   Cheerio.prototype.splice = Array.prototype.splice;
+  // The type declarations expose Symbol.iterator so code written against
+  // cheerio 1.x selections (for..of, spread, Array.from) keeps compiling;
+  // implement it, not just declare it.
+  Cheerio.prototype[Symbol.iterator] = function (this: CheerioInstance): Iterator<LegacyNode> {
+    const length = this.length;
+    let index = 0;
+    return {
+      next: (): IteratorResult<LegacyNode> => {
+        if (index >= length) {
+          return { done: true, value: undefined };
+        }
+        return { done: false, value: this[index++] as LegacyNode };
+      },
+    };
+  };
 
   Cheerio.prototype._make = function (this: CheerioInstance, dom: any, context?: any): CheerioInstance {
     const cheerio = new (this.constructor as CheerioConstructor)(dom, context, this._root, this.options);
