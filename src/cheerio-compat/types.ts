@@ -42,7 +42,8 @@ export type CheerioConstructor = {
   prototype: CheerioPrototype;
 };
 
-export type CheerioPrototype = Record<string, any>;
+/** Prototype records carry string plugin keys and symbol well-known keys. */
+export type CheerioPrototype = Record<string | symbol, any>;
 
 /**
  * cheerio 1.x-compatible type aliases, so code written against rc.12

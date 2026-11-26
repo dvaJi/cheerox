@@ -53,6 +53,7 @@ npm run notices:check   # must exit 0
 
 | Command | Covers |
 | --- | --- |
+| `npm run check` | tsc over `src/` — the exact step the publish workflow runs |
 | `npm test` | JS suite (534) |
 | `npm run test:legacy` | 0.22 facade suite (577) |
 | `npm run test:upstream` | cheerio 1.2.0's own suite (777, modern facade) |
